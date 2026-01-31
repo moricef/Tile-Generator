@@ -156,6 +156,12 @@ LAYER_MAPPING = {
     ]
 }
 
+# Minimum polygon area in m^2 to be included at a given zoom level
+MIN_AREA_PER_ZOOM = {
+    8: 500000, 9: 200000, 10: 100000, 11: 50000,
+    12: 10000, 13: 2500, 14: 500, 15: 100, 16: 0
+}
+
 
 def lon_to_tile_x(lon: float, zoom: int) -> int:
     """Convert longitude to tile X coordinate."""
@@ -200,6 +206,26 @@ def get_feature_tiles(coords: List[Tuple[float, float]], zoom: int, is_polygon: 
             tiles.add((x, y))
 
     return tiles
+
+
+def calculate_area(coords: List[Tuple[float, float]]) -> float:
+    """Calculate polygon area in square meters using Shoelace formula."""
+    if len(coords) < 3:
+        return 0.0
+
+    area_deg = 0.0
+    for i in range(len(coords)):
+        j = (i + 1) % len(coords)
+        area_deg += coords[i][0] * coords[j][1]
+        area_deg -= coords[j][0] * coords[i][1]
+    
+    # Convert square degrees to approximate square meters (at 45 deg latitude)
+    # Conversion factor: (m/deg_lon) * (m/deg_lat)
+    # m/deg_lon at 45deg = 111320 * cos(45)
+    # m/deg_lat is constant ~111320
+    # For simplicity, we use a single factor.
+    area_m2 = abs(area_deg / 2.0) * (111320.0 * 111320.0 * math.cos(math.radians(45.0)))
+    return area_m2
 
 
 def get_layer_for_tags(tags: Dict[str, str]) -> Optional[str]:
@@ -407,9 +433,11 @@ class OSMHandler(osmium.SimpleHandler):
         combined_priority = layer_base_priority + (priority % 10)
 
         if is_closed and is_area_tags and 'highway' not in tags:
+            area_m2 = calculate_area(coords)
             feature = {
                 'geom_type': GEOM_POLYGON,
                 'coords': coords,
+                'area': area_m2,
                 'color_rgb565': color_rgb565,
                 'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
                 'width_meters': 0.0  # Polygons don't use width
@@ -427,6 +455,7 @@ class OSMHandler(osmium.SimpleHandler):
         feature = {
             'geom_type': GEOM_LINESTRING,
             'coords': coords,
+            'area': 0.0,
             'color_rgb565': color_rgb565,
             'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
             'width_meters': width_meters
@@ -516,9 +545,11 @@ class OSMHandler(osmium.SimpleHandler):
                 if len(coords) < 4:
                     continue
 
+                area_m2 = calculate_area(coords)
                 feature = {
                     'geom_type': GEOM_POLYGON,
                     'coords': coords,
+                    'area': area_m2,
                     'color_rgb565': color_rgb565,
                     'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
                     'width_meters': 0.0  # Polygons don't use width
@@ -710,10 +741,15 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
     for zoom in range(zoom_range[0], zoom_range[1] + 1):
         tile_features: Dict[Tuple[int, int], List[Dict]] = defaultdict(list)
         tolerance = get_simplify_tolerance(zoom)
+        min_area = MIN_AREA_PER_ZOOM.get(zoom, 0)
 
         for feature in handler.features:
             min_zoom = feature['zoom_priority'] >> 4
             if min_zoom > zoom:
+                continue
+
+            # Area culling for polygons
+            if feature['geom_type'] == GEOM_POLYGON and feature['area'] < min_area:
                 continue
 
             # Simplify once per zoom level
@@ -750,9 +786,9 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
 
             # Pre-sort by priority (low nibble) for streaming render on ESP32
             features.sort(key=lambda f: f['zoom_priority'] & 0x0F)
-            # Final safety check: NAV1 format uses uint16 (2 bytes) for feature count 
+            # Final safety check: NAV1 format uses uint16 (2 bytes) for feature count
             if len(features) > 65535:
-                logging.warning(f"Tile {zoom}/{x}/{y} exceeds 65535 features ({len(features)}). Truncating to respect NAV1 format.")
+                logger.warning(f"Tile {zoom}/{x}/{y} exceeds 65535 features ({len(features)}). Truncating to respect NAV1 format.")
                 features = features[:65535]
 
             if write_nav_tile(features, tile_path, zoom, x, y):
