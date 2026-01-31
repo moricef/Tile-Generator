@@ -750,6 +750,10 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
 
             # Pre-sort by priority (low nibble) for streaming render on ESP32
             features.sort(key=lambda f: f['zoom_priority'] & 0x0F)
+            # Final safety check: NAV1 format uses uint16 (2 bytes) for feature count 
+            if len(features) > 65535:
+                logging.warning(f"Tile {zoom}/{x}/{y} exceeds 65535 features ({len(features)}). Truncating to respect NAV1 format.")
+                features = features[:65535]
 
             if write_nav_tile(features, tile_path, zoom, x, y):
                 tiles_written += 1
