@@ -33,7 +33,8 @@ except ImportError:
     sys.exit(1)
 
 try:
-    from shapely.geometry import Polygon
+    from shapely.geometry import Polygon, MultiPolygon
+    from shapely.ops import unary_union
     import shapely.wkb
     SHAPELY_AVAILABLE = True
 except ImportError:
@@ -146,8 +147,10 @@ LAYER_MAPPING = {
         'tunnel=yes'
     ],
     'terrain': [
-        'natural=peak', 'natural=ridge',
+        'natural=peak', 'natural=ridge', 'natural=arete',
         'natural=volcano', 'natural=cliff',
+        'natural=bare_rock', 'natural=scree', 'natural=rock', 'natural=stone',
+        'natural=glacier', 'natural=fell', 'natural=shingle',
         'natural=tree_row', 'natural=tree'
     ],
     'places': [
@@ -161,6 +164,148 @@ MIN_AREA_PER_ZOOM = {
     8: 500000, 9: 200000, 10: 100000, 11: 50000,
     12: 10000, 13: 2500, 14: 500, 15: 100, 16: 0
 }
+
+
+# Merge groups by color for z8-z10
+# Render order: rock (background) → farmland → grassland → scrubland → forest (top)
+# All with priority nibble 0 to be rendered UNDER water and roads
+MERGE_GROUPS = [
+    {
+        'name': 'rock',
+        'tags': {'natural=bare_rock', 'natural=scree', 'natural=rock', 'natural=stone'},
+        'color': '#eee8dc',
+        'render_order': 0,
+    },
+    {
+        'name': 'farmland',
+        'tags': {'landuse=farmland'},
+        'color': '#eef0d5',
+        'render_order': 1,
+    },
+    {
+        'name': 'grassland',
+        'tags': {'natural=grassland', 'landuse=meadow', 'landuse=grass'},
+        'color': '#cdebb0',
+        'render_order': 2,
+    },
+    {
+        'name': 'scrubland',
+        'tags': {'natural=scrub', 'natural=heath'},
+        'color': '#c8d7ab',
+        'render_order': 3,
+    },
+    {
+        'name': 'forest',
+        'tags': {'natural=wood', 'landuse=forest'},
+        'color': '#add19e',
+        'render_order': 4,
+    },
+]
+
+MERGE_MAX_ZOOM = 10
+MERGE_BUFFER_DEGREES = {
+    8: 0.005,   # ~500m: merge nearby parcels at z8
+    9: 0.003,   # ~300m: merge at z9
+    10: 0.001   # ~100m: merge at z10
+}
+
+# Set of all tags participating in merge (for skip in main loop)
+MERGE_ALL_TAGS = set()
+for _g in MERGE_GROUPS:
+    MERGE_ALL_TAGS.update(_g['tags'])
+
+
+def _get_osm_key(tags: Dict[str, str], config: Dict) -> Optional[str]:
+    """Find the matching OSM config key for a set of tags (e.g. 'natural=wood')."""
+    for key, value in tags.items():
+        feature_key = f"{key}={value}"
+        if feature_key in config and isinstance(config[feature_key], dict):
+            return feature_key
+        if key in config and isinstance(config[key], dict):
+            return key
+    return None
+
+
+def merge_vegetation_features(features: List[Dict], zoom: int, tolerance: float) -> List[Dict]:
+    """Merge vegetation polygons by color group using buffer + union.
+
+    Each group (forest, scrubland, grassland, farmland) is merged separately
+    and keeps its own color.
+    """
+    if not SHAPELY_AVAILABLE:
+        return []
+
+    buffer_dist = MERGE_BUFFER_DEGREES.get(zoom, 0.0005)
+    all_merged = []
+
+    for group in MERGE_GROUPS:
+        # Collect polygons for this group
+        shapely_polys = []
+        for f in features:
+            if f['geom_type'] != GEOM_POLYGON:
+                continue
+            if f.get('osm_key') not in group['tags']:
+                continue
+            coords = f['coords']
+            if len(coords) < 4:
+                continue
+            try:
+                poly = Polygon(coords)
+                if poly.is_valid and not poly.is_empty:
+                    shapely_polys.append(poly.buffer(buffer_dist))
+            except Exception:
+                continue
+
+        if not shapely_polys:
+            continue
+
+        logger.info(f"  Merge {group['name']}: {len(shapely_polys)} polygons (buffer={buffer_dist}°)")
+        merged = unary_union(shapely_polys)
+
+        color_rgb565 = hex_to_rgb565(group['color'])
+        # Use very low priority (0-4) to ensure rendering under water (priority ~11)
+        # pack_zoom_priority(8, priority) where priority=0-4 gives nibble 0
+        # This makes merged veg render at 0x80 (128) which is before water features
+        zoom_priority = pack_zoom_priority(8, group['render_order'])
+
+        result_polys = []
+        if merged.geom_type == 'Polygon':
+            result_polys = [merged]
+        elif merged.geom_type == 'MultiPolygon':
+            result_polys = list(merged.geoms)
+
+        count = 0
+        for poly in result_polys:
+            if poly.is_empty or not poly.exterior:
+                continue
+            simplified = poly.simplify(tolerance, preserve_topology=True)
+            if simplified.is_empty:
+                continue
+            if simplified.geom_type == 'Polygon':
+                polys_to_add = [simplified]
+            elif simplified.geom_type == 'MultiPolygon':
+                polys_to_add = list(simplified.geoms)
+            else:
+                continue
+            for sp in polys_to_add:
+                coords = list(sp.exterior.coords)
+                if len(coords) < 4:
+                    continue
+                area_m2 = calculate_area(coords)
+                all_merged.append({
+                    'geom_type': GEOM_POLYGON,
+                    'coords': coords,
+                    'area': area_m2,
+                    'color_rgb565': color_rgb565,
+                    'zoom_priority': zoom_priority,
+                    'width_meters': 0.0,
+                    'osm_key': '_merged_' + group['name']
+                })
+                count += 1
+
+        logger.info(f"    → {count} merged polygons")
+
+    return all_merged
 
 
 def lon_to_tile_x(lon: float, zoom: int) -> int:
@@ -419,7 +564,7 @@ class OSMHandler(osmium.SimpleHandler):
         is_area_tags = (
             'building' in tags or
             'landuse' in tags or
-            ('natural' in tags and tags.get('natural') in ['water', 'wood', 'forest', 'beach', 'sand', 'wetland', 'grassland', 'scrub', 'heath']) or
+            ('natural' in tags and tags.get('natural') in ['water', 'wood', 'forest', 'beach', 'sand', 'wetland', 'grassland', 'scrub', 'heath', 'bare_rock', 'scree', 'rock', 'stone', 'glacier', 'fell', 'shingle']) or
             ('leisure' in tags and tags.get('leisure') in ['park', 'garden', 'pitch', 'golf_course', 'nature_reserve', 'playground', 'sports_centre', 'stadium', 'common']) or
             ('amenity' in tags and tags.get('amenity') in ['parking', 'school', 'university', 'hospital', 'marketplace']) or
             ('waterway' in tags and tags.get('waterway') in ['riverbank', 'dock', 'boatyard']) or
@@ -440,7 +585,8 @@ class OSMHandler(osmium.SimpleHandler):
                 'area': area_m2,
                 'color_rgb565': color_rgb565,
                 'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
-                'width_meters': 0.0  # Polygons don't use width
+                'width_meters': 0.0,
+                'osm_key': _get_osm_key(tags, self.config)
             }
             self.features.append(feature)
             self.stats['features_extracted'] += 1
@@ -458,7 +604,8 @@ class OSMHandler(osmium.SimpleHandler):
             'area': 0.0,
             'color_rgb565': color_rgb565,
             'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
-            'width_meters': width_meters
+            'width_meters': width_meters,
+            'osm_key': _get_osm_key(tags, self.config)
         }
         self.features.append(feature)
         self.stats['features_extracted'] += 1
@@ -552,7 +699,8 @@ class OSMHandler(osmium.SimpleHandler):
                     'area': area_m2,
                     'color_rgb565': color_rgb565,
                     'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
-                    'width_meters': 0.0  # Polygons don't use width
+                    'width_meters': 0.0,
+                    'osm_key': _get_osm_key(tags, self.config)
                 }
                 self.features.append(feature)
                 self.stats['features_extracted'] += 1
@@ -743,9 +891,22 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
         tolerance = get_simplify_tolerance(zoom)
         min_area = MIN_AREA_PER_ZOOM.get(zoom, 0)
 
+        # Merge vegetation polygons for low zoom levels (z8-z10)
+        merge_veg = zoom <= MERGE_MAX_ZOOM
+        if merge_veg:
+            merged = merge_vegetation_features(handler.features, zoom, tolerance)
+            for mf in merged:
+                tiles = get_feature_tiles(mf['coords'], zoom, True)
+                for tile in tiles:
+                    tile_features[tile].append(mf)
+
         for feature in handler.features:
             min_zoom = feature['zoom_priority'] >> 4
             if min_zoom > zoom:
+                continue
+
+            # Skip vegetation features at merge zoom levels (they are merged above)
+            if merge_veg and feature.get('osm_key') in MERGE_ALL_TAGS:
                 continue
 
             # Area culling for polygons
@@ -756,7 +917,7 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
             coords = feature['coords']
             if len(coords) > 2:
                 coords = simplify_coords(coords, tolerance)
-            
+
             # Create a shallow copy with simplified coords for this zoom
             zoom_feature = feature.copy()
             zoom_feature['coords'] = coords
