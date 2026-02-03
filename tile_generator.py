@@ -48,8 +48,16 @@ NAV_MAGIC = b'NAV1'
 COORD_SCALE = 10000000  # 1e7 for ~1cm precision
 
 # Geometry types
+GEOM_POINT = 1
 GEOM_LINESTRING = 2
 GEOM_POLYGON = 3
+
+# Point features to extract from nodes (rendered as symbols)
+# shape: 'triangle' for peaks, 'circle' for places
+POINT_FEATURES = {
+    'natural=peak': 'triangle',
+    'natural=volcano': 'triangle',
+}
 
 # Tags that support width (LineStrings only)
 WIDTH_TAGS = {'highway', 'railway', 'waterway'}
@@ -157,7 +165,7 @@ LAYER_MAPPING = {
         'boundary=administrative'
     ],
     'places': [
-        'place=state', 'place=town',
+        'place=city', 'place=state', 'place=town',
         'place=village', 'place=hamlet'
     ]
 }
@@ -296,6 +304,50 @@ def get_simplify_tolerance(zoom: int) -> float:
     return pixel_size_degrees
 
 
+class BoundaryScanner(osmium.SimpleHandler):
+    """First pass: collect way IDs that are members of boundary relations."""
+
+    def __init__(self, config: Dict, max_zoom: int):
+        super().__init__()
+        self.config = config
+        self.max_zoom = max_zoom
+        self.boundary_ways: Dict[int, List[Dict]] = {}  # way_id -> list of boundary configs
+
+    def relation(self, r):
+        tags = {tag.k: tag.v for tag in r.tags}
+        if tags.get('type') != 'boundary' or tags.get('boundary') != 'administrative':
+            return
+
+        admin_level = tags.get('admin_level', '')
+        feature_key = f"boundary=administrative;admin_level={admin_level}"
+        if feature_key not in self.config or not isinstance(self.config[feature_key], dict):
+            return
+
+        cfg = self.config[feature_key]
+        min_zoom = cfg.get('zoom', 6)
+        if min_zoom > self.max_zoom:
+            return
+
+        color_rgb565 = hex_to_rgb565(cfg.get('color', '#000000'))
+        priority = cfg.get('priority', 85)
+        layer_base_priority = LAYER_PRIORITY.get('boundaries', 85)
+        combined_priority = layer_base_priority + (priority % 10)
+
+        width_pixels = cfg.get('width', 1)
+
+        way_info = {
+            'color_rgb565': color_rgb565,
+            'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
+            'width_pixels': width_pixels,
+        }
+
+        for member in r.members:
+            if member.type == 'w':
+                if member.ref not in self.boundary_ways:
+                    self.boundary_ways[member.ref] = []
+                self.boundary_ways[member.ref].append(way_info)
+
+
 class OSMHandler(osmium.SimpleHandler):
     """Handler for processing OSM data from PBF files."""
 
@@ -304,9 +356,12 @@ class OSMHandler(osmium.SimpleHandler):
         self.config = config
         self.min_zoom, self.max_zoom = zoom_range
         self.features: List[Dict] = []
+        self.boundary_ways: Dict[int, Dict] = {}  # Set by caller after BoundaryScanner
         self.stats = {
+            'nodes_processed': 0,
             'ways_processed': 0,
             'areas_processed': 0,
+            'boundary_ways_extracted': 0,
             'features_extracted': 0,
             'features_filtered': 0
         }
@@ -361,10 +416,58 @@ class OSMHandler(osmium.SimpleHandler):
                 return True
         return False
 
+    def node(self, n):
+        """Process node - extract point features (peaks, places)."""
+        if not n.location.valid():
+            return
+
+        for tag in n.tags:
+            feature_key = f"{tag.k}={tag.v}"
+            if feature_key in POINT_FEATURES and feature_key in self.config:
+                cfg = self.config[feature_key]
+                min_zoom = cfg.get('zoom', 12)
+                if min_zoom > self.max_zoom:
+                    return
+
+                color_rgb565 = hex_to_rgb565(cfg.get('color', '#000000'))
+                priority = cfg.get('priority', 30)
+                layer = get_layer_for_tags({tag.k: tag.v})
+                layer_base_priority = LAYER_PRIORITY.get(layer or 'terrain', 20)
+                combined_priority = layer_base_priority + (priority % 10)
+
+                self.features.append({
+                    'geom_type': GEOM_POINT,
+                    'coords': [(n.location.lon, n.location.lat)],
+                    'color_rgb565': color_rgb565,
+                    'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
+                    'width_meters': 0.0,
+                    'shape': POINT_FEATURES[feature_key],
+                })
+                self.stats['nodes_processed'] += 1
+                return
+
     def way(self, w):
         """Process way - extract roads and linear features."""
         self.stats['ways_processed'] += 1
         self._log_progress()
+
+        # Check if this way is part of boundary relations
+        if w.id in self.boundary_ways:
+            coords = []
+            for node in w.nodes:
+                if node.location.valid():
+                    coords.append((node.location.lon, node.location.lat))
+            if len(coords) >= 2:
+                for bnd in self.boundary_ways[w.id]:
+                    self.features.append({
+                        'geom_type': GEOM_LINESTRING,
+                        'coords': coords,
+                        'color_rgb565': bnd['color_rgb565'],
+                        'zoom_priority': bnd['zoom_priority'],
+                        'width_meters': 0.0,
+                        'width_pixels': bnd.get('width_pixels', 1),
+                    })
+                    self.stats['boundary_ways_extracted'] += 1
 
         if not self._has_interesting_tags(w.tags):
             self.stats['features_filtered'] += 1
@@ -473,47 +576,6 @@ class OSMHandler(osmium.SimpleHandler):
 
         return 0.0
 
-    def _process_boundary(self, a, feature_key):
-        """Extract administrative boundary as LINESTRING from area."""
-        cfg = self.config[feature_key]
-        min_zoom = cfg.get('zoom', 6)
-        if min_zoom > self.max_zoom:
-            return
-
-        try:
-            wkb = self.wkbfab.create_multipolygon(a)
-            geom = shapely.wkb.loads(wkb, hex=True)
-
-            color_rgb565 = hex_to_rgb565(cfg.get('color', '#000000'))
-            priority = cfg.get('priority', 85)
-            layer_base_priority = LAYER_PRIORITY.get('boundaries', 85)
-            combined_priority = layer_base_priority + (priority % 10)
-
-            polygons = []
-            if geom.geom_type == 'Polygon':
-                polygons = [geom]
-            elif geom.geom_type == 'MultiPolygon':
-                polygons = list(geom.geoms)
-
-            for poly in polygons:
-                if poly.is_empty or not poly.exterior:
-                    continue
-                coords = list(poly.exterior.coords)
-                if len(coords) < 2:
-                    continue
-
-                self.features.append({
-                    'geom_type': GEOM_LINESTRING,
-                    'coords': coords,
-                    'color_rgb565': color_rgb565,
-                    'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
-                    'width_meters': 0.0
-                })
-                self.stats['features_extracted'] += 1
-
-        except Exception:
-            pass
-
     def area(self, a):
         """Process area - handles multipolygon relations."""
         self.stats['areas_processed'] += 1
@@ -525,12 +587,8 @@ class OSMHandler(osmium.SimpleHandler):
 
         tags = self._tags_to_dict(a.tags)
 
-        # Administrative boundaries: store as LINESTRING (border lines, not filled areas)
+        # Skip boundary relations - handled via BoundaryScanner + way()
         if tags.get('boundary') == 'administrative':
-            admin_level = tags.get('admin_level', '')
-            feature_key = f"boundary=administrative;admin_level={admin_level}"
-            if feature_key in self.config and isinstance(self.config[feature_key], dict):
-                self._process_boundary(a, feature_key)
             return
 
         if not self._is_feature_in_config(tags):
@@ -752,7 +810,9 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     continue
 
                 width_meters = feature.get('width_meters', 0.0)
-                width_pixels = meters_to_pixels(width_meters, zoom) if width_meters > 0 else 1
+                width_pixels = feature.get('width_pixels', 0)
+                if width_pixels == 0:
+                    width_pixels = meters_to_pixels(width_meters, zoom) if width_meters > 0 else 1
                 
                 bx1, by1 = max(0, min(255, f_min_x >> 4)), max(0, min(255, f_min_y >> 4))
                 bx2, by2 = max(0, min(255, f_max_x >> 4)), max(0, min(255, f_max_y >> 4))
@@ -804,16 +864,26 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
 
     start_time = time.time()
 
+    # First pass: scan for boundary relations (fast, no locations needed)
+    logger.info("Pass 1: Scanning boundary relations...")
+    scanner = BoundaryScanner(config, zoom_range[1])
+    scanner.apply_file(input_pbf)
+    logger.info(f"  Boundary ways found: {len(scanner.boundary_ways):,}")
+
+    # Second pass: extract all features
     handler = OSMHandler(config, zoom_range)
-    logger.info("Processing OSM data...")
+    handler.boundary_ways = scanner.boundary_ways
+    logger.info("Pass 2: Processing OSM data...")
     handler.apply_file(input_pbf, locations=True, idx='flex_mem')
     print()
 
     elapsed = time.time() - start_time
     logger.info(f"Processing completed in {elapsed:.2f}s")
     logger.info(f"Statistics:")
+    logger.info(f"  Nodes (peaks/volcanoes): {handler.stats['nodes_processed']:,}")
     logger.info(f"  Ways processed: {handler.stats['ways_processed']:,}")
     logger.info(f"  Areas processed: {handler.stats['areas_processed']:,}")
+    logger.info(f"  Boundary ways extracted: {handler.stats['boundary_ways_extracted']:,}")
     logger.info(f"  Features extracted: {handler.stats['features_extracted']:,}")
     logger.info(f"  Features filtered: {handler.stats['features_filtered']:,}")
 
@@ -844,14 +914,52 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
             if not coords:
                 continue
 
-            # Create a lightweight record for this zoom
-            zoom_feature = {
-                'geom_type': feature['geom_type'],
-                'coords': coords,
-                'color_rgb565': feature['color_rgb565'],
-                'zoom_priority': feature['zoom_priority'],
-                'width_meters': feature.get('width_meters', 0.0)
-            }
+            # Convert point features to symbol polygons
+            if feature['geom_type'] == GEOM_POINT:
+                lon, lat = coords[0]
+                tile_width_deg = 360.0 / (2.0 ** zoom)
+                pixel_deg = tile_width_deg / 256.0
+                size = pixel_deg * 3  # 3 pixel radius
+
+                shape = feature.get('shape', 'circle')
+                # Correct for Mercator distortion
+                lat_size = size / math.cos(math.radians(lat))
+
+                if shape == 'triangle':
+                    sym_coords = [
+                        (lon, lat + lat_size * 1.2),
+                        (lon - size, lat - lat_size * 0.6),
+                        (lon + size, lat - lat_size * 0.6),
+                        (lon, lat + lat_size * 1.2),
+                    ]
+                else:  # square dot (2x2 pixels)
+                    s = pixel_deg  # 1 pixel
+                    ls = s / math.cos(math.radians(lat))
+                    sym_coords = [
+                        (lon - s, lat + ls),
+                        (lon + s, lat + ls),
+                        (lon + s, lat - ls),
+                        (lon - s, lat - ls),
+                        (lon - s, lat + ls),
+                    ]
+
+                zoom_feature = {
+                    'geom_type': GEOM_POLYGON,
+                    'coords': sym_coords,
+                    'color_rgb565': feature['color_rgb565'],
+                    'zoom_priority': feature['zoom_priority'],
+                    'width_meters': 0.0
+                }
+            else:
+                # Create a lightweight record for this zoom
+                zoom_feature = {
+                    'geom_type': feature['geom_type'],
+                    'coords': coords,
+                    'color_rgb565': feature['color_rgb565'],
+                    'zoom_priority': feature['zoom_priority'],
+                    'width_meters': feature.get('width_meters', 0.0),
+                    'width_pixels': feature.get('width_pixels', 0),
+                }
 
             is_polygon = zoom_feature['geom_type'] == GEOM_POLYGON
             tiles = get_feature_tiles(zoom_feature['coords'], zoom, is_polygon)
