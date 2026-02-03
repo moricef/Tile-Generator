@@ -266,7 +266,6 @@ class NAVViewer:
             if len(pts) >= 3:
                 if self.fill_polygons:
                     pygame.draw.polygon(surface, color, pts)
-                    pygame.draw.polygon(surface, darken_color(color), pts, 1)
                 else:
                     pygame.draw.polygon(surface, color, pts, 1)
 
@@ -460,16 +459,18 @@ def main():
                     dx = event.pos[0] - drag_start[0]
                     dy = event.pos[1] - drag_start[1]
 
-                    if viewer.bbox:
-                        min_lon, min_lat, max_lon, max_lat = viewer.bbox
-                        lon_per_pixel = (max_lon - min_lon) / VIEWPORT_SIZE
-                        lat_per_pixel = (max_lat - min_lat) / VIEWPORT_SIZE
+                    # Calcul des degrés par pixel selon le zoom
+                    # 360° / (nombre_de_tuiles * 256 pixels)
+                    deg_per_pixel = 360.0 / ((2 ** viewer.zoom) * TILE_SIZE)
 
-                        new_lon = drag_center_start[1] - dx * lon_per_pixel
-                        new_lat = drag_center_start[0] + dy * lat_per_pixel
+                    # Correction cosinus pour la latitude (Mercator)
+                    lat_corr = math.cos(math.radians(viewer.center_lat))
+                    
+                    new_lon = drag_center_start[1] - (dx * deg_per_pixel)
+                    new_lat = drag_center_start[0] + (dy * deg_per_pixel * lat_corr)
 
-                        viewer.set_center(new_lat, new_lon)
-                        need_redraw = True
+                    viewer.set_center(new_lat, new_lon)
+                    need_redraw = True
 
         if need_redraw:
             viewer.render_to_surface(viewport_surface)

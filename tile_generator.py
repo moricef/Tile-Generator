@@ -34,6 +34,7 @@ except ImportError:
 
 try:
     from shapely.geometry import Polygon, MultiPolygon
+    from shapely.ops import unary_union
     import shapely.wkb
     SHAPELY_AVAILABLE = True
 except ImportError:
@@ -78,90 +79,30 @@ def meters_to_pixels(width_meters: float, zoom: int, lat: float = 45.0) -> int:
     """
     meters_per_pixel = 156543.0 * math.cos(math.radians(lat)) / (2 ** zoom)
     pixels = int(width_meters / meters_per_pixel + 0.5)
+
     return max(1, min(15, pixels))  # Clamp to 1-15
 
 
-# Layer rendering priority (lower = rendered first = behind)
-LAYER_PRIORITY = {
-    'water': 10,
-    'landuse': 20,
-    'terrain': 30,
-    'railways': 40,
-    'roads': 50,
-    'infrastructure': 60,
-    'buildings': 70,
-    'amenities': 80,
-    'places': 90
-}
-
-# Layer definitions based on feature types
-LAYER_MAPPING = {
-    'water': [
-        'natural=water', 'natural=coastline', 'natural=bay',
-        'waterway=riverbank', 'waterway=dock', 'waterway=boatyard',
-        'waterway=river', 'waterway=stream', 'waterway=canal',
-        'natural=spring', 'natural=wetland'
-    ],
-    'landuse': [
-        'natural=beach', 'natural=sand', 'natural=wood',
-        'landuse=forest', 'natural=forest', 'natural=scrub',
-        'natural=heath', 'natural=grassland', 'landuse=meadow',
-        'landuse=grass', 'landuse=orchard', 'landuse=vineyard',
-        'landuse=farmland', 'landuse=park', 'leisure=park',
-        'leisure=nature_reserve', 'leisure=garden', 'leisure=pitch',
-        'leisure=golf_course', 'leisure=recreation_ground', 'landuse=recreation_ground',
-        'landuse=residential', 'place=suburb',
-        'landuse=commercial', 'landuse=retail', 'landuse=industrial',
-        'landuse=construction', 'landuse=cemetery', 'landuse=allotments',
-        'leisure=stadium', 'leisure=sports_centre', 'leisure=playground',
-        'amenity=parking'
-    ],
-    'roads': [
-        'highway=motorway', 'highway=motorway_link',
-        'highway=trunk', 'highway=trunk_link',
-        'highway=primary', 'highway=primary_link',
-        'highway=secondary', 'highway=secondary_link',
-        'highway=tertiary', 'highway=tertiary_link',
-        'highway=residential', 'highway=living_street',
-        'highway=unclassified', 'highway=service',
-        'highway=pedestrian', 'highway=track',
-        'highway=path', 'highway=footway',
-        'highway=cycleway', 'highway=steps',
-        'highway=crossing', 'highway=bus_stop'
-    ],
-    'railways': [
-        'railway=rail', 'railway=subway', 'railway=tram'
-    ],
-    'buildings': [
-        'building', 'man_made=tower'
-    ],
-    'amenities': [
-        'amenity=hospital',
-        'amenity=school', 'amenity=university',
-        'amenity=place_of_worship'
-    ],
-    'infrastructure': [
-        'bridge=yes', 'man_made=bridge',
-        'aeroway=runway', 'aeroway=taxiway', 'aeroway=apron',
-        'tunnel=yes'
-    ],
-    'terrain': [
-        'natural=peak', 'natural=ridge', 'natural=arete',
-        'natural=volcano', 'natural=cliff',
-        'natural=bare_rock', 'natural=scree', 'natural=rock', 'natural=stone',
-        'natural=glacier', 'natural=fell', 'natural=shingle',
-        'natural=tree_row', 'natural=tree'
-    ],
-    'places': [
-        'place=state', 'place=town',
-        'place=village', 'place=hamlet'
-    ]
-}
 
 # Minimum polygon area in m^2 to be included at a given zoom level
 MIN_AREA_PER_ZOOM = {
-    8: 500000, 9: 200000, 10: 100000, 11: 50000,
-    12: 10000, 13: 2500, 14: 500, 15: 100, 16: 0
+    8: 50000, 9: 25000, 10: 10000, 11: 5000,
+    12: 2500, 13: 1000, 14: 500, 15: 100, 16: 0
+}
+
+# Zoom levels where polygon merge is applied
+MERGE_MAX_ZOOM = 12
+MERGE_BUFFER_DEGREES = {
+    8: 0.0005, 9: 0.0003, 10: 0.0002, 11: 0.0001, 12: 0.00005
+}
+
+# Tags eligible for merge (polygon landuse/vegetation types)
+MERGE_TAGS = {
+    'natural=wood', 'landuse=forest',
+    'natural=scrub', 'natural=heath',
+    'natural=grassland', 'landuse=meadow', 'landuse=grass',
+    'landuse=farmland',
+    'natural=bare_rock', 'natural=scree', 'natural=rock', 'natural=stone',
 }
 
 
@@ -175,6 +116,88 @@ def _get_osm_key(tags: Dict[str, str], config: Dict) -> Optional[str]:
             return key
     return None
 
+
+
+def merge_polygons_by_key(features: List[Dict], zoom: int, tolerance: float) -> List[Dict]:
+    """Merge adjacent polygons of the same osm_key to reduce count at low zooms.
+
+    Groups polygons by osm_key, merges touching/nearby ones with unary_union,
+    and keeps the original color/priority from the JSON config.
+    Area filter applied AFTER merge so small adjacent parcels combine first.
+    """
+    if not SHAPELY_AVAILABLE:
+        return features
+
+    buffer_dist = MERGE_BUFFER_DEGREES.get(zoom, 0.0005)
+    min_area = MIN_AREA_PER_ZOOM.get(zoom, 0)
+
+    # Separate mergeable polygons from non-mergeable features
+    non_merge = []
+    by_key: Dict[str, List[Dict]] = defaultdict(list)
+
+    for f in features:
+        if f['geom_type'] != GEOM_POLYGON or f.get('osm_key') not in MERGE_TAGS:
+            non_merge.append(f)
+        else:
+            by_key[f['osm_key']].append(f)
+
+    merged_features = []
+    for osm_key, group in by_key.items():
+        # Take color/priority from the first feature (all same osm_key = same JSON config)
+        ref = group[0]
+
+        shapely_polys = []
+        for f in group:
+            coords = f['coords']
+            if len(coords) < 4:
+                continue
+            try:
+                poly = Polygon(coords)
+                if poly.is_valid and not poly.is_empty:
+                    shapely_polys.append(poly.buffer(buffer_dist))
+            except Exception:
+                continue
+
+        if not shapely_polys:
+            continue
+
+        merged = unary_union(shapely_polys)
+
+        result_polys = []
+        if merged.geom_type == 'Polygon':
+            result_polys = [merged]
+        elif merged.geom_type == 'MultiPolygon':
+            result_polys = list(merged.geoms)
+
+        count = 0
+        for poly in result_polys:
+            if poly.is_empty or not poly.exterior:
+                continue
+            simplified = poly.simplify(tolerance, preserve_topology=True)
+            if simplified.is_empty:
+                continue
+            polys = [simplified] if simplified.geom_type == 'Polygon' else list(simplified.geoms)
+            for sp in polys:
+                coords = list(sp.exterior.coords)
+                if len(coords) < 4:
+                    continue
+                area_m2 = calculate_area(coords)
+                if area_m2 < min_area:
+                    continue
+                merged_features.append({
+                    'geom_type': GEOM_POLYGON,
+                    'coords': coords,
+                    'area': area_m2,
+                    'color_rgb565': ref['color_rgb565'],
+                    'zoom_priority': ref['zoom_priority'],
+                    'width_meters': 0.0,
+                    'osm_key': osm_key,
+                })
+                count += 1
+
+        logger.info(f"  Merge {osm_key}: {len(shapely_polys)} → {count} polygons")
+
+    return non_merge + merged_features
 
 
 def lon_to_tile_x(lon: float, zoom: int) -> int:
@@ -241,19 +264,6 @@ def calculate_area(coords: List[Tuple[float, float]]) -> float:
     area_m2 = abs(area_deg / 2.0) * (111320.0 * 111320.0 * math.cos(math.radians(45.0)))
     return area_m2
 
-
-def get_layer_for_tags(tags: Dict[str, str]) -> Optional[str]:
-    """Determine which layer a feature belongs to based on its tags."""
-    for layer_name, feature_keys in LAYER_MAPPING.items():
-        for feature_key in feature_keys:
-            if '=' in feature_key:
-                key, value = feature_key.split('=', 1)
-                if key in tags and tags[key] == value:
-                    return layer_name
-            else:
-                if feature_key in tags:
-                    return layer_name
-    return None
 
 
 def get_config_value_for_tags(
@@ -324,9 +334,20 @@ def pack_zoom_priority(min_zoom: int, priority: int) -> int:
 
 
 def get_simplify_tolerance(zoom: int) -> float:
-    """Calculate simplification tolerance based on zoom level."""
+    """Calculate simplification tolerance based on zoom level.
+
+    More aggressive simplification at low zooms to reduce polygon complexity.
+    """
     tile_width_degrees = 360.0 / (2.0 ** zoom)
     pixel_size_degrees = tile_width_degrees / 256.0
+
+    # Multiply tolerance at low zooms for aggressive simplification
+    if zoom <= 8:
+        return pixel_size_degrees * 3.0  # Very aggressive: reduce small polygons to basic shapes
+    elif zoom <= 10:
+        return pixel_size_degrees * 2.0
+    elif zoom <= 12:
+        return pixel_size_degrees * 1.5
     return pixel_size_degrees
 
 
@@ -410,11 +431,6 @@ class OSMHandler(osmium.SimpleHandler):
             self.stats['features_filtered'] += 1
             return
 
-        layer = get_layer_for_tags(tags)
-        if layer is None:
-            self.stats['features_filtered'] += 1
-            return
-
         min_zoom = get_zoom_for_tags(tags, self.config)
         if min_zoom > self.max_zoom:
             self.stats['features_filtered'] += 1
@@ -443,8 +459,6 @@ class OSMHandler(osmium.SimpleHandler):
         color = get_color_for_tags(tags, self.config)
         priority = get_priority_for_tags(tags, self.config)
         color_rgb565 = hex_to_rgb565(color)
-        layer_base_priority = LAYER_PRIORITY.get(layer, 50)
-        combined_priority = layer_base_priority + (priority % 10)
 
         if is_closed and is_area_tags and 'highway' not in tags:
             area_m2 = calculate_area(coords)
@@ -453,7 +467,7 @@ class OSMHandler(osmium.SimpleHandler):
                 'coords': coords,
                 'area': area_m2,
                 'color_rgb565': color_rgb565,
-                'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
+                'zoom_priority': pack_zoom_priority(min_zoom, priority),
                 'width_meters': 0.0,
                 'osm_key': _get_osm_key(tags, self.config)
             }
@@ -472,7 +486,7 @@ class OSMHandler(osmium.SimpleHandler):
             'coords': coords,
             'area': 0.0,
             'color_rgb565': color_rgb565,
-            'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
+            'zoom_priority': pack_zoom_priority(min_zoom, priority),
             'width_meters': width_meters,
             'osm_key': _get_osm_key(tags, self.config)
         }
@@ -520,11 +534,6 @@ class OSMHandler(osmium.SimpleHandler):
             self.stats['features_filtered'] += 1
             return
 
-        layer = get_layer_for_tags(tags)
-        if layer is None:
-            self.stats['features_filtered'] += 1
-            return
-
         if 'highway' in tags:
             self.stats['features_filtered'] += 1
             return
@@ -544,8 +553,6 @@ class OSMHandler(osmium.SimpleHandler):
             color = get_color_for_tags(tags, self.config)
             priority = get_priority_for_tags(tags, self.config)
             color_rgb565 = hex_to_rgb565(color)
-            layer_base_priority = LAYER_PRIORITY.get(layer, 50)
-            combined_priority = layer_base_priority + (priority % 10)
 
             polygons = []
             if geom.geom_type == 'Polygon':
@@ -567,7 +574,7 @@ class OSMHandler(osmium.SimpleHandler):
                     'coords': coords,
                     'area': area_m2,
                     'color_rgb565': color_rgb565,
-                    'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
+                    'zoom_priority': pack_zoom_priority(min_zoom, priority),
                     'width_meters': 0.0,
                     'osm_key': _get_osm_key(tags, self.config)
                 }
@@ -760,11 +767,19 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
         tolerance = get_simplify_tolerance(zoom)
         min_area = MIN_AREA_PER_ZOOM.get(zoom, 0)
 
+        # Collect eligible features for this zoom
+        zoom_features = []
         for feature in handler.features:
             min_zoom = feature['zoom_priority'] >> 4
             if min_zoom > zoom:
                 continue
+            zoom_features.append(feature)
 
+        # Merge adjacent polygons at low zoom levels
+        if zoom <= MERGE_MAX_ZOOM:
+            zoom_features = merge_polygons_by_key(zoom_features, zoom, tolerance)
+
+        for feature in zoom_features:
             # Area culling for polygons
             if feature['geom_type'] == GEOM_POLYGON and feature['area'] < min_area:
                 continue
