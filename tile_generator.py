@@ -167,8 +167,8 @@ MIN_AREA_PER_ZOOM = {
 
 
 # Merge groups by color for z8-z10
-# Render order: rock (background) → farmland → grassland → scrubland → forest (top)
-# All with priority nibble 0 to be rendered UNDER water and roads
+# More nuanced vegetation colors with background prairie covering white zones
+# Render order: background prairie → farmland → light green → scrubland → dense forest (top)
 MERGE_GROUPS = [
     {
         'name': 'rock',
@@ -177,36 +177,41 @@ MERGE_GROUPS = [
         'render_order': 0,
     },
     {
-        'name': 'farmland',
-        'tags': {'landuse=farmland'},
-        'color': '#eef0d5',
+        'name': 'background_base',
+        'tags': {
+            'natural=grassland', 'landuse=meadow', 'landuse=grass',
+            'landuse=residential',  # Urban/periurban zones
+            'landuse=commercial', 'landuse=industrial', 'landuse=retail',
+            'natural=fell',  # Alpine meadows / bare summits
+        },
+        'color': '#f2efe9',  # Grey-green background for bare zones, periurban, prairies
         'render_order': 1,
     },
     {
-        'name': 'grassland',
-        'tags': {'natural=grassland', 'landuse=meadow', 'landuse=grass'},
-        'color': '#cdebb0',
+        'name': 'farmland',
+        'tags': {'landuse=farmland'},
+        'color': '#f1f3dd',  # Cultivated zones beige
         'render_order': 2,
     },
     {
-        'name': 'scrubland',
+        'name': 'light_vegetation',
         'tags': {'natural=scrub', 'natural=heath'},
-        'color': '#c8d7ab',
+        'color': '#d7efc0',  # Light green around forests
         'render_order': 3,
     },
     {
-        'name': 'forest',
+        'name': 'dense_forest',
         'tags': {'natural=wood', 'landuse=forest'},
-        'color': '#add19e',
+        'color': '#bddab1',  # Dense forest green (only big forest blocks)
         'render_order': 4,
     },
 ]
 
 MERGE_MAX_ZOOM = 10
 MERGE_BUFFER_DEGREES = {
-    8: 0.005,   # ~500m: merge nearby parcels at z8
-    9: 0.003,   # ~300m: merge at z9
-    10: 0.001   # ~100m: merge at z10
+    8: 0.0015,   # ~300m: reduced from 500m to avoid forest over-merging
+    9: 0.0009,   # ~200m: merge at z9
+    10: 0.0007   # ~100m: merge at z10
 }
 
 # Set of all tags participating in merge (for skip in main loop)
@@ -227,24 +232,27 @@ def _get_osm_key(tags: Dict[str, str], config: Dict) -> Optional[str]:
 
 
 def merge_vegetation_features(features: List[Dict], zoom: int, tolerance: float) -> List[Dict]:
-    """Merge vegetation polygons by color group using buffer + union.
+    """Process vegetation polygons: simplify geometry and filter by area.
 
-    Each group (forest, scrubland, grassland, farmland) is merged separately
-    and keeps its own color.
+    NO unary_union to avoid overlapping blobs - each polygon keeps its identity.
+    Just simplify and assign group color.
     """
     if not SHAPELY_AVAILABLE:
         return []
 
-    buffer_dist = MERGE_BUFFER_DEGREES.get(zoom, 0.0005)
-    all_merged = []
+    all_processed = []
+    min_area = MIN_AREA_PER_ZOOM.get(zoom, 0)
 
     for group in MERGE_GROUPS:
         # Collect polygons for this group
-        shapely_polys = []
+        group_polys = []
         for f in features:
             if f['geom_type'] != GEOM_POLYGON:
                 continue
             if f.get('osm_key') not in group['tags']:
+                continue
+            # Filter by minimum area
+            if f.get('area', 0) < min_area:
                 continue
             coords = f['coords']
             if len(coords) < 4:
@@ -252,60 +260,53 @@ def merge_vegetation_features(features: List[Dict], zoom: int, tolerance: float)
             try:
                 poly = Polygon(coords)
                 if poly.is_valid and not poly.is_empty:
-                    shapely_polys.append(poly.buffer(buffer_dist))
+                    group_polys.append(poly)
             except Exception:
                 continue
 
-        if not shapely_polys:
+        if not group_polys:
             continue
 
-        logger.info(f"  Merge {group['name']}: {len(shapely_polys)} polygons (buffer={buffer_dist}°)")
-        merged = unary_union(shapely_polys)
+        logger.info(f"  Process {group['name']}: {len(group_polys)} polygons (min_area={min_area}m²)")
 
         color_rgb565 = hex_to_rgb565(group['color'])
-        # Use very low priority (0-4) to ensure rendering under water (priority ~11)
-        # pack_zoom_priority(8, priority) where priority=0-4 gives nibble 0
-        # This makes merged veg render at 0x80 (128) which is before water features
-        zoom_priority = pack_zoom_priority(8, group['render_order'])
-
-        result_polys = []
-        if merged.geom_type == 'Polygon':
-            result_polys = [merged]
-        elif merged.geom_type == 'MultiPolygon':
-            result_polys = list(merged.geoms)
+        # Use zoom nibble 7 to render before water
+        combined_priority = group['render_order']
+        zoom_priority = (7 << 4) | combined_priority
 
         count = 0
-        for poly in result_polys:
-            if poly.is_empty or not poly.exterior:
-                continue
+        for poly in group_polys:
+            # Simplify geometry
             simplified = poly.simplify(tolerance, preserve_topology=True)
             if simplified.is_empty:
                 continue
+
             if simplified.geom_type == 'Polygon':
                 polys_to_add = [simplified]
             elif simplified.geom_type == 'MultiPolygon':
                 polys_to_add = list(simplified.geoms)
             else:
                 continue
+
             for sp in polys_to_add:
                 coords = list(sp.exterior.coords)
                 if len(coords) < 4:
                     continue
                 area_m2 = calculate_area(coords)
-                all_merged.append({
+                all_processed.append({
                     'geom_type': GEOM_POLYGON,
                     'coords': coords,
                     'area': area_m2,
                     'color_rgb565': color_rgb565,
                     'zoom_priority': zoom_priority,
                     'width_meters': 0.0,
-                    'osm_key': '_merged_' + group['name']
+                    'osm_key': '_processed_' + group['name']
                 })
                 count += 1
 
-        logger.info(f"    → {count} merged polygons")
+        logger.info(f"    → {count} polygons kept")
 
-    return all_merged
+    return all_processed
 
 
 def lon_to_tile_x(lon: float, zoom: int) -> int:
@@ -945,8 +946,9 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
             tile_dir = os.path.join(output_dir, str(zoom), str(x))
             tile_path = os.path.join(tile_dir, f"{y}.nav")
 
-            # Pre-sort by priority (low nibble) for streaming render on ESP32
-            features.sort(key=lambda f: f['zoom_priority'] & 0x0F)
+            # Pre-sort by zoom_priority (full byte: zoom nibble + priority nibble)
+            # Lower values render first (behind), higher values render last (on top)
+            features.sort(key=lambda f: f['zoom_priority'])
             # Final safety check: NAV1 format uses uint16 (2 bytes) for feature count
             if len(features) > 65535:
                 logger.warning(f"Tile {zoom}/{x}/{y} exceeds 65535 features ({len(features)}). Truncating to respect NAV1 format.")
