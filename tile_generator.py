@@ -34,7 +34,6 @@ except ImportError:
 
 try:
     from shapely.geometry import Polygon
-    from shapely.ops import unary_union
     import shapely.wkb
     SHAPELY_AVAILABLE = True
 except ImportError:
@@ -92,6 +91,7 @@ LAYER_PRIORITY = {
     'roads': 50,
     'infrastructure': 60,
     'buildings': 70,
+    'boundaries': 85,
     'places': 90
 }
 
@@ -152,6 +152,9 @@ LAYER_MAPPING = {
         'natural=peak', 'natural=ridge',
         'natural=volcano', 'natural=cliff',
         'natural=tree_row', 'natural=tree'
+    ],
+    'boundaries': [
+        'boundary=administrative'
     ],
     'places': [
         'place=state', 'place=town',
@@ -304,7 +307,6 @@ class OSMHandler(osmium.SimpleHandler):
         self.stats = {
             'ways_processed': 0,
             'areas_processed': 0,
-            'relations_processed': 0,
             'features_extracted': 0,
             'features_filtered': 0
         }
@@ -320,13 +322,7 @@ class OSMHandler(osmium.SimpleHandler):
         tags = set()
         for key in self.config:
             if isinstance(self.config[key], dict):
-                if ';' in key:
-                    for part in key.split(';'):
-                        if '=' in part:
-                            tags.add(part.split('=')[0])
-                        else:
-                            tags.add(part)
-                elif '=' in key:
+                if '=' in key:
                     tag_key = key.split('=')[0]
                     tags.add(tag_key)
                 else:
@@ -477,6 +473,47 @@ class OSMHandler(osmium.SimpleHandler):
 
         return 0.0
 
+    def _process_boundary(self, a, feature_key):
+        """Extract administrative boundary as LINESTRING from area."""
+        cfg = self.config[feature_key]
+        min_zoom = cfg.get('zoom', 6)
+        if min_zoom > self.max_zoom:
+            return
+
+        try:
+            wkb = self.wkbfab.create_multipolygon(a)
+            geom = shapely.wkb.loads(wkb, hex=True)
+
+            color_rgb565 = hex_to_rgb565(cfg.get('color', '#000000'))
+            priority = cfg.get('priority', 85)
+            layer_base_priority = LAYER_PRIORITY.get('boundaries', 85)
+            combined_priority = layer_base_priority + (priority % 10)
+
+            polygons = []
+            if geom.geom_type == 'Polygon':
+                polygons = [geom]
+            elif geom.geom_type == 'MultiPolygon':
+                polygons = list(geom.geoms)
+
+            for poly in polygons:
+                if poly.is_empty or not poly.exterior:
+                    continue
+                coords = list(poly.exterior.coords)
+                if len(coords) < 2:
+                    continue
+
+                self.features.append({
+                    'geom_type': GEOM_LINESTRING,
+                    'coords': coords,
+                    'color_rgb565': color_rgb565,
+                    'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
+                    'width_meters': 0.0
+                })
+                self.stats['features_extracted'] += 1
+
+        except Exception:
+            pass
+
     def area(self, a):
         """Process area - handles multipolygon relations."""
         self.stats['areas_processed'] += 1
@@ -487,6 +524,14 @@ class OSMHandler(osmium.SimpleHandler):
             return
 
         tags = self._tags_to_dict(a.tags)
+
+        # Administrative boundaries: store as LINESTRING (border lines, not filled areas)
+        if tags.get('boundary') == 'administrative':
+            admin_level = tags.get('admin_level', '')
+            feature_key = f"boundary=administrative;admin_level={admin_level}"
+            if feature_key in self.config and isinstance(self.config[feature_key], dict):
+                self._process_boundary(a, feature_key)
+            return
 
         if not self._is_feature_in_config(tags):
             self.stats['features_filtered'] += 1
@@ -546,67 +591,6 @@ class OSMHandler(osmium.SimpleHandler):
         except Exception as e:
             self.stats['features_filtered'] += 1
 
-    def relation(self, r):
-        """Process relation - extract administrative boundaries."""
-        self.stats['relations_processed'] += 1
-
-        tags = self._tags_to_dict(r.tags)
-
-        # Only process boundary relations
-        if tags.get('boundary') != 'administrative':
-            return
-
-        admin_level = tags.get('admin_level')
-        if not admin_level:
-            return
-
-        # Build combined key for config lookup
-        feature_key = f"boundary=administrative;admin_level={admin_level}"
-        if feature_key not in self.config or not isinstance(self.config[feature_key], dict):
-            return
-
-        min_zoom = self.config[feature_key].get('zoom', 6)
-        if min_zoom > self.max_zoom:
-            return
-
-        color = self.config[feature_key].get('color', '#000000')
-        priority = self.config[feature_key].get('priority', 90)
-        color_rgb565 = hex_to_rgb565(color)
-        combined_priority = LAYER_PRIORITY.get('places', 90) + (priority % 10)
-
-        try:
-            wkb = self.wkbfab.create_multipolygon(r)
-            geom = shapely.wkb.loads(wkb, hex=True)
-
-            # Extract exterior rings as linestrings (boundaries are lines, not filled areas)
-            polygons = []
-            if geom.geom_type == 'Polygon':
-                polygons = [geom]
-            elif geom.geom_type == 'MultiPolygon':
-                polygons = list(geom.geoms)
-
-            for poly in polygons:
-                if poly.is_empty or not poly.exterior:
-                    continue
-
-                coords = list(poly.exterior.coords)
-                if len(coords) < 2:
-                    continue
-
-                feature = {
-                    'id': r.id,
-                    'geom_type': GEOM_LINESTRING,
-                    'coords': coords,
-                    'color_rgb565': color_rgb565,
-                    'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
-                    'width_meters': 2.0
-                }
-                self.features.append(feature)
-                self.stats['features_extracted'] += 1
-
-        except Exception:
-            pass
-
 
 def simplify_coords(coords: List[Tuple[float, float]], tolerance: float) -> List[Tuple[float, float]]:
     """Simple Douglas-Peucker-like simplification."""
@@ -623,13 +607,12 @@ def simplify_coords(coords: List[Tuple[float, float]], tolerance: float) -> List
     return coords
 
 
-def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: int, tile_y: int) -> Tuple[bool, int]:
+def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: int, tile_y: int) -> bool:
     """
     Write features to NAV binary tile format using relative coordinates.
-    Returns (success, merged_count).
     """
     if not features:
-        return False, 0
+        return False
 
     # Calculate tile bounds
     n = 2.0 ** zoom
@@ -675,89 +658,18 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                            int(tile_max_lon * COORD_SCALE), 
                            int(tile_max_lat * COORD_SCALE)))
 
-        processed_features = []
-        
-        if SHAPELY_AVAILABLE:
-            from shapely.geometry import box, Polygon, MultiPolygon, LineString, MultiLineString, GeometryCollection
-            
-            # Separate polygons for merging
-            polygons_by_style = defaultdict(list)
-            other_features = []
-            
-            for feat in features:
-                if feat['geom_type'] == GEOM_POLYGON:
-                    style_key = (feat['color_rgb565'], feat['zoom_priority'])
-                    polygons_by_style[style_key].append(feat)
-                else:
-                    other_features.append(feat)
-            
-            # Merge polygons of the same style
-            poly_before = 0
-            for style_list in polygons_by_style.values():
-                poly_before += len(style_list)
-                
-            for (color, priority), poly_list in polygons_by_style.items():
-                try:
-                    shapely_polys = []
-                    for p in poly_list:
-                        sp = Polygon(p['coords'])
-                        if not sp.is_valid:
-                            sp = sp.buffer(0)
-                        shapely_polys.append(sp)
-                    
-                    merged = unary_union(shapely_polys)
-                    
-                    # Convert back to feature format
-                    parts = []
-                    if isinstance(merged, MultiPolygon):
-                        parts = list(merged.geoms)
-                    elif isinstance(merged, Polygon):
-                        parts = [merged]
-                    
-                    for part in parts:
-                        if not part.is_empty:
-                            processed_features.append({
-                                'geom_type': GEOM_POLYGON,
-                                'coords': list(part.exterior.coords),
-                                'rings': [list(p.coords) for p in part.interiors],
-                                'color_rgb565': color,
-                                'zoom_priority': priority,
-                                'width_meters': 0.0
-                            })
-                except:
-                    processed_features.extend(poly_list)
-            
-            poly_after = len([f for f in processed_features if f['geom_type'] == GEOM_POLYGON])
-            merged_count = max(0, poly_before - poly_after)
-            
-            processed_features.extend(other_features)
-        else:
-            processed_features = features
-            merged_count = 0
-
-        # Clipping box with 10% margin
-        margin = 0.10
-        lon_margin = (tile_max_lon - tile_min_lon) * margin
-        lat_margin = (tile_max_lat - tile_min_lat) * margin
-        
-        clip_box = None
-        if SHAPELY_AVAILABLE:
-            from shapely.geometry import box
-            clip_box = box(tile_min_lon - lon_margin, tile_min_lat - lat_margin, 
-                           tile_max_lon + lon_margin, tile_max_lat + lat_margin)
-
-        for feature in processed_features:
+        for feature in features:
             orig_coords = feature['coords']
             is_polygon = feature['geom_type'] == GEOM_POLYGON
             
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
             final_features_data = []
             
-            # Clip geometry
+            # Clip geometry if shapely is available
             if clip_box:
                 try:
-                    from shapely.geometry import Polygon, MultiPolygon, LineString, MultiLineString, GeometryCollection
-                    geom = Polygon(orig_coords, feature.get('rings', [])) if is_polygon else LineString(orig_coords)
+                    # Simplify slightly to avoid tiny artifacts before clipping
+                    geom = Polygon(orig_coords) if is_polygon else LineString(orig_coords)
                     if not geom.is_valid:
                         geom = geom.buffer(0)
                     
@@ -765,6 +677,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     if clipped.is_empty:
                         continue
                         
+                    # Extract parts of the correct type
                     parts = []
                     if isinstance(clipped, GeometryCollection):
                         parts = list(clipped.geoms)
@@ -792,10 +705,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 except:
                     continue
             else:
-                rings = [orig_coords]
-                if is_polygon and 'rings' in feature:
-                    rings.extend(feature['rings'])
-                final_features_data = [rings]
+                final_features_data = [[orig_coords]]
 
             for feature_rings in final_features_data:
                 # Project all rings for this feature part
@@ -863,8 +773,8 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                         f.write(struct.pack('<hh', px, py))
 
                 if is_polygon:
-                    # Write ring ends (using uint16 to support > 255 rings in complex merged areas)
-                    f.write(struct.pack('<H', len(projected_rings)))
+                    # Write ring ends
+                    f.write(struct.pack('<B', len(projected_rings)))
                     current_end = 0
                     for ring in projected_rings:
                         current_end += len(ring)
@@ -875,7 +785,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
         f.seek(4)
         f.write(struct.pack('<H', written_features))
 
-    return True, merged_count
+    return True
 
 
 def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
@@ -905,7 +815,6 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
     logger.info(f"Statistics:")
     logger.info(f"  Ways processed: {handler.stats['ways_processed']:,}")
     logger.info(f"  Areas processed: {handler.stats['areas_processed']:,}")
-    logger.info(f"  Relations processed: {handler.stats['relations_processed']:,}")
     logger.info(f"  Features extracted: {handler.stats['features_extracted']:,}")
     logger.info(f"  Features filtered: {handler.stats['features_filtered']:,}")
 
@@ -915,15 +824,9 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
     total_size = 0
 
     for zoom in range(zoom_range[0], zoom_range[1] + 1):
-        tile_features = defaultdict(list)
+        tile_features: Dict[Tuple[int, int], List[Dict]] = defaultdict(list)
         tolerance = get_simplify_tolerance(zoom)
-        zoom_merged = 0
-        
-        # Phase 1: Prepare and filter features for this zoom level
-        zoom_start = time.time()
-        prepared_count = 0
-        total_to_process = len(handler.features)
-        
+
         for feature in handler.features:
             min_zoom = feature['zoom_priority'] >> 4
             if min_zoom > zoom:
@@ -934,27 +837,15 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
             if len(coords) > 2:
                 coords = simplify_coords(coords, tolerance)
             
-            if not coords:
-                continue
-
-            # Create a lightweight record for this zoom
-            zoom_feature = {
-                'geom_type': feature['geom_type'],
-                'coords': coords,
-                'color_rgb565': feature['color_rgb565'],
-                'zoom_priority': feature['zoom_priority'],
-                'width_meters': feature.get('width_meters', 0.0)
-            }
+            # Create a shallow copy with simplified coords for this zoom
+            zoom_feature = feature.copy()
+            zoom_feature['coords'] = coords
 
             is_polygon = zoom_feature['geom_type'] == GEOM_POLYGON
             tiles = get_feature_tiles(zoom_feature['coords'], zoom, is_polygon)
 
             for tile in tiles:
                 tile_features[tile].append(zoom_feature)
-            
-            prepared_count += 1
-            if prepared_count % 25000 == 0:
-                print(f"\r  Zoom {zoom:2d}: Preparing features... {prepared_count:,} / {total_to_process:,}", end='', flush=True)
 
         if not tile_features:
             continue
@@ -962,36 +853,25 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
         num_tiles = len(tile_features)
         tiles_written = 0
         tile_items = list(tile_features.items())
-        print() # New line after preparation phase
 
-        # Phase 2: Process and write tiles
-        zoom_features_total = 0
         for i, ((x, y), features) in enumerate(tile_items):
             progress = (i + 1) / num_tiles
-            bar_width = 25
+            bar_width = 30
             filled = int(bar_width * progress)
             bar = '█' * filled + '░' * (bar_width - filled)
-            print(f"\r  Zoom {zoom:2d}: Tiles [{bar}] {i+1}/{num_tiles}", end='', flush=True)
+            print(f"\r  Zoom {zoom:2d}: [{bar}] {i+1}/{num_tiles} tiles", end='', flush=True)
 
             tile_dir = os.path.join(output_dir, str(zoom), str(x))
             tile_path = os.path.join(tile_dir, f"{y}.nav")
 
-            # Pre-sort by priority
+            # Pre-sort by priority (low nibble) for streaming render on ESP32
             features.sort(key=lambda f: f['zoom_priority'] & 0x0F)
 
-            success, merged = write_nav_tile(features, tile_path, zoom, x, y)
-            if success:
+            if write_nav_tile(features, tile_path, zoom, x, y):
                 tiles_written += 1
-                zoom_merged += merged
-                zoom_features_total += (len(features) - merged) # Count unique features written
                 total_size += os.path.getsize(tile_path)
 
-        # Clear memory before next zoom level
-        tile_features.clear()
-        tile_items.clear()
-        
-        zoom_elapsed = time.time() - zoom_start
-        print(f"\r  Zoom {zoom:2d}: {tiles_written} tiles written. Merged {zoom_merged} polygons. ({zoom_elapsed:.1f}s, {zoom_features_total:,} features)" + " " * 5)
+        print(f"\r  Zoom {zoom:2d}: {tiles_written} tiles written" + " " * 30)
         total_tiles += tiles_written
 
     total_time = time.time() - start_time
