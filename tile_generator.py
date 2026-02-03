@@ -34,7 +34,6 @@ except ImportError:
 
 try:
     from shapely.geometry import Polygon, MultiPolygon
-    from shapely.ops import unary_union
     import shapely.wkb
     SHAPELY_AVAILABLE = True
 except ImportError:
@@ -166,60 +165,6 @@ MIN_AREA_PER_ZOOM = {
 }
 
 
-# Merge groups by color for z8-z10
-# More nuanced vegetation colors with background prairie covering white zones
-# Render order: background prairie → farmland → light green → scrubland → dense forest (top)
-MERGE_GROUPS = [
-    {
-        'name': 'rock',
-        'tags': {'natural=bare_rock', 'natural=scree', 'natural=rock', 'natural=stone'},
-        'color': '#eee8dc',
-        'render_order': 0,
-    },
-    {
-        'name': 'background_base',
-        'tags': {
-            'natural=grassland', 'landuse=meadow', 'landuse=grass',
-            'landuse=residential',  # Urban/periurban zones
-            'landuse=commercial', 'landuse=industrial', 'landuse=retail',
-            'natural=fell',  # Alpine meadows / bare summits
-        },
-        'color': '#f2efe9',  # Grey-green background for bare zones, periurban, prairies
-        'render_order': 1,
-    },
-    {
-        'name': 'farmland',
-        'tags': {'landuse=farmland'},
-        'color': '#f1f3dd',  # Cultivated zones beige
-        'render_order': 2,
-    },
-    {
-        'name': 'light_vegetation',
-        'tags': {'natural=scrub', 'natural=heath'},
-        'color': '#d7efc0',  # Light green around forests
-        'render_order': 3,
-    },
-    {
-        'name': 'dense_forest',
-        'tags': {'natural=wood', 'landuse=forest'},
-        'color': '#bddab1',  # Dense forest green (only big forest blocks)
-        'render_order': 4,
-    },
-]
-
-MERGE_MAX_ZOOM = 10
-MERGE_BUFFER_DEGREES = {
-    8: 0.0015,   # ~300m: reduced from 500m to avoid forest over-merging
-    9: 0.0009,   # ~200m: merge at z9
-    10: 0.0007   # ~100m: merge at z10
-}
-
-# Set of all tags participating in merge (for skip in main loop)
-MERGE_ALL_TAGS = set()
-for _g in MERGE_GROUPS:
-    MERGE_ALL_TAGS.update(_g['tags'])
-
-
 def _get_osm_key(tags: Dict[str, str], config: Dict) -> Optional[str]:
     """Find the matching OSM config key for a set of tags (e.g. 'natural=wood')."""
     for key, value in tags.items():
@@ -230,83 +175,6 @@ def _get_osm_key(tags: Dict[str, str], config: Dict) -> Optional[str]:
             return key
     return None
 
-
-def merge_vegetation_features(features: List[Dict], zoom: int, tolerance: float) -> List[Dict]:
-    """Process vegetation polygons: simplify geometry and filter by area.
-
-    NO unary_union to avoid overlapping blobs - each polygon keeps its identity.
-    Just simplify and assign group color.
-    """
-    if not SHAPELY_AVAILABLE:
-        return []
-
-    all_processed = []
-    min_area = MIN_AREA_PER_ZOOM.get(zoom, 0)
-
-    for group in MERGE_GROUPS:
-        # Collect polygons for this group
-        group_polys = []
-        for f in features:
-            if f['geom_type'] != GEOM_POLYGON:
-                continue
-            if f.get('osm_key') not in group['tags']:
-                continue
-            # Filter by minimum area
-            if f.get('area', 0) < min_area:
-                continue
-            coords = f['coords']
-            if len(coords) < 4:
-                continue
-            try:
-                poly = Polygon(coords)
-                if poly.is_valid and not poly.is_empty:
-                    group_polys.append(poly)
-            except Exception:
-                continue
-
-        if not group_polys:
-            continue
-
-        logger.info(f"  Process {group['name']}: {len(group_polys)} polygons (min_area={min_area}m²)")
-
-        color_rgb565 = hex_to_rgb565(group['color'])
-        # Use zoom nibble 7 to render before water
-        combined_priority = group['render_order']
-        zoom_priority = (7 << 4) | combined_priority
-
-        count = 0
-        for poly in group_polys:
-            # Simplify geometry
-            simplified = poly.simplify(tolerance, preserve_topology=True)
-            if simplified.is_empty:
-                continue
-
-            if simplified.geom_type == 'Polygon':
-                polys_to_add = [simplified]
-            elif simplified.geom_type == 'MultiPolygon':
-                polys_to_add = list(simplified.geoms)
-            else:
-                continue
-
-            for sp in polys_to_add:
-                coords = list(sp.exterior.coords)
-                if len(coords) < 4:
-                    continue
-                area_m2 = calculate_area(coords)
-                all_processed.append({
-                    'geom_type': GEOM_POLYGON,
-                    'coords': coords,
-                    'area': area_m2,
-                    'color_rgb565': color_rgb565,
-                    'zoom_priority': zoom_priority,
-                    'width_meters': 0.0,
-                    'osm_key': '_processed_' + group['name']
-                })
-                count += 1
-
-        logger.info(f"    → {count} polygons kept")
-
-    return all_processed
 
 
 def lon_to_tile_x(lon: float, zoom: int) -> int:
@@ -892,22 +760,9 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
         tolerance = get_simplify_tolerance(zoom)
         min_area = MIN_AREA_PER_ZOOM.get(zoom, 0)
 
-        # Merge vegetation polygons for low zoom levels (z8-z10)
-        merge_veg = zoom <= MERGE_MAX_ZOOM
-        if merge_veg:
-            merged = merge_vegetation_features(handler.features, zoom, tolerance)
-            for mf in merged:
-                tiles = get_feature_tiles(mf['coords'], zoom, True)
-                for tile in tiles:
-                    tile_features[tile].append(mf)
-
         for feature in handler.features:
             min_zoom = feature['zoom_priority'] >> 4
             if min_zoom > zoom:
-                continue
-
-            # Skip vegetation features at merge zoom levels (they are merged above)
-            if merge_veg and feature.get('osm_key') in MERGE_ALL_TAGS:
                 continue
 
             # Area culling for polygons
