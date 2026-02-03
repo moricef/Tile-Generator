@@ -644,5 +644,26 @@
     "zoom": 13,
     "color": "#e0e0e0",
     "priority": 95
+  },
+
+  "boundary=administrative;admin_level=2": {
+    "zoom": 6,
+    "color": "#8b008b",
+    "priority": 98
+  },
+  "boundary=administrative;admin_level=4": {
+    "zoom": 7,
+    "color": "#ff00ff",
+    "priority": 97
+  },
+  "boundary=administrative;admin_level=6": {
+    "zoom": 9,
+    "color": "#ff69b4",
+    "priority": 96
+  },
+  "boundary=administrative;admin_level=8": {
+    "zoom": 12,
+    "color": "#ffc0cb",
+    "priority": 95
   }
 }
