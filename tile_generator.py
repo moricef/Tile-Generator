@@ -304,6 +304,7 @@ class OSMHandler(osmium.SimpleHandler):
         self.stats = {
             'ways_processed': 0,
             'areas_processed': 0,
+            'relations_processed': 0,
             'features_extracted': 0,
             'features_filtered': 0
         }
@@ -319,7 +320,13 @@ class OSMHandler(osmium.SimpleHandler):
         tags = set()
         for key in self.config:
             if isinstance(self.config[key], dict):
-                if '=' in key:
+                if ';' in key:
+                    for part in key.split(';'):
+                        if '=' in part:
+                            tags.add(part.split('=')[0])
+                        else:
+                            tags.add(part)
+                elif '=' in key:
                     tag_key = key.split('=')[0]
                     tags.add(tag_key)
                 else:
@@ -538,6 +545,67 @@ class OSMHandler(osmium.SimpleHandler):
 
         except Exception as e:
             self.stats['features_filtered'] += 1
+
+    def relation(self, r):
+        """Process relation - extract administrative boundaries."""
+        self.stats['relations_processed'] += 1
+
+        tags = self._tags_to_dict(r.tags)
+
+        # Only process boundary relations
+        if tags.get('boundary') != 'administrative':
+            return
+
+        admin_level = tags.get('admin_level')
+        if not admin_level:
+            return
+
+        # Build combined key for config lookup
+        feature_key = f"boundary=administrative;admin_level={admin_level}"
+        if feature_key not in self.config or not isinstance(self.config[feature_key], dict):
+            return
+
+        min_zoom = self.config[feature_key].get('zoom', 6)
+        if min_zoom > self.max_zoom:
+            return
+
+        color = self.config[feature_key].get('color', '#000000')
+        priority = self.config[feature_key].get('priority', 90)
+        color_rgb565 = hex_to_rgb565(color)
+        combined_priority = LAYER_PRIORITY.get('places', 90) + (priority % 10)
+
+        try:
+            wkb = self.wkbfab.create_multipolygon(r)
+            geom = shapely.wkb.loads(wkb, hex=True)
+
+            # Extract exterior rings as linestrings (boundaries are lines, not filled areas)
+            polygons = []
+            if geom.geom_type == 'Polygon':
+                polygons = [geom]
+            elif geom.geom_type == 'MultiPolygon':
+                polygons = list(geom.geoms)
+
+            for poly in polygons:
+                if poly.is_empty or not poly.exterior:
+                    continue
+
+                coords = list(poly.exterior.coords)
+                if len(coords) < 2:
+                    continue
+
+                feature = {
+                    'id': r.id,
+                    'geom_type': GEOM_LINESTRING,
+                    'coords': coords,
+                    'color_rgb565': color_rgb565,
+                    'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
+                    'width_meters': 2.0
+                }
+                self.features.append(feature)
+                self.stats['features_extracted'] += 1
+
+        except Exception:
+            pass
 
 
 def simplify_coords(coords: List[Tuple[float, float]], tolerance: float) -> List[Tuple[float, float]]:
@@ -837,6 +905,7 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
     logger.info(f"Statistics:")
     logger.info(f"  Ways processed: {handler.stats['ways_processed']:,}")
     logger.info(f"  Areas processed: {handler.stats['areas_processed']:,}")
+    logger.info(f"  Relations processed: {handler.stats['relations_processed']:,}")
     logger.info(f"  Features extracted: {handler.stats['features_extracted']:,}")
     logger.info(f"  Features filtered: {handler.stats['features_filtered']:,}")
 

@@ -32,6 +32,11 @@
     "color": "#add19e",
     "priority": 22
   },
+  "natural=forest": {
+    "zoom": 8,
+    "color": "#add19e",
+    "priority": 22
+  },
   "landuse=farmland": {
     "zoom": 8,
     "color": "#eef0d5",
@@ -69,6 +74,11 @@
   },
   "landuse=residential": {
     "zoom": 8,
+    "color": "#e0dfdf",
+    "priority": 24
+  },
+  "place=suburb": {
+    "zoom": 10,
     "color": "#e0dfdf",
     "priority": 24
   },
@@ -304,7 +314,27 @@
     "color": "#aad3df",
     "priority": 40
   },
+  "water=river": {
+    "zoom": 8,
+    "color": "#aad3df",
+    "priority": 40
+  },
+  "water=canal": {
+    "zoom": 8,
+    "color": "#aad3df",
+    "priority": 40
+  },
+  "water=reservoir": {
+    "zoom": 8,
+    "color": "#aad3df",
+    "priority": 40
+  },
   "waterway=dock": {
+    "zoom": 12,
+    "color": "#aad3df",
+    "priority": 41
+  },
+  "waterway=boatyard": {
     "zoom": 12,
     "color": "#aad3df",
     "priority": 41
@@ -322,6 +352,11 @@
   "natural=wetland": {
     "zoom": 11,
     "color": "#d6f1e0",
+    "priority": 42
+  },
+  "natural=spring": {
+    "zoom": 13,
+    "color": "#aad3df",
     "priority": 42
   },
   "waterway=river": {
