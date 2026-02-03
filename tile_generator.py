@@ -23,6 +23,8 @@ import struct
 from typing import Dict, List, Tuple, Set, Any, Optional
 from collections import defaultdict
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import multiprocessing
 
 try:
     import osmium
@@ -46,17 +48,29 @@ logger = logging.getLogger(__name__)
 # NAV format constants
 NAV_MAGIC = b'NAV1'
 COORD_SCALE = 10000000  # 1e7 for ~1cm precision
+LAND_BG_COLOR = '#f2efe9'  # OSM Carto default land background
 
 # Geometry types
 GEOM_POINT = 1
 GEOM_LINESTRING = 2
 GEOM_POLYGON = 3
+GEOM_TEXT = 4
 
 # Point features to extract from nodes (rendered as symbols)
 # shape: 'triangle' for peaks, 'circle' for places
 POINT_FEATURES = {
     'natural=peak': 'triangle',
     'natural=volcano': 'triangle',
+}
+
+# Place features to extract as text labels
+# Maps to font_size: 0=small, 1=medium, 2=large
+TEXT_FEATURES = {
+    'place=city': 2,
+    'place=town': 1,
+    'place=village': 0,
+    'place=suburb': 0,
+    'place=hamlet': 0,
 }
 
 # Tags that support width (LineStrings only)
@@ -359,6 +373,7 @@ class OSMHandler(osmium.SimpleHandler):
         self.boundary_ways: Dict[int, Dict] = {}  # Set by caller after BoundaryScanner
         self.stats = {
             'nodes_processed': 0,
+            'text_labels': 0,
             'ways_processed': 0,
             'areas_processed': 0,
             'boundary_ways_extracted': 0,
@@ -417,12 +432,16 @@ class OSMHandler(osmium.SimpleHandler):
         return False
 
     def node(self, n):
-        """Process node - extract point features (peaks, places)."""
+        """Process node - extract point features (peaks) and text labels (places)."""
         if not n.location.valid():
             return
 
-        for tag in n.tags:
-            feature_key = f"{tag.k}={tag.v}"
+        tags = self._tags_to_dict(n.tags)
+
+        for key, value in tags.items():
+            feature_key = f"{key}={value}"
+
+            # Point symbols (peaks, volcanoes)
             if feature_key in POINT_FEATURES and feature_key in self.config:
                 cfg = self.config[feature_key]
                 min_zoom = cfg.get('zoom', 12)
@@ -431,7 +450,7 @@ class OSMHandler(osmium.SimpleHandler):
 
                 color_rgb565 = hex_to_rgb565(cfg.get('color', '#000000'))
                 priority = cfg.get('priority', 30)
-                layer = get_layer_for_tags({tag.k: tag.v})
+                layer = get_layer_for_tags({key: value})
                 layer_base_priority = LAYER_PRIORITY.get(layer or 'terrain', 20)
                 combined_priority = layer_base_priority + (priority % 10)
 
@@ -443,6 +462,54 @@ class OSMHandler(osmium.SimpleHandler):
                     'width_meters': 0.0,
                     'shape': POINT_FEATURES[feature_key],
                 })
+                self.stats['nodes_processed'] += 1
+                return
+
+            # Text labels (places)
+            if feature_key in TEXT_FEATURES and feature_key in self.config:
+                name = tags.get('name', '')
+                if not name:
+                    self.stats['features_filtered'] += 1
+                    return
+
+                cfg = self.config[feature_key]
+                min_zoom = cfg.get('zoom', 12)
+                if min_zoom > self.max_zoom:
+                    return
+
+                color_rgb565 = hex_to_rgb565(cfg.get('color', '#000000'))
+                priority = cfg.get('priority', 90)
+                layer_base_priority = LAYER_PRIORITY.get('places', 90)
+                combined_priority = layer_base_priority + (priority % 10)
+
+                # Split long names on 2 lines at hyphen or space near middle
+                if len(name) > 12:
+                    mid = len(name) // 2
+                    best = -1
+                    best_dist = len(name)
+                    for i, c in enumerate(name):
+                        if c in ('-', ' '):
+                            dist = abs(i - mid)
+                            if dist < best_dist:
+                                best_dist = dist
+                                best = i
+                    if best > 0:
+                        if name[best] == '-':
+                            name = name[:best+1] + '\n' + name[best+1:]
+                        else:
+                            name = name[:best] + '\n' + name[best+1:]
+
+                name_bytes = name.encode('utf-8')[:255]
+
+                self.features.append({
+                    'geom_type': GEOM_TEXT,
+                    'coords': [(n.location.lon, n.location.lat)],
+                    'color_rgb565': color_rgb565,
+                    'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
+                    'font_size': TEXT_FEATURES[feature_key],
+                    'text': name_bytes,
+                })
+                self.stats['text_labels'] += 1
                 self.stats['nodes_processed'] += 1
                 return
 
@@ -710,19 +777,75 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
     written_features = 0
     with open(output_path, 'wb') as f:
-        f.write(struct.pack('<4sHiiii', NAV_MAGIC, 0, 
-                           int(tile_min_lon * COORD_SCALE), 
-                           int(tile_min_lat * COORD_SCALE), 
-                           int(tile_max_lon * COORD_SCALE), 
+        f.write(struct.pack('<4sHiiii', NAV_MAGIC, 0,
+                           int(tile_min_lon * COORD_SCALE),
+                           int(tile_min_lat * COORD_SCALE),
+                           int(tile_max_lon * COORD_SCALE),
                            int(tile_max_lat * COORD_SCALE)))
 
+        # Background land polygon covering the entire tile
+        bg_points = [(0, 0), (4096, 0), (4096, 4096), (0, 4096), (0, 0)]
+        f.write(struct.pack('<B', GEOM_POLYGON))       # type
+        f.write(struct.pack('<H', hex_to_rgb565(LAND_BG_COLOR)))  # color
+        f.write(struct.pack('<B', pack_zoom_priority(0, 0)))  # lowest priority
+        f.write(struct.pack('<B', 1))                   # width
+        f.write(struct.pack('<BBBB', 0, 0, 255, 255))  # bbox = full tile
+        f.write(struct.pack('<H', 5))                   # 5 points
+        f.write(b'\x00')                                # reserved
+        for px, py in bg_points:
+            f.write(struct.pack('<hh', px, py))
+        f.write(struct.pack('<H', 1))                   # 1 ring
+        f.write(struct.pack('<H', 5))                   # ring end at point 5
+        written_features += 1
+
         for feature in features:
+            # Handle text features separately
+            if feature['geom_type'] == GEOM_TEXT:
+                lon, lat = feature['coords'][0]
+                px = int((lon - tile_min_lon) / (tile_max_lon - tile_min_lon) * 4096)
+                m_y = lat_to_merc(lat)
+                py = int((t_max_merc - m_y) / merc_range * 4096)
+
+                if not (-8192 < px < 12288 and -8192 < py < 12288):
+                    continue
+
+                text_bytes = feature['text']
+                text_len = len(text_bytes)
+                # coordCount = ceil((4 + 1 + text_len) / 4) for skip compatibility
+                data_size = 4 + 1 + text_len  # x,y + text_len + text
+                coord_count = (data_size + 3) // 4
+                padded_size = coord_count * 4
+
+                bx = max(0, min(255, px >> 4))
+                by = max(0, min(255, py >> 4))
+
+                # Standard 12-byte header
+                f.write(struct.pack('<B', GEOM_TEXT))
+                f.write(struct.pack('<H', feature['color_rgb565']))
+                f.write(struct.pack('<B', feature['zoom_priority']))
+                f.write(struct.pack('<B', feature.get('font_size', 0)))
+                f.write(struct.pack('<BBBB', bx, by, bx, by))
+                f.write(struct.pack('<H', coord_count))
+                f.write(b'\x00')
+
+                # Data: position + text
+                f.write(struct.pack('<hh', px, py))
+                f.write(struct.pack('<B', text_len))
+                f.write(text_bytes)
+                # Pad to multiple of 4
+                padding = padded_size - data_size
+                if padding > 0:
+                    f.write(b'\x00' * padding)
+
+                written_features += 1
+                continue
+
             orig_coords = feature['coords']
             is_polygon = feature['geom_type'] == GEOM_POLYGON
-            
+
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
             final_features_data = []
-            
+
             # Clip geometry
             if clip_box:
                 try:
@@ -880,7 +1003,8 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
     elapsed = time.time() - start_time
     logger.info(f"Processing completed in {elapsed:.2f}s")
     logger.info(f"Statistics:")
-    logger.info(f"  Nodes (peaks/volcanoes): {handler.stats['nodes_processed']:,}")
+    logger.info(f"  Nodes (peaks): {handler.stats['nodes_processed'] - handler.stats['text_labels']:,}")
+    logger.info(f"  Text labels (places): {handler.stats['text_labels']:,}")
     logger.info(f"  Ways processed: {handler.stats['ways_processed']:,}")
     logger.info(f"  Areas processed: {handler.stats['areas_processed']:,}")
     logger.info(f"  Boundary ways extracted: {handler.stats['boundary_ways_extracted']:,}")
@@ -895,12 +1019,15 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
     for zoom in range(zoom_range[0], zoom_range[1] + 1):
         tile_features = defaultdict(list)
         tolerance = get_simplify_tolerance(zoom)
-        
+
         # Phase 1: Prepare and filter features for this zoom level
         zoom_start = time.time()
         prepared_count = 0
         total_to_process = len(handler.features)
-        
+
+        # Collect text labels for collision detection
+        text_candidates = []
+
         for feature in handler.features:
             min_zoom = feature['zoom_priority'] >> 4
             if min_zoom > zoom:
@@ -926,11 +1053,13 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                 lat_size = size / math.cos(math.radians(lat))
 
                 if shape == 'triangle':
+                    # Equilateral triangle: height = size * sqrt(3)/2 ≈ size * 0.866
+                    h = lat_size * 0.866
                     sym_coords = [
-                        (lon, lat + lat_size * 1.2),
-                        (lon - size, lat - lat_size * 0.6),
-                        (lon + size, lat - lat_size * 0.6),
-                        (lon, lat + lat_size * 1.2),
+                        (lon, lat + h * 0.667),             # top (1/3 above center)
+                        (lon - size, lat - h * 0.333),      # bottom-left
+                        (lon + size, lat - h * 0.333),      # bottom-right
+                        (lon, lat + h * 0.667),
                     ]
                 else:  # square dot (2x2 pixels)
                     s = pixel_deg  # 1 pixel
@@ -950,6 +1079,15 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                     'zoom_priority': feature['zoom_priority'],
                     'width_meters': 0.0
                 }
+            elif feature['geom_type'] == GEOM_TEXT:
+                zoom_feature = {
+                    'geom_type': GEOM_TEXT,
+                    'coords': coords,
+                    'color_rgb565': feature['color_rgb565'],
+                    'zoom_priority': feature['zoom_priority'],
+                    'font_size': feature.get('font_size', 0),
+                    'text': feature['text'],
+                }
             else:
                 # Create a lightweight record for this zoom
                 zoom_feature = {
@@ -961,46 +1099,110 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                     'width_pixels': feature.get('width_pixels', 0),
                 }
 
-            is_polygon = zoom_feature['geom_type'] == GEOM_POLYGON
-            tiles = get_feature_tiles(zoom_feature['coords'], zoom, is_polygon)
-
-            for tile in tiles:
-                tile_features[tile].append(zoom_feature)
+            # Text labels: collect for collision detection
+            if zoom_feature['geom_type'] == GEOM_TEXT:
+                text_candidates.append(zoom_feature)
+            else:
+                is_polygon = zoom_feature['geom_type'] == GEOM_POLYGON
+                tiles = get_feature_tiles(zoom_feature['coords'], zoom, is_polygon)
+                for tile in tiles:
+                    tile_features[tile].append(zoom_feature)
             
             prepared_count += 1
             if prepared_count % 25000 == 0:
                 print(f"\r  Zoom {zoom:2d}: Preparing features... {prepared_count:,} / {total_to_process:,}", end='', flush=True)
+
+        # Phase 1b: Text label collision detection
+        if text_candidates:
+            tile_width_deg = 360.0 / (2.0 ** zoom)
+            pixel_deg = tile_width_deg / 256.0
+            # Approximate label size: ~8 pixels per char width, ~12 pixels height
+            char_w = pixel_deg * 4  # half-width per char in degrees
+            label_h = pixel_deg * 8  # half-height in degrees
+
+            # Sort by priority (higher zoom_priority nibble = more important)
+            text_candidates.sort(key=lambda f: -(f['zoom_priority'] & 0x0F))
+
+            placed_boxes = []  # list of (min_lon, min_lat, max_lon, max_lat)
+            labels_placed = 0
+            labels_dropped = 0
+
+            for tf in text_candidates:
+                lon, lat = tf['coords'][0]
+                text_len = len(tf['text'])
+                half_w = char_w * text_len / 2
+                half_h = label_h
+
+                box = (lon - half_w, lat - half_h, lon + half_w, lat + half_h)
+
+                # Check overlap with placed labels
+                overlap = False
+                for pb in placed_boxes:
+                    if (box[0] < pb[2] and box[2] > pb[0] and
+                        box[1] < pb[3] and box[3] > pb[1]):
+                        overlap = True
+                        break
+
+                if overlap:
+                    labels_dropped += 1
+                    continue
+
+                placed_boxes.append(box)
+                labels_placed += 1
+
+                # Distribute to tiles (including neighbors)
+                tiles = get_feature_tiles(tf['coords'], zoom, False)
+                expanded = set()
+                for (tx, ty) in tiles:
+                    for dx in range(-1, 2):
+                        for dy in range(-1, 2):
+                            expanded.add((tx + dx, ty + dy))
+                for tile in expanded:
+                    tile_features[tile].append(tf)
+
+            if labels_dropped > 0:
+                print(f"\r  Zoom {zoom:2d}: Labels: {labels_placed} placed, {labels_dropped} dropped (overlap)")
 
         if not tile_features:
             continue
 
         num_tiles = len(tile_features)
         tiles_written = 0
-        tile_items = list(tile_features.items())
         print() # New line after preparation phase
 
-        # Phase 2: Process and write tiles
-        for i, ((x, y), features) in enumerate(tile_items):
-            progress = (i + 1) / num_tiles
-            bar_width = 25
-            filled = int(bar_width * progress)
-            bar = '█' * filled + '░' * (bar_width - filled)
-            print(f"\r  Zoom {zoom:2d}: Tiles [{bar}] {i+1}/{num_tiles}", end='', flush=True)
-
+        # Phase 2: Process and write tiles (parallel)
+        num_workers = min(multiprocessing.cpu_count(), num_tiles)
+        tile_jobs = []
+        for (x, y), features in tile_features.items():
             tile_dir = os.path.join(output_dir, str(zoom), str(x))
             tile_path = os.path.join(tile_dir, f"{y}.nav")
-
-            # Pre-sort by priority
             features.sort(key=lambda f: f['zoom_priority'] & 0x0F)
+            tile_jobs.append((features, tile_path, zoom, x, y))
 
-            if write_nav_tile(features, tile_path, zoom, x, y):
-                tiles_written += 1
-                total_size += os.path.getsize(tile_path)
+        completed = 0
+        with ThreadPoolExecutor(max_workers=num_workers) as executor:
+            futures = {executor.submit(write_nav_tile, *job): job for job in tile_jobs}
+            for future in as_completed(futures):
+                completed += 1
+                progress = completed / num_tiles
+                bar_width = 25
+                filled = int(bar_width * progress)
+                bar = '█' * filled + '░' * (bar_width - filled)
+                print(f"\r  Zoom {zoom:2d}: Tiles [{bar}] {completed}/{num_tiles}", end='', flush=True)
+
+                result = future.result()
+                if result:
+                    tiles_written += 1
+                    tile_path = futures[future][1]
+                    try:
+                        total_size += os.path.getsize(tile_path)
+                    except OSError:
+                        pass
 
         # Clear memory before next zoom level
         tile_features.clear()
-        tile_items.clear()
-        
+        tile_jobs.clear()
+
         zoom_elapsed = time.time() - zoom_start
         print(f"\r  Zoom {zoom:2d}: {tiles_written} tiles written. ({zoom_elapsed:.1f}s)" + " " * 20)
         total_tiles += tiles_written

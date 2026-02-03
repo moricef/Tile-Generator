@@ -240,7 +240,7 @@
   },
   "natural=peak": {
     "zoom": 12,
-    "color": "#8b4513",
+    "color": "#d08050",
     "priority": 30
   },
   "natural=rock": {
@@ -666,7 +666,7 @@
     "priority": 90
   },
   "place=town": {
-    "zoom": 8,
+    "zoom": 9,
     "color": "#555555",
     "priority": 91
   },
@@ -675,8 +675,13 @@
     "color": "#666666",
     "priority": 92
   },
+  "place=suburb": {
+    "zoom": 12,
+    "color": "#666666",
+    "priority": 92
+  },
   "place=hamlet": {
-    "zoom": 11,
+    "zoom": 13,
     "color": "#777777",
     "priority": 93
   },

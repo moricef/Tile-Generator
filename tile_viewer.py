@@ -41,6 +41,7 @@ NAV_MAGIC = b'NAV1'
 GEOM_POINT = 1
 GEOM_LINESTRING = 2
 GEOM_POLYGON = 3
+GEOM_TEXT = 4
 
 
 def deg2num(lat_deg: float, lon_deg: float, zoom: int) -> Tuple[float, float]:
@@ -86,6 +87,8 @@ class NavFeature:
         self.ring_ends: List[int] = []  # Indices where each ring ends
         self.tile_x = 0
         self.tile_y = 0
+        self.text: str = ''  # For GEOM_TEXT features
+        self.font_size: int = 0  # 0=small, 1=medium, 2=large
 
     @property
     def min_zoom(self) -> int:
@@ -132,14 +135,24 @@ def read_nav_tile(path: str, tile_x: int, tile_y: int) -> List[NavFeature]:
                 coord_count = struct.unpack('<H', f.read(2))[0]
                 f.read(1)
 
-                for _ in range(coord_count):
-                    px, py = struct.unpack('<hh', f.read(4))
-                    feature.coords.append((px, py))
+                if feature.geom_type == GEOM_TEXT:
+                    # Read raw data block (coord_count * 4 bytes)
+                    data = f.read(coord_count * 4)
+                    if len(data) >= 5:
+                        px, py = struct.unpack('<hh', data[0:4])
+                        feature.coords.append((px, py))
+                        text_len = data[4]
+                        feature.text = data[5:5 + text_len].decode('utf-8', errors='replace')
+                        feature.font_size = feature.width
+                else:
+                    for _ in range(coord_count):
+                        px, py = struct.unpack('<hh', f.read(4))
+                        feature.coords.append((px, py))
 
-                if feature.geom_type == GEOM_POLYGON:
-                    ring_count = struct.unpack('<B', f.read(1))[0]
-                    for _ in range(ring_count):
-                        feature.ring_ends.append(struct.unpack('<H', f.read(2))[0])
+                    if feature.geom_type == GEOM_POLYGON:
+                        ring_count = struct.unpack('<H', f.read(2))[0]
+                        for _ in range(ring_count):
+                            feature.ring_ends.append(struct.unpack('<H', f.read(2))[0])
 
                 features.append(feature)
     except Exception as e:
@@ -293,7 +306,23 @@ class NAVViewer:
         if not feature.coords: return
         color = rgb565_to_rgb888(feature.color_rgb565)
 
-        if feature.geom_type == GEOM_POINT:
+        if feature.geom_type == GEOM_TEXT:
+            px, py = feature.coords[0]
+            sx, sy = self._tile_coord_to_screen(feature.tile_x, feature.tile_y, px, py)
+            if 0 <= sx < VIEWPORT_SIZE and 0 <= sy < VIEWPORT_SIZE and feature.text:
+                font_sizes = {0: 13, 1: 15, 2: 18}
+                size = font_sizes.get(feature.font_size, 13)
+                text_font = pygame.font.SysFont(None, size)
+                lines = feature.text.split('\n')
+                line_height = text_font.get_linesize()
+                total_height = line_height * len(lines)
+                y_start = sy - total_height // 2
+                for i, line in enumerate(lines):
+                    rendered = text_font.render(line, True, color)
+                    surface.blit(rendered, (sx - rendered.get_width() // 2, y_start + i * line_height))
+            return
+
+        elif feature.geom_type == GEOM_POINT:
             px, py = feature.coords[0]
             sx, sy = self._tile_coord_to_screen(feature.tile_x, feature.tile_y, px, py)
             if 0 <= sx < VIEWPORT_SIZE and 0 <= sy < VIEWPORT_SIZE:
