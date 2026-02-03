@@ -665,10 +665,10 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
             final_features_data = []
             
-            # Clip geometry if shapely is available
+            # Clip geometry
             if clip_box:
                 try:
-                    # Simplify slightly to avoid tiny artifacts before clipping
+                    from shapely.geometry import Polygon, MultiPolygon, LineString, MultiLineString, GeometryCollection
                     geom = Polygon(orig_coords) if is_polygon else LineString(orig_coords)
                     if not geom.is_valid:
                         geom = geom.buffer(0)
@@ -677,7 +677,6 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     if clipped.is_empty:
                         continue
                         
-                    # Extract parts of the correct type
                     parts = []
                     if isinstance(clipped, GeometryCollection):
                         parts = list(clipped.geoms)
@@ -773,8 +772,8 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                         f.write(struct.pack('<hh', px, py))
 
                 if is_polygon:
-                    # Write ring ends
-                    f.write(struct.pack('<B', len(projected_rings)))
+                    # Write ring ends (using uint16 to support > 255 rings in complex merged areas)
+                    f.write(struct.pack('<H', len(projected_rings)))
                     current_end = 0
                     for ring in projected_rings:
                         current_end += len(ring)
@@ -824,9 +823,14 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
     total_size = 0
 
     for zoom in range(zoom_range[0], zoom_range[1] + 1):
-        tile_features: Dict[Tuple[int, int], List[Dict]] = defaultdict(list)
+        tile_features = defaultdict(list)
         tolerance = get_simplify_tolerance(zoom)
-
+        
+        # Phase 1: Prepare and filter features for this zoom level
+        zoom_start = time.time()
+        prepared_count = 0
+        total_to_process = len(handler.features)
+        
         for feature in handler.features:
             min_zoom = feature['zoom_priority'] >> 4
             if min_zoom > zoom:
@@ -837,15 +841,27 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
             if len(coords) > 2:
                 coords = simplify_coords(coords, tolerance)
             
-            # Create a shallow copy with simplified coords for this zoom
-            zoom_feature = feature.copy()
-            zoom_feature['coords'] = coords
+            if not coords:
+                continue
+
+            # Create a lightweight record for this zoom
+            zoom_feature = {
+                'geom_type': feature['geom_type'],
+                'coords': coords,
+                'color_rgb565': feature['color_rgb565'],
+                'zoom_priority': feature['zoom_priority'],
+                'width_meters': feature.get('width_meters', 0.0)
+            }
 
             is_polygon = zoom_feature['geom_type'] == GEOM_POLYGON
             tiles = get_feature_tiles(zoom_feature['coords'], zoom, is_polygon)
 
             for tile in tiles:
                 tile_features[tile].append(zoom_feature)
+            
+            prepared_count += 1
+            if prepared_count % 25000 == 0:
+                print(f"\r  Zoom {zoom:2d}: Preparing features... {prepared_count:,} / {total_to_process:,}", end='', flush=True)
 
         if not tile_features:
             continue
@@ -853,25 +869,32 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
         num_tiles = len(tile_features)
         tiles_written = 0
         tile_items = list(tile_features.items())
+        print() # New line after preparation phase
 
+        # Phase 2: Process and write tiles
         for i, ((x, y), features) in enumerate(tile_items):
             progress = (i + 1) / num_tiles
-            bar_width = 30
+            bar_width = 25
             filled = int(bar_width * progress)
             bar = '█' * filled + '░' * (bar_width - filled)
-            print(f"\r  Zoom {zoom:2d}: [{bar}] {i+1}/{num_tiles} tiles", end='', flush=True)
+            print(f"\r  Zoom {zoom:2d}: Tiles [{bar}] {i+1}/{num_tiles}", end='', flush=True)
 
             tile_dir = os.path.join(output_dir, str(zoom), str(x))
             tile_path = os.path.join(tile_dir, f"{y}.nav")
 
-            # Pre-sort by priority (low nibble) for streaming render on ESP32
+            # Pre-sort by priority
             features.sort(key=lambda f: f['zoom_priority'] & 0x0F)
 
             if write_nav_tile(features, tile_path, zoom, x, y):
                 tiles_written += 1
                 total_size += os.path.getsize(tile_path)
 
-        print(f"\r  Zoom {zoom:2d}: {tiles_written} tiles written" + " " * 30)
+        # Clear memory before next zoom level
+        tile_features.clear()
+        tile_items.clear()
+        
+        zoom_elapsed = time.time() - zoom_start
+        print(f"\r  Zoom {zoom:2d}: {tiles_written} tiles written. ({zoom_elapsed:.1f}s)" + " " * 20)
         total_tiles += tiles_written
 
     total_time = time.time() - start_time
