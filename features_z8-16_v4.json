@@ -37,16 +37,6 @@
     "color": "#add19e",
     "priority": 22
   },
-  "natural=fell": {
-    "zoom": 8,
-    "color": "#d6d99f",
-    "priority": 22
-  },
-  "landuse=quarry": {
-    "zoom": 8,
-    "color": "#c1c1c1",
-    "priority": 25
-  },
   "landuse=farmland": {
     "zoom": 8,
     "color": "#eef0d5",
@@ -88,7 +78,7 @@
     "priority": 24
   },
   "landuse=quarry": {
-    "zoom": 10,
+    "zoom": 8,
     "color": "#c1c1c1",
     "priority": 25
   },
@@ -262,6 +252,41 @@
     "color": "#eeeeee",
     "priority": 27
   },
+  "place=island": {
+    "zoom": 10,
+    "color": "#f2efe9",
+    "priority": 28
+  },
+  "place=islet": {
+    "zoom": 12,
+    "color": "#f2efe9",
+    "priority": 28
+  },
+  "place=isolated_dwelling": {
+    "zoom": 14,
+    "color": "#e0dfdf",
+    "priority": 28
+  },
+  "place=locality": {
+    "zoom": 13,
+    "color": "#f2efe9",
+    "priority": 28
+  },
+  "place=neighbourhood": {
+    "zoom": 13,
+    "color": "#e0dfdf",
+    "priority": 28
+  },
+  "place=quarter": {
+    "zoom": 13,
+    "color": "#e0dfdf",
+    "priority": 28
+  },
+  "place=farm": {
+    "zoom": 14,
+    "color": "#f5dcba",
+    "priority": 28
+  },
 
   "natural=bare_rock": {
     "zoom": 8,
@@ -299,7 +324,7 @@
     "priority": 35
   },
   "natural=fell": {
-    "zoom": 10,
+    "zoom": 8,
     "color": "#d6d99f",
     "priority": 35
   },

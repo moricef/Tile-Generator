@@ -175,6 +175,7 @@ LAYER_MAPPING = {
         'natural=water', 'natural=coastline', 'natural=bay',
         'waterway=riverbank', 'waterway=dock', 'waterway=boatyard',
         'waterway=river', 'waterway=stream', 'waterway=canal',
+        'waterway=ditch', 'waterway=drain',
         'natural=spring', 'natural=wetland',
         'water=river', 'water=canal', 'water=reservoir', 'water=pond', 'water=lake', 'water=basin'
     ],
@@ -182,18 +183,23 @@ LAYER_MAPPING = {
         'natural=beach', 'natural=sand', 'natural=wood',
         'landuse=forest', 'natural=forest', 'natural=scrub',
         'natural=heath', 'natural=grassland', 'landuse=meadow',
-        'natural=bare_rock', 'natural=rock', 'natural=scree', 'natural=stone', 
-        'natural=fell', 'natural=moor', 'landuse=quarry'
+        'natural=bare_rock', 'natural=rock', 'natural=scree', 'natural=stone',
+        'natural=fell', 'natural=moor', 'natural=shrubbery', 'landuse=quarry',
         'landuse=grass', 'landuse=orchard', 'landuse=vineyard',
-        'landuse=farmland', 'landuse=park', 'leisure=park',
+        'landuse=farmland', 'landuse=farmyard', 'landuse=park', 'leisure=park',
         'leisure=nature_reserve', 'leisure=garden', 'leisure=pitch',
         'leisure=golf_course', 'leisure=recreation_ground', 'landuse=recreation_ground',
-        'landuse=residential', 'place=suburb',
+        'landuse=residential', 'place=suburb', 'place=island', 'place=islet',
+        'place=isolated_dwelling', 'place=locality', 'place=neighbourhood',
+        'place=quarter', 'place=farm',
         'landuse=commercial', 'landuse=retail', 'landuse=industrial',
         'landuse=construction', 'landuse=cemetery', 'landuse=allotments',
-        'leisure=stadium', 'leisure=sports_centre', 'leisure=playground',
+        'leisure=stadium', 'leisure=sports_centre', 'leisure=sports_hall', 'leisure=playground',
+        'leisure=swimming_pool', 'leisure=track',
         'amenity=parking', 'leisure=common', 'landuse=village_green',
-        'landuse=quarry', 'landuse=military', 'landuse=landfill', 'landuse=brownfield'
+        'landuse=quarry', 'landuse=military', 'landuse=landfill', 'landuse=brownfield',
+        'landuse=basin', 'landuse=reservoir', 'landuse=railway', 'landuse=education',
+        'landuse=garages', 'landuse=flowerbed'
     ],
     'roads': [
         'highway=motorway', 'highway=motorway_link',
@@ -206,10 +212,13 @@ LAYER_MAPPING = {
         'highway=pedestrian', 'highway=track',
         'highway=path', 'highway=footway',
         'highway=cycleway', 'highway=steps',
-        'highway=crossing', 'highway=bus_stop'
+        'highway=crossing', 'highway=bus_stop',
+        'highway=construction', 'highway=platform'
     ],
     'railways': [
-        'railway=rail', 'railway=subway', 'railway=tram'
+        'railway=rail', 'railway=subway', 'railway=tram',
+        'railway=abandoned', 'railway=disused', 'railway=funicular',
+        'railway=narrow_gauge', 'railway=platform'
     ],
     'buildings': [
         'building', 'man_made=tower'
@@ -217,24 +226,32 @@ LAYER_MAPPING = {
     'amenities': [
         'amenity=hospital',
         'amenity=school', 'amenity=university',
-        'amenity=place_of_worship'
+        'amenity=place_of_worship',
+        'amenity=grave_yard', 'amenity=marketplace',
+        'amenity=parking_space'
     ],
     'infrastructure': [
         'bridge=yes', 'man_made=bridge',
         'aeroway=runway', 'aeroway=taxiway', 'aeroway=apron',
-        'tunnel=yes'
+        'aeroway=aerodrome', 'aeroway=hangar', 'aeroway=helipad',
+        'aeroway=parking_position',
+        'tunnel=yes', 'tunnel=culvert',
+        'man_made=embankment', 'man_made=pier',
+        'waterway=dam', 'waterway=weir'
     ],
     'terrain': [
         'natural=peak', 'natural=ridge',
         'natural=volcano', 'natural=cliff',
-        'natural=tree_row', 'natural=tree'
+        'natural=tree_row', 'natural=tree',
+        'natural=arete', 'natural=earth_bank',
+        'natural=shingle', 'natural=glacier'
     ],
     'boundaries': [
         'boundary=administrative'
     ],
     'places': [
         'place=city', 'place=state', 'place=town',
-        'place=village', 'place=hamlet'
+        'place=village', 'place=hamlet', 'place=square'
     ]
 }
 
@@ -432,7 +449,12 @@ class OSMHandler(osmium.SimpleHandler):
             'areas_processed': 0,
             'boundary_ways_extracted': 0,
             'features_extracted': 0,
-            'features_filtered': 0
+            'features_filtered': 0,
+            'area_no_config': 0,
+            'area_no_layer': 0,
+            'area_zoom_filtered': 0,
+            'area_exception': 0,
+            'area_boundary': 0
         }
         self.start_time = time.time()
         self.last_progress_time = time.time()
@@ -730,23 +752,27 @@ class OSMHandler(osmium.SimpleHandler):
         self._log_progress()
 
         tags = self._tags_to_dict(a.tags)
-        
+
         # Skip boundary relations
         if tags.get('boundary') == 'administrative':
+            self.stats['area_boundary'] += 1
             return
 
         # Check if feature is in config and has a layer mapping
         if not self._is_feature_in_config(tags):
+            self.stats['area_no_config'] += 1
             return
 
         layer = get_layer_for_tags(tags)
         if layer is None:
+            self.stats['area_no_layer'] += 1
             return
 
         # Removed the 'highway in tags' filter that was causing issues
-        
+
         min_zoom = get_zoom_for_tags(tags, self.config)
         if min_zoom > self.max_zoom:
+            self.stats['area_zoom_filtered'] += 1
             return
 
         # Construction de la géométrie
@@ -783,89 +809,11 @@ class OSMHandler(osmium.SimpleHandler):
                     'inner_rings': inner_rings,
                 })
                 self.stats['features_extracted'] += 1
-        except Exception:
-            self.stats['features_filtered'] += 1
-
-"""    def area(self, a):
-        """Process area - handles multipolygon relations."""
-        self.stats['areas_processed'] += 1
-        self._log_progress()
-
-        if not self._has_interesting_tags(a.tags):
-            self.stats['features_filtered'] += 1
-            return
-
-        tags = self._tags_to_dict(a.tags)
-
-        # Skip boundary relations - handled via BoundaryScanner + way()
-        if tags.get('boundary') == 'administrative':
-            return
-
-        if not self._is_feature_in_config(tags):
-            self.stats['features_filtered'] += 1
-            return
-
-        layer = get_layer_for_tags(tags)
-        if layer is None:
-            self.stats['features_filtered'] += 1
-            return
-
-        """ if 'highway' in tags:
-            self.stats['features_filtered'] += 1
-            return """
-
-        min_zoom = get_zoom_for_tags(tags, self.config)
-        if min_zoom > self.max_zoom:
-            self.stats['features_filtered'] += 1
-            return
-
-        if a.from_way() and a.orig_id() in self.processed_way_ids:
-            return
-
-        try:
-            wkb = self.wkbfab.create_multipolygon(a)
-            geom = shapely.wkb.loads(wkb, hex=True)
-
-            color = get_color_for_tags(tags, self.config)
-            priority = get_priority_for_tags(tags, self.config)
-            color_rgb565 = hex_to_rgb565(color)
-            layer_base_priority = LAYER_PRIORITY.get(layer, 50)
-            combined_priority = layer_base_priority + (priority % 10)
-
-            polygons = []
-            if geom.geom_type == 'Polygon':
-                polygons = [geom]
-            elif geom.geom_type == 'MultiPolygon':
-                polygons = list(geom.geoms)
-
-            for poly in polygons:
-                if poly.is_empty or not poly.exterior:
-                    continue
-
-                coords = list(poly.exterior.coords)
-                if len(coords) < 4:
-                    continue
-
-                # Collect inner rings (holes) - e.g. islands in rivers
-                inner_rings = []
-                for interior in poly.interiors:
-                    ring_coords = list(interior.coords)
-                    if len(ring_coords) >= 4:
-                        inner_rings.append(ring_coords)
-
-                feature = {
-                    'geom_type': GEOM_POLYGON,
-                    'coords': coords,
-                    'color_rgb565': color_rgb565,
-                    'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
-                    'width_meters': 0.0,  # Polygons don't use width
-                    'inner_rings': inner_rings,
-                }
-                self.features.append(feature)
-                self.stats['features_extracted'] += 1
-
         except Exception as e:
-            self.stats['features_filtered'] += 1 """
+            self.stats['area_exception'] += 1
+            # Debug: log first 10 errors
+            if self.stats['area_exception'] <= 10:
+                logger.warning(f"Area extraction failed: {e} | tags: {tags}")
 
 
 def simplify_coords(coords: List[Tuple[float, float]], tolerance: float) -> List[Tuple[float, float]]:
@@ -1238,6 +1186,12 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
     logger.info(f"  Boundary ways extracted: {handler.stats['boundary_ways_extracted']:,}")
     logger.info(f"  Features extracted: {handler.stats['features_extracted']:,}")
     logger.info(f"  Features filtered: {handler.stats['features_filtered']:,}")
+    logger.info(f"  Area filter breakdown:")
+    logger.info(f"    - Boundary admin: {handler.stats['area_boundary']:,}")
+    logger.info(f"    - Not in config: {handler.stats['area_no_config']:,}")
+    logger.info(f"    - No layer mapping: {handler.stats['area_no_layer']:,}")
+    logger.info(f"    - Zoom filtered: {handler.stats['area_zoom_filtered']:,}")
+    logger.info(f"    - Exceptions: {handler.stats['area_exception']:,}")
 
     logger.info("Generating NAV tile files...")
 
