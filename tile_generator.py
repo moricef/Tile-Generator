@@ -176,12 +176,14 @@ LAYER_MAPPING = {
         'waterway=riverbank', 'waterway=dock', 'waterway=boatyard',
         'waterway=river', 'waterway=stream', 'waterway=canal',
         'natural=spring', 'natural=wetland',
-        'water=river', 'water=canal', 'water=reservoir'
+        'water=river', 'water=canal', 'water=reservoir', 'water=pond', 'water=lake', 'water=basin'
     ],
     'landuse': [
         'natural=beach', 'natural=sand', 'natural=wood',
         'landuse=forest', 'natural=forest', 'natural=scrub',
         'natural=heath', 'natural=grassland', 'landuse=meadow',
+        'natural=bare_rock', 'natural=rock', 'natural=scree', 'natural=stone', 
+        'natural=fell', 'natural=moor', 'landuse=quarry'
         'landuse=grass', 'landuse=orchard', 'landuse=vineyard',
         'landuse=farmland', 'landuse=park', 'leisure=park',
         'leisure=nature_reserve', 'leisure=garden', 'leisure=pitch',
@@ -191,7 +193,7 @@ LAYER_MAPPING = {
         'landuse=construction', 'landuse=cemetery', 'landuse=allotments',
         'leisure=stadium', 'leisure=sports_centre', 'leisure=playground',
         'amenity=parking', 'leisure=common', 'landuse=village_green',
-        'landuse=grass'
+        'landuse=quarry', 'landuse=military', 'landuse=landfill', 'landuse=brownfield'
     ],
     'roads': [
         'highway=motorway', 'highway=motorway_link',
@@ -721,8 +723,70 @@ class OSMHandler(osmium.SimpleHandler):
                 pass
 
         return 0.0
-
+    
     def area(self, a):
+        """Process area - handles multipolygon relations."""
+        self.stats['areas_processed'] += 1
+        self._log_progress()
+
+        tags = self._tags_to_dict(a.tags)
+        
+        # Skip boundary relations
+        if tags.get('boundary') == 'administrative':
+            return
+
+        # Check if feature is in config and has a layer mapping
+        if not self._is_feature_in_config(tags):
+            return
+
+        layer = get_layer_for_tags(tags)
+        if layer is None:
+            return
+
+        # Removed the 'highway in tags' filter that was causing issues
+        
+        min_zoom = get_zoom_for_tags(tags, self.config)
+        if min_zoom > self.max_zoom:
+            return
+
+        # Construction de la géométrie
+        try:
+            wkb = self.wkbfab.create_multipolygon(a)
+            geom = shapely.wkb.loads(wkb, hex=True)
+
+            color = get_color_for_tags(tags, self.config)
+            priority = get_priority_for_tags(tags, self.config)
+            color_rgb565 = hex_to_rgb565(color)
+            layer_base_priority = LAYER_PRIORITY.get(layer, 50)
+            combined_priority = layer_base_priority + (priority % 10)
+
+            polygons = []
+            if geom.geom_type == 'Polygon':
+                polygons = [geom]
+            elif geom.geom_type == 'MultiPolygon':
+                polygons = list(geom.geoms)
+
+            for poly in polygons:
+                if poly.is_empty or not poly.exterior:
+                    continue
+                coords = list(poly.exterior.coords)
+                if len(coords) < 4:
+                    continue
+                inner_rings = [list(i.coords) for i in poly.interiors if len(i.coords) >= 4]
+
+                self.features.append({
+                    'geom_type': GEOM_POLYGON,
+                    'coords': coords,
+                    'color_rgb565': color_rgb565,
+                    'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
+                    'width_meters': 0.0,
+                    'inner_rings': inner_rings,
+                })
+                self.stats['features_extracted'] += 1
+        except Exception:
+            self.stats['features_filtered'] += 1
+
+"""    def area(self, a):
         """Process area - handles multipolygon relations."""
         self.stats['areas_processed'] += 1
         self._log_progress()
@@ -746,9 +810,9 @@ class OSMHandler(osmium.SimpleHandler):
             self.stats['features_filtered'] += 1
             return
 
-        if 'highway' in tags:
+        """ if 'highway' in tags:
             self.stats['features_filtered'] += 1
-            return
+            return """
 
         min_zoom = get_zoom_for_tags(tags, self.config)
         if min_zoom > self.max_zoom:
@@ -801,7 +865,7 @@ class OSMHandler(osmium.SimpleHandler):
                 self.stats['features_extracted'] += 1
 
         except Exception as e:
-            self.stats['features_filtered'] += 1
+            self.stats['features_filtered'] += 1 """
 
 
 def simplify_coords(coords: List[Tuple[float, float]], tolerance: float) -> List[Tuple[float, float]]:

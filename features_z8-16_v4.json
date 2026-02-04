@@ -37,6 +37,16 @@
     "color": "#add19e",
     "priority": 22
   },
+  "natural=fell": {
+    "zoom": 8,
+    "color": "#d6d99f",
+    "priority": 22
+  },
+  "landuse=quarry": {
+    "zoom": 8,
+    "color": "#c1c1c1",
+    "priority": 25
+  },
   "landuse=farmland": {
     "zoom": 8,
     "color": "#eef0d5",
@@ -58,7 +68,7 @@
     "priority": 24
   },
   "landuse=commercial": {
-    "zoom": 10,
+    "zoom": 8,
     "color": "#f2dad9",
     "priority": 24
   },
@@ -68,7 +78,7 @@
     "priority": 24
   },
   "landuse=industrial": {
-    "zoom": 9,
+    "zoom": 8,
     "color": "#ebdbe8",
     "priority": 24
   },
@@ -76,6 +86,26 @@
     "zoom": 8,
     "color": "#e0dfdf",
     "priority": 24
+  },
+  "landuse=quarry": {
+    "zoom": 10,
+    "color": "#c1c1c1",
+    "priority": 25
+  },
+  "landuse=military": {
+    "zoom": 10,
+    "color": "#f1f0d0",
+    "priority": 25
+  },
+  "landuse=landfill": {
+    "zoom": 11,
+    "color": "#b6b592",
+    "priority": 25
+  },
+  "landuse=reservoir": {
+    "zoom": 8,
+    "color": "#aad3df",
+    "priority": 40
   },
   "place=suburb": {
     "zoom": 10,
@@ -326,6 +356,21 @@
   },
   "water=reservoir": {
     "zoom": 8,
+    "color": "#aad3df",
+    "priority": 40
+  },
+  "water=pond": {
+    "zoom": 12,
+    "color": "#aad3df",
+    "priority": 40
+  },
+  "water=lake": {
+    "zoom": 8,
+    "color": "#aad3df",
+    "priority": 40
+  },
+  "water=basin": {
+    "zoom": 11,
     "color": "#aad3df",
     "priority": 40
   },
