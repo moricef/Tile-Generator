@@ -511,11 +511,6 @@
     "color": "#996600",
     "priority": 57
   },
-  "man_made=bridge": {
-    "zoom": 12,
-    "color": "#b8b8b8",
-    "priority": 35
-  },
   "tunnel=yes": {
     "zoom": 13,
     "color": "#aaaaaa",

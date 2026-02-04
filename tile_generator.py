@@ -68,23 +68,23 @@ POINT_FEATURES = {
 # population_zoom_rules: list of (min_pop, zoom) sorted descending
 TEXT_FEATURES = {
     'place=city': {
-        'font_size': 2,
+        'font_size': 3,
         'zoom_rules': [(1000000, 4), (500000, 5), (100000, 6), (0, 8)],
     },
     'place=town': {
-        'font_size': 1,
+        'font_size': 2,
         'zoom_rules': [(0, 9)],
     },
     'place=village': {
-        'font_size': 0,
+        'font_size': 1,
         'zoom_rules': [(0, 12)],
     },
     'place=suburb': {
-        'font_size': 0,
+        'font_size': 1,
         'zoom_rules': [(0, 12)],
     },
     'place=hamlet': {
-        'font_size': 0,
+        'font_size': 1,
         'zoom_rules': [(0, 14)],
     },
 }
@@ -117,6 +117,15 @@ LINE_WIDTH_PER_ZOOM = {
     'tram':          {                         12: 1, 13: 1, 14: 2, 15: 2, 16: 3},
     'narrow_gauge':  {                                13: 1, 14: 2, 15: 2, 16: 2},
     'funicular':     {                                13: 1, 14: 2, 15: 2, 16: 2},
+}
+
+# Override color per zoom level (RGB565) - only for features that change color by zoom
+# Format: type_value -> {zoom: '#hexcolor'}
+# If a zoom is not listed, the default JSON color is used
+LINE_COLOR_PER_ZOOM = {
+    'residential':   {12: '#cccccc'},  # grey at z12, white (from JSON) at z13+
+    'unclassified':  {12: '#cccccc'},
+    'living_street': {12: '#cccccc'},
 }
 
 # Cache for zoom level parameters
@@ -623,6 +632,13 @@ class OSMHandler(osmium.SimpleHandler):
         if len(coords) < 2:
             self.stats['features_filtered'] += 1
             return
+
+        # Railway service tracks (yard, siding, spur): push to z13 per OSM Carto
+        if 'railway' in tags and tags.get('service') in ('yard', 'siding', 'spur', 'crossover'):
+            min_zoom = max(min_zoom, 13)
+            if min_zoom > self.max_zoom:
+                self.stats['features_filtered'] += 1
+                return
 
         is_closed = len(coords) >= 4 and coords[0] == coords[-1]
         
@@ -1173,14 +1189,22 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                 }
             else:
                 # Create a lightweight record for this zoom
+                color_rgb565 = feature['color_rgb565']
+                # Override color per zoom if defined
+                hw_type = feature.get('highway_type', '')
+                if hw_type and hw_type in LINE_COLOR_PER_ZOOM:
+                    color_override = LINE_COLOR_PER_ZOOM[hw_type].get(zoom)
+                    if color_override:
+                        color_rgb565 = hex_to_rgb565(color_override)
+
                 zoom_feature = {
                     'geom_type': feature['geom_type'],
                     'coords': coords,
-                    'color_rgb565': feature['color_rgb565'],
+                    'color_rgb565': color_rgb565,
                     'zoom_priority': feature['zoom_priority'],
                     'width_meters': feature.get('width_meters', 0.0),
                     'width_pixels': feature.get('width_pixels', 0),
-                    'highway_type': feature.get('highway_type', ''),
+                    'highway_type': hw_type,
                     'inner_rings': feature.get('inner_rings', []),
                 }
 
