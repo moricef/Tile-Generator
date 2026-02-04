@@ -1119,7 +1119,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 pixel_area = (f_max_x - f_min_x) * (f_max_y - f_min_y) / (16 * 16)
                 if is_polygon:
                     if zoom <= 9:
-                        min_pixel_area = 0.1
+                        min_pixel_area = 0.05
                     elif zoom <= 12:
                         min_pixel_area = 1.0
                     else:
@@ -1216,6 +1216,17 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
     logger.info(f"    - No layer mapping: {handler.stats['area_no_layer']:,}")
     logger.info(f"    - Zoom filtered: {handler.stats['area_zoom_filtered']:,}")
     logger.info(f"    - Exceptions: {handler.stats['area_exception']:,}")
+
+    logger.info("Calculating global features bounding box...")
+    min_lon, max_lon = 180.0, -180.0
+    min_lat, max_lat = 90.0, -90.0
+    for feature in handler.features:
+        for lon, lat in feature['coords']:
+            min_lon = min(min_lon, lon)
+            max_lon = max(max_lon, lon)
+            min_lat = min(min_lat, lat)
+            max_lat = max(max_lat, lat)
+    logger.info(f"  BBox: lon=[{min_lon:.4f}, {max_lon:.4f}], lat=[{min_lat:.4f}, {max_lat:.4f}]")
 
     logger.info("Generating NAV tile files...")
 
@@ -1379,21 +1390,31 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
             if labels_dropped > 0:
                 print(f"\r  Zoom {zoom:2d}: Labels: {labels_placed} placed, {labels_dropped} dropped (overlap)")
 
-        if not tile_features:
-            continue
+        # Phase 2: Calculate tile grid from global bbox and write all tiles
+        min_tx = lon_to_tile_x(min_lon, zoom)
+        max_tx = lon_to_tile_x(max_lon, zoom)
+        min_ty = lat_to_tile_y(max_lat, zoom)  # lat is inverted for Y
+        max_ty = lat_to_tile_y(min_lat, zoom)
 
-        num_tiles = len(tile_features)
+        num_tiles = (max_tx - min_tx + 1) * (max_ty - min_ty + 1)
+        if num_tiles <= 0:
+            print(f"\r  Zoom {zoom:2d}: No tiles to generate for this area.")
+            continue
+        
         tiles_written = 0
         print() # New line after preparation phase
 
-        # Phase 2: Process and write tiles (parallel)
         num_workers = min(multiprocessing.cpu_count(), num_tiles)
         tile_jobs = []
-        for (x, y), features in tile_features.items():
-            tile_dir = os.path.join(output_dir, str(zoom), str(x))
-            tile_path = os.path.join(tile_dir, f"{y}.nav")
-            features.sort(key=lambda f: f['zoom_priority'] & 0x0F)
-            tile_jobs.append((features, tile_path, zoom, x, y))
+        for y in range(min_ty, max_ty + 1):
+            for x in range(min_tx, max_tx + 1):
+                # Get features for this tile, or an empty list if none
+                features = tile_features.get((x, y), [])
+                tile_dir = os.path.join(output_dir, str(zoom), str(x))
+                tile_path = os.path.join(tile_dir, f"{y}.nav")
+                # Even with no features, the job is created to write the background tile
+                features.sort(key=lambda f: f['zoom_priority'] & 0x0F)
+                tile_jobs.append((features, tile_path, zoom, x, y))
 
         completed = 0
         with ThreadPoolExecutor(max_workers=num_workers) as executor:
