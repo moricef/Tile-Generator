@@ -913,14 +913,16 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     merged_features.extend(poly_list)
                     continue
 
-                water_rgb565 = hex_to_rgb565('#aad3df')
-                if zoom <= 10 and len(shapely_polys) >= 3 and color != water_rgb565:
-                    pixel_deg = 360.0 / (2**zoom * 256)
-                    buffer_dist = pixel_deg * 4
-                    buffered = [p.buffer(buffer_dist) for p in shapely_polys]
+                pixel_deg = 360.0 / (2**zoom * 256)
+                is_vegetation = (priority < 30)
+
+                if zoom <= 10 and is_vegetation:
+                    # Buffer pour fusionner la végétation adjacente et combler les trous
+                    buffered = [p.buffer(pixel_deg * 1.2) for p in shapely_polys]
                     merged = shapely_unary_union(buffered)
-                    merged = merged.buffer(-buffer_dist)
+                    merged = merged.buffer(-pixel_deg * 1.1)
                 else:
+                    # Pour l'eau et les autres features, fusionner précisément sans buffer
                     merged = shapely_unary_union(shapely_polys)
 
                 parts = []
@@ -961,7 +963,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
         bg_points = [(0, 0), (4096, 0), (4096, 4096), (0, 4096), (0, 0)]
         f.write(struct.pack('<B', GEOM_POLYGON))       # type
         f.write(struct.pack('<H', hex_to_rgb565(LAND_BG_COLOR)))  # color
-        f.write(struct.pack('<B', pack_zoom_priority(0, 0)))  # lowest priority
+        f.write(struct.pack('<B', pack_zoom_priority(0, 1)))  # lowest priority
         f.write(struct.pack('<B', 1))                   # width
         f.write(struct.pack('<BBBB', 0, 0, 255, 255))  # bbox = full tile
         f.write(struct.pack('<H', 5))                   # 5 points
@@ -1117,11 +1119,11 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 pixel_area = (f_max_x - f_min_x) * (f_max_y - f_min_y) / (16 * 16)
                 if is_polygon:
                     if zoom <= 9:
-                        min_pixel_area = 0.2
+                        min_pixel_area = 0.1
                     elif zoom <= 12:
-                        min_pixel_area = 2.0
+                        min_pixel_area = 1.0
                     else:
-                        min_pixel_area = 4.0
+                        min_pixel_area = 3.0
                 if is_polygon and pixel_area < min_pixel_area:
                     continue
 
