@@ -64,17 +64,60 @@ POINT_FEATURES = {
 }
 
 # Place features to extract as text labels
-# Maps to font_size: 0=small, 1=medium, 2=large
+# Maps to (base_font_size, base_zoom, population_zoom_rules)
+# population_zoom_rules: list of (min_pop, zoom) sorted descending
 TEXT_FEATURES = {
-    'place=city': 2,
-    'place=town': 1,
-    'place=village': 0,
-    'place=suburb': 0,
-    'place=hamlet': 0,
+    'place=city': {
+        'font_size': 2,
+        'zoom_rules': [(1000000, 4), (500000, 5), (100000, 6), (0, 8)],
+    },
+    'place=town': {
+        'font_size': 1,
+        'zoom_rules': [(0, 9)],
+    },
+    'place=village': {
+        'font_size': 0,
+        'zoom_rules': [(0, 12)],
+    },
+    'place=suburb': {
+        'font_size': 0,
+        'zoom_rules': [(0, 12)],
+    },
+    'place=hamlet': {
+        'font_size': 0,
+        'zoom_rules': [(0, 14)],
+    },
 }
 
 # Tags that support width (LineStrings only)
 WIDTH_TAGS = {'highway', 'railway', 'waterway'}
+
+# Fixed width in pixels per feature type and zoom level (OSM Carto style)
+# Format: type_value -> {zoom: pixels}
+LINE_WIDTH_PER_ZOOM = {
+    # Highway
+    'motorway':      {8: 2, 9: 2, 10: 2, 11: 2, 12: 3, 13: 4, 14: 5, 15: 6, 16: 7},
+    'motorway_link': {8: 1, 9: 1, 10: 1, 11: 1, 12: 2, 13: 2, 14: 3, 15: 3, 16: 4},
+    'trunk':         {8: 2, 9: 2, 10: 2, 11: 2, 12: 3, 13: 3, 14: 4, 15: 5, 16: 6},
+    'trunk_link':    {8: 1, 9: 1, 10: 1, 11: 1, 12: 2, 13: 2, 14: 3, 15: 3, 16: 4},
+    'primary':       {8: 1, 9: 1, 10: 1, 11: 2, 12: 2, 13: 3, 14: 4, 15: 5, 16: 6},
+    'primary_link':  {8: 1, 9: 1, 10: 1, 11: 1, 12: 2, 13: 2, 14: 3, 15: 3, 16: 4},
+    'secondary':     {8: 1, 9: 1, 10: 1, 11: 1, 12: 2, 13: 2, 14: 3, 15: 4, 16: 5},
+    'secondary_link':{8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 2, 14: 2, 15: 3, 16: 4},
+    'tertiary':      {                         12: 1, 13: 2, 14: 2, 15: 3, 16: 4},
+    'tertiary_link': {                         12: 1, 13: 1, 14: 2, 15: 2, 16: 3},
+    'residential':   {                         12: 1, 13: 1, 14: 2, 15: 2, 16: 3},
+    'living_street': {                                13: 1, 14: 1, 15: 2, 16: 2},
+    'unclassified':  {                         12: 1, 13: 1, 14: 2, 15: 2, 16: 3},
+    'service':       {                                       14: 1, 15: 1, 16: 2},
+    'track':         {                                       14: 1, 15: 1, 16: 1},
+    # Railway
+    'rail':          {8: 1, 9: 1, 10: 1, 11: 1, 12: 2, 13: 3, 14: 3, 15: 3, 16: 4},
+    'subway':        {                         12: 1, 13: 2, 14: 2, 15: 2, 16: 3},
+    'tram':          {                         12: 1, 13: 1, 14: 2, 15: 2, 16: 3},
+    'narrow_gauge':  {                                13: 1, 14: 2, 15: 2, 16: 2},
+    'funicular':     {                                13: 1, 14: 2, 15: 2, 16: 2},
+}
 
 # Cache for zoom level parameters
 _ZOOM_PARAMS_CACHE = {}
@@ -472,8 +515,23 @@ class OSMHandler(osmium.SimpleHandler):
                     self.stats['features_filtered'] += 1
                     return
 
+                text_cfg = TEXT_FEATURES[feature_key]
                 cfg = self.config[feature_key]
-                min_zoom = cfg.get('zoom', 12)
+
+                # Determine zoom from population
+                population = 0
+                pop_str = tags.get('population', '0')
+                try:
+                    population = int(pop_str.replace(',', '').replace(' ', ''))
+                except (ValueError, TypeError):
+                    pass
+
+                min_zoom = text_cfg['zoom_rules'][-1][1]  # default: last rule
+                for min_pop, z in text_cfg['zoom_rules']:
+                    if population >= min_pop:
+                        min_zoom = z
+                        break
+
                 if min_zoom > self.max_zoom:
                     return
 
@@ -506,8 +564,9 @@ class OSMHandler(osmium.SimpleHandler):
                     'coords': [(n.location.lon, n.location.lat)],
                     'color_rgb565': color_rgb565,
                     'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
-                    'font_size': TEXT_FEATURES[feature_key],
+                    'font_size': text_cfg['font_size'],
                     'text': name_bytes,
+                    'population': population,
                 })
                 self.stats['text_labels'] += 1
                 self.stats['nodes_processed'] += 1
@@ -606,13 +665,17 @@ class OSMHandler(osmium.SimpleHandler):
         if any(tag in tags for tag in WIDTH_TAGS):
             width_meters = self._get_width_meters(tags)
 
+        # Store line type for zoom-based width lookup
+        highway_type = tags.get('highway', '') or tags.get('railway', '')
+
         feature = {
             'id': w.id,
             'geom_type': GEOM_LINESTRING,
             'coords': coords,
             'color_rgb565': color_rgb565,
             'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
-            'width_meters': width_meters
+            'width_meters': width_meters,
+            'highway_type': highway_type,
         }
         self.features.append(feature)
         self.stats['features_extracted'] += 1
@@ -703,12 +766,20 @@ class OSMHandler(osmium.SimpleHandler):
                 if len(coords) < 4:
                     continue
 
+                # Collect inner rings (holes) - e.g. islands in rivers
+                inner_rings = []
+                for interior in poly.interiors:
+                    ring_coords = list(interior.coords)
+                    if len(ring_coords) >= 4:
+                        inner_rings.append(ring_coords)
+
                 feature = {
                     'geom_type': GEOM_POLYGON,
                     'coords': coords,
                     'color_rgb565': color_rgb565,
                     'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
-                    'width_meters': 0.0  # Polygons don't use width
+                    'width_meters': 0.0,  # Polygons don't use width
+                    'inner_rings': inner_rings,
                 }
                 self.features.append(feature)
                 self.stats['features_extracted'] += 1
@@ -841,6 +912,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 continue
 
             orig_coords = feature['coords']
+            inner_rings = feature.get('inner_rings', [])
             is_polygon = feature['geom_type'] == GEOM_POLYGON
 
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
@@ -850,7 +922,10 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             if clip_box:
                 try:
                     from shapely.geometry import Polygon, MultiPolygon, LineString, MultiLineString, GeometryCollection
-                    geom = Polygon(orig_coords) if is_polygon else LineString(orig_coords)
+                    if is_polygon and inner_rings:
+                        geom = Polygon(orig_coords, inner_rings)
+                    else:
+                        geom = Polygon(orig_coords) if is_polygon else LineString(orig_coords)
                     if not geom.is_valid:
                         geom = geom.buffer(0)
                     
@@ -885,7 +960,10 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 except:
                     continue
             else:
-                final_features_data = [[orig_coords]]
+                if is_polygon and inner_rings:
+                    final_features_data = [[orig_coords] + inner_rings]
+                else:
+                    final_features_data = [[orig_coords]]
 
             for feature_rings in final_features_data:
                 # Project all rings for this feature part
@@ -932,10 +1010,15 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 if is_polygon and pixel_area < 4:
                     continue
 
-                width_meters = feature.get('width_meters', 0.0)
                 width_pixels = feature.get('width_pixels', 0)
                 if width_pixels == 0:
-                    width_pixels = meters_to_pixels(width_meters, zoom) if width_meters > 0 else 1
+                    # Use fixed road width table for highways
+                    hw_type = feature.get('highway_type', '')
+                    if hw_type and hw_type in LINE_WIDTH_PER_ZOOM:
+                        width_pixels = LINE_WIDTH_PER_ZOOM[hw_type].get(zoom, 1)
+                    else:
+                        width_meters = feature.get('width_meters', 0.0)
+                        width_pixels = meters_to_pixels(width_meters, zoom) if width_meters > 0 else 1
                 
                 bx1, by1 = max(0, min(255, f_min_x >> 4)), max(0, min(255, f_min_y >> 4))
                 bx2, by2 = max(0, min(255, f_max_x >> 4)), max(0, min(255, f_max_y >> 4))
@@ -1097,6 +1180,8 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                     'zoom_priority': feature['zoom_priority'],
                     'width_meters': feature.get('width_meters', 0.0),
                     'width_pixels': feature.get('width_pixels', 0),
+                    'highway_type': feature.get('highway_type', ''),
+                    'inner_rings': feature.get('inner_rings', []),
                 }
 
             # Text labels: collect for collision detection
@@ -1120,8 +1205,8 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
             char_w = pixel_deg * 4  # half-width per char in degrees
             label_h = pixel_deg * 8  # half-height in degrees
 
-            # Sort by priority (higher zoom_priority nibble = more important)
-            text_candidates.sort(key=lambda f: -(f['zoom_priority'] & 0x0F))
+            # Sort by font_size desc (city>town>village), then population desc
+            text_candidates.sort(key=lambda f: (-f.get('font_size', 0), -f.get('population', 0)))
 
             placed_boxes = []  # list of (min_lon, min_lat, max_lon, max_lat)
             labels_placed = 0

@@ -466,11 +466,6 @@
     "color": "#e990a0",
     "priority": 55
   },
-  "highway=pedestrian": {
-    "zoom": 13,
-    "color": "#dddde8",
-    "priority": 55
-  },
   "highway=platform": {
     "zoom": 13,
     "color": "#bbbbbb",
@@ -482,18 +477,13 @@
     "priority": 55
   },
   "highway=residential": {
-    "zoom": 14,
+    "zoom": 12,
     "color": "#ffffff",
     "priority": 55
   },
   "highway=secondary_link": {
     "zoom": 12,
     "color": "#f7f496",
-    "priority": 55
-  },
-  "highway=steps": {
-    "zoom": 13,
-    "color": "#fa8072",
     "priority": 55
   },
   "highway=tertiary_link": {
@@ -507,7 +497,7 @@
     "priority": 55
   },
   "highway=unclassified": {
-    "zoom": 13,
+    "zoom": 12,
     "color": "#ffffff",
     "priority": 55
   },
@@ -521,31 +511,10 @@
     "color": "#996600",
     "priority": 57
   },
-  "highway=cycleway": {
-    "zoom": 13,
-    "color": "#0000ff",
-    "priority": 58
-  },
-  "highway=footway": {
-    "zoom": 14,
-    "color": "#fa8072",
-    "priority": 58
-  },
-  "highway=path": {
-    "zoom": 14,
-    "color": "#fa8072",
-    "priority": 58
-  },
-
-  "bridge=yes": {
-    "zoom": 14,
-    "color": "#b8b8b8",
-    "priority": 60
-  },
   "man_made=bridge": {
     "zoom": 12,
     "color": "#b8b8b8",
-    "priority": 60
+    "priority": 35
   },
   "tunnel=yes": {
     "zoom": 13,

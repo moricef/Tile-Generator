@@ -345,9 +345,6 @@ class NAVViewer:
                         # Draw exterior with feature color, holes with background color
                         ring_color = color if i == 0 else self.background_color
                         pygame.draw.polygon(surface, ring_color, pts)
-                        # Only outline the exterior ring, and only if it's not a hole
-                        if i == 0:
-                            pygame.draw.polygon(surface, darken_color(color), pts, 1)
                     else:
                         pygame.draw.polygon(surface, color, pts, 1)
 
