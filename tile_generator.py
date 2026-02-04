@@ -68,23 +68,23 @@ POINT_FEATURES = {
 # population_zoom_rules: list of (min_pop, zoom) sorted descending
 TEXT_FEATURES = {
     'place=city': {
-        'font_size': 3,
+        'font_size': 2,
         'zoom_rules': [(1000000, 4), (500000, 5), (100000, 6), (0, 8)],
     },
     'place=town': {
-        'font_size': 2,
+        'font_size': 1,
         'zoom_rules': [(0, 9)],
     },
     'place=village': {
-        'font_size': 1,
+        'font_size': 0,
         'zoom_rules': [(0, 12)],
     },
     'place=suburb': {
-        'font_size': 1,
+        'font_size': 0,
         'zoom_rules': [(0, 12)],
     },
     'place=hamlet': {
-        'font_size': 1,
+        'font_size': 0,
         'zoom_rules': [(0, 14)],
     },
 }
@@ -862,6 +862,70 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
+    # Merge polygons of the same style to reduce feature count
+    if SHAPELY_AVAILABLE:
+        from shapely.geometry import Polygon as ShapelyPolygon, MultiPolygon as ShapelyMultiPolygon
+        from shapely.ops import unary_union as shapely_unary_union
+
+        polygons_by_style = defaultdict(list)
+        other_features = []
+
+        for feat in features:
+            if feat['geom_type'] == GEOM_POLYGON:
+                style_key = (feat['color_rgb565'], feat['zoom_priority'])
+                polygons_by_style[style_key].append(feat)
+            else:
+                other_features.append(feat)
+
+        merged_features = []
+        for (color, priority), poly_list in polygons_by_style.items():
+            if len(poly_list) < 2:
+                merged_features.extend(poly_list)
+                continue
+            try:
+                shapely_polys = []
+                for p in poly_list:
+                    inner = p.get('inner_rings', [])
+                    if inner:
+                        sp = ShapelyPolygon(p['coords'], inner)
+                    else:
+                        sp = ShapelyPolygon(p['coords'])
+                    if not sp.is_valid:
+                        sp = sp.buffer(0)
+                    if not sp.is_empty:
+                        shapely_polys.append(sp)
+
+                if not shapely_polys:
+                    merged_features.extend(poly_list)
+                    continue
+
+                merged = shapely_unary_union(shapely_polys)
+
+                parts = []
+                if isinstance(merged, ShapelyMultiPolygon):
+                    parts = list(merged.geoms)
+                elif isinstance(merged, ShapelyPolygon):
+                    parts = [merged]
+
+                for part in parts:
+                    if not part.is_empty and part.exterior and len(part.exterior.coords) >= 4:
+                        inner_rings = []
+                        for interior in part.interiors:
+                            if len(interior.coords) >= 4:
+                                inner_rings.append(list(interior.coords))
+                        merged_features.append({
+                            'geom_type': GEOM_POLYGON,
+                            'coords': list(part.exterior.coords),
+                            'inner_rings': inner_rings,
+                            'color_rgb565': color,
+                            'zoom_priority': priority,
+                            'width_meters': 0.0,
+                        })
+            except Exception:
+                merged_features.extend(poly_list)
+
+        features = other_features + merged_features
+
     written_features = 0
     with open(output_path, 'wb') as f:
         f.write(struct.pack('<4sHiiii', NAV_MAGIC, 0,
@@ -1022,6 +1086,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                             pass # We'll check actual pixel area below
 
                 # Simple bounding box area check in pixels (more efficient)
+                # Filter tiny polygons (invisible on screen)
                 pixel_area = (f_max_x - f_min_x) * (f_max_y - f_min_y) / (16 * 16)
                 if is_polygon and pixel_area < 4:
                     continue
