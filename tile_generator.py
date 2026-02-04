@@ -779,6 +779,11 @@ class OSMHandler(osmium.SimpleHandler):
         try:
             wkb = self.wkbfab.create_multipolygon(a)
             geom = shapely.wkb.loads(wkb, hex=True)
+            if not geom.is_valid:
+                geom = geom.buffer(0)
+                if geom.is_empty:
+                    self.stats['area_exception'] += 1
+                    return
 
             color = get_color_for_tags(tags, self.config)
             priority = get_priority_for_tags(tags, self.config)
@@ -835,9 +840,6 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
     """
     Write features to NAV binary tile format using relative coordinates.
     """
-    if not features:
-        return False
-
     # Calculate tile bounds
     n = 2.0 ** zoom
     lon_deg_per_tile = 360.0 / n
@@ -911,7 +913,15 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     merged_features.extend(poly_list)
                     continue
 
-                merged = shapely_unary_union(shapely_polys)
+                water_rgb565 = hex_to_rgb565('#aad3df')
+                if zoom <= 10 and len(shapely_polys) >= 3 and color != water_rgb565:
+                    pixel_deg = 360.0 / (2**zoom * 256)
+                    buffer_dist = pixel_deg * 4
+                    buffered = [p.buffer(buffer_dist) for p in shapely_polys]
+                    merged = shapely_unary_union(buffered)
+                    merged = merged.buffer(-buffer_dist)
+                else:
+                    merged = shapely_unary_union(shapely_polys)
 
                 parts = []
                 if isinstance(merged, ShapelyMultiPolygon):
@@ -939,6 +949,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
         features = other_features + merged_features
 
     written_features = 0
+    filtered_by_size = 0
     with open(output_path, 'wb') as f:
         f.write(struct.pack('<4sHiiii', NAV_MAGIC, 0,
                            int(tile_min_lon * COORD_SCALE),
@@ -1049,8 +1060,12 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                 for l in part.geoms:
                                     if len(l.coords) >= 2:
                                         final_features_data.append([list(l.coords)])
-                except:
-                    continue
+                except Exception as e:
+                    # Clipping failed, use unclipped geometry as fallback
+                    if is_polygon and inner_rings:
+                        final_features_data = [[orig_coords] + inner_rings]
+                    else:
+                        final_features_data = [[orig_coords]]
             else:
                 if is_polygon and inner_rings:
                     final_features_data = [[orig_coords] + inner_rings]
@@ -1100,7 +1115,14 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 # Simple bounding box area check in pixels (more efficient)
                 # Filter tiny polygons (invisible on screen)
                 pixel_area = (f_max_x - f_min_x) * (f_max_y - f_min_y) / (16 * 16)
-                if is_polygon and pixel_area < 4:
+                if is_polygon:
+                    if zoom <= 9:
+                        min_pixel_area = 0.2
+                    elif zoom <= 12:
+                        min_pixel_area = 2.0
+                    else:
+                        min_pixel_area = 4.0
+                if is_polygon and pixel_area < min_pixel_area:
                     continue
 
                 width_pixels = feature.get('width_pixels', 0)
