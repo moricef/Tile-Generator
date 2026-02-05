@@ -23,7 +23,7 @@ import struct
 from typing import Dict, List, Tuple, Set, Any, Optional
 from collections import defaultdict
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, as_completed
 import multiprocessing
 
 try:
@@ -1455,7 +1455,7 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                 tile_jobs.append((features, tile_path, zoom, x, y))
 
         completed = 0
-        with ThreadPoolExecutor(max_workers=num_workers) as executor:
+        with ProcessPoolExecutor(max_workers=num_workers) as executor:
             futures = {executor.submit(write_nav_tile, *job): job for job in tile_jobs}
             for future in as_completed(futures):
                 completed += 1
