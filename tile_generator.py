@@ -916,10 +916,10 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 pixel_deg = 360.0 / (2**zoom * 256)
                 # Extract priority nibble from packed byte (zoom_priority = zoom<<4 | prio)
                 priority_nibble = priority & 0x0F
-                # landuse(1-2), terrain(3-4), water(4-5) → area features that need gap-filling
-                is_area_fill = priority_nibble <= 5
+                # landuse(1-2), terrain(2-3) only — NOT water(4-5) to avoid flooding
+                is_landcover = priority_nibble <= 3
 
-                if zoom <= 11 and is_area_fill:
+                if zoom <= 11 and is_landcover:
                     # Buffer-expand then shrink to merge adjacent polygons and fill small gaps
                     buffer_size = pixel_deg * (1.5 if zoom <= 9 else 1.0)
                     buffered = [p.buffer(buffer_size) for p in shapely_polys]
