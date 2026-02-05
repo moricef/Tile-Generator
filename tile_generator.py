@@ -1128,11 +1128,11 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 pixel_area = (f_max_x - f_min_x) * (f_max_y - f_min_y) / (16 * 16)
                 if is_polygon:
                     if zoom <= 9:
-                        min_pixel_area = 5.0
+                        min_pixel_area = 2.0
                     elif zoom == 10:
-                        min_pixel_area = 0.8
+                        min_pixel_area = 1.0
                     elif zoom == 11:
-                        min_pixel_area = 0.4
+                        min_pixel_area = 0.5
                     else:  # zoom >= 12
                         min_pixel_area = 0.1
                 if is_polygon and pixel_area < min_pixel_area:
