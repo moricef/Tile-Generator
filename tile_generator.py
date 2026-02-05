@@ -1145,6 +1145,11 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 if is_polygon and pixel_area < min_pixel_area:
                     continue
 
+                # Hard limit: skip features exceeding uint16 capacity
+                # Impossible to render on ESP32 and would corrupt binary format
+                if total_points > 65535:
+                    continue
+
                 width_pixels = feature.get('width_pixels', 0)
                 if width_pixels == 0:
                     # Use fixed road width table for highways
