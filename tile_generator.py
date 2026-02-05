@@ -916,7 +916,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 pixel_deg = 360.0 / (2**zoom * 256)
                 is_vegetation = (priority < 30)
 
-                if zoom <= 11 and is_vegetation:
+                if zoom <= 10 and is_vegetation:
                     # Buffer pour fusionner la végétation adjacente et combler les trous
                     buffered = [p.buffer(pixel_deg * 1.0) for p in shapely_polys]
                     merged = shapely_unary_union(buffered)
@@ -1023,7 +1023,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             is_polygon = feature['geom_type'] == GEOM_POLYGON
 
             # Ignorer les trous (inner_rings) à bas zoom pour solidifier les polygones
-            if zoom <= 11 and is_polygon:
+            if zoom <= 9 and is_polygon:
                 inner_rings = []
 
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
@@ -1124,10 +1124,14 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 # Filter tiny polygons (invisible on screen)
                 pixel_area = (f_max_x - f_min_x) * (f_max_y - f_min_y) / (16 * 16)
                 if is_polygon:
-                    if zoom <= 12:
-                        min_pixel_area = 0.5
-                    else:
-                        min_pixel_area = 2.0
+                    if zoom <= 9:
+                        min_pixel_area = 5.0
+                    elif zoom == 10:
+                        min_pixel_area = 0.8
+                    elif zoom == 11:
+                        min_pixel_area = 0.4
+                    else:  # zoom >= 12
+                        min_pixel_area = 0.1
                 if is_polygon and pixel_area < min_pixel_area:
                     continue
 
