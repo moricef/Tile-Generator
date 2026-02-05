@@ -937,20 +937,34 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 elif isinstance(merged, ShapelyPolygon):
                     parts = [merged]
 
+                min_hole_area = 1280.0 / (2 ** zoom)
+                min_hole_deg2 = min_hole_area * (pixel_deg ** 2)
+                total_merged_points = 0
+
+                candidate_features = []
                 for part in parts:
                     if not part.is_empty and part.exterior and len(part.exterior.coords) >= 4:
                         inner_rings = []
                         for interior in part.interiors:
-                            if len(interior.coords) >= 4:
+                            if len(interior.coords) >= 4 and ShapelyPolygon(interior).area >= min_hole_deg2:
                                 inner_rings.append(list(interior.coords))
-                        merged_features.append({
+                        ext_coords = list(part.exterior.coords)
+                        pt_count = len(ext_coords) + sum(len(r) for r in inner_rings)
+                        total_merged_points += pt_count
+                        candidate_features.append({
                             'geom_type': GEOM_POLYGON,
-                            'coords': list(part.exterior.coords),
+                            'coords': ext_coords,
                             'inner_rings': inner_rings,
                             'color_rgb565': color,
                             'zoom_priority': priority,
                             'width_meters': 0.0,
                         })
+
+                if total_merged_points > 60000:
+                    # Merge too complex, keep original separate polygons
+                    merged_features.extend(poly_list)
+                else:
+                    merged_features.extend(candidate_features)
             except Exception:
                 merged_features.extend(poly_list)
 
