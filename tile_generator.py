@@ -1228,15 +1228,19 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
     logger.info(f"    - Zoom filtered: {handler.stats['area_zoom_filtered']:,}")
     logger.info(f"    - Exceptions: {handler.stats['area_exception']:,}")
 
-    logger.info("Calculating global features bounding box...")
+    logger.info("Calculating bounding box from polygons only (useful area)...")
     min_lon, max_lon = 180.0, -180.0
     min_lat, max_lat = 90.0, -90.0
+    polygon_count = 0
     for feature in handler.features:
-        for lon, lat in feature['coords']:
-            min_lon = min(min_lon, lon)
-            max_lon = max(max_lon, lon)
-            min_lat = min(min_lat, lat)
-            max_lat = max(max_lat, lat)
+        if feature['geom_type'] == GEOM_POLYGON:
+            polygon_count += 1
+            for lon, lat in feature['coords']:
+                min_lon = min(min_lon, lon)
+                max_lon = max(max_lon, lon)
+                min_lat = min(min_lat, lat)
+                max_lat = max(max_lat, lat)
+    logger.info(f"  BBox from {polygon_count:,} polygons")
     logger.info(f"  BBox: lon=[{min_lon:.4f}, {max_lon:.4f}], lat=[{min_lat:.4f}, {max_lat:.4f}]")
 
     logger.info("Generating NAV tile files...")
