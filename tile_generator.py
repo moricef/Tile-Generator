@@ -914,15 +914,18 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     continue
 
                 pixel_deg = 360.0 / (2**zoom * 256)
-                is_vegetation = (priority < 30)
+                # Extract priority nibble from packed byte (zoom_priority = zoom<<4 | prio)
+                priority_nibble = priority & 0x0F
+                # landuse(1-2), terrain(3-4), water(4-5) → area features that need gap-filling
+                is_area_fill = priority_nibble <= 5
 
-                if zoom <= 10 and is_vegetation:
-                    # Buffer pour fusionner la végétation adjacente et combler les trous
-                    buffered = [p.buffer(pixel_deg * 1.0) for p in shapely_polys]
+                if zoom <= 11 and is_area_fill:
+                    # Buffer-expand then shrink to merge adjacent polygons and fill small gaps
+                    buffer_size = pixel_deg * (1.5 if zoom <= 9 else 1.0)
+                    buffered = [p.buffer(buffer_size) for p in shapely_polys]
                     merged = shapely_unary_union(buffered)
-                    merged = merged.buffer(-pixel_deg * 1.0)
+                    merged = merged.buffer(-buffer_size)
                 else:
-                    # Pour l'eau et les autres features, fusionner précisément sans buffer
                     merged = shapely_unary_union(shapely_polys)
 
                 parts = []
