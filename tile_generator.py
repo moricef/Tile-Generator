@@ -1450,11 +1450,11 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
         tile_jobs = []
         for y in range(min_ty, max_ty + 1):
             for x in range(min_tx, max_tx + 1):
-                # Get features for this tile, or an empty list if none
                 features = tile_features.get((x, y), [])
+                if not features:
+                    continue
                 tile_dir = os.path.join(output_dir, str(zoom), str(x))
                 tile_path = os.path.join(tile_dir, f"{y}.nav")
-                # Even with no features, the job is created to write the background tile
                 features.sort(key=lambda f: f['zoom_priority'] & 0x0F)
                 tile_jobs.append((features, tile_path, zoom, x, y))
 
