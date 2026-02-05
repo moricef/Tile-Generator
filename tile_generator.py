@@ -56,6 +56,11 @@ GEOM_LINESTRING = 2
 GEOM_POLYGON = 3
 GEOM_TEXT = 4
 
+# Perceptual filtering: minimum visible area in pixels squared
+K_VISIBILITY = 2.0
+# Anti-pitting: holes must be N times more visible than objects to be kept
+K_HOLE_FACTOR = 3.0
+
 # Point features to extract from nodes (rendered as symbols)
 # shape: 'triangle' for peaks, 'circle' for places
 POINT_FEATURES = {
@@ -937,8 +942,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 elif isinstance(merged, ShapelyPolygon):
                     parts = [merged]
 
-                min_hole_area = 1280.0 / (2 ** zoom)
-                min_hole_deg2 = min_hole_area * (pixel_deg ** 2)
+                min_hole_deg2 = (pixel_deg ** 2) * K_VISIBILITY * K_HOLE_FACTOR
                 total_merged_points = 0
 
                 candidate_features = []
@@ -960,7 +964,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                             'width_meters': 0.0,
                         })
 
-                if total_merged_points > 60000:
+                if total_merged_points > 65535:
                     # Merge too complex, keep original separate polygons
                     merged_features.extend(poly_list)
                 else:
@@ -1044,7 +1048,6 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
             # Filter inner_rings too small to be visible at this zoom
             if is_polygon and inner_rings:
-                min_hole_area = 1280.0 / (2 ** zoom)
                 filtered_rings = []
                 for ring in inner_rings:
                     if len(ring) >= 4:
@@ -1053,7 +1056,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                         rw = (max(rx) - min(rx)) / (tile_max_lon - tile_min_lon) * 4096
                         rh = (max(ry) - min(ry)) / merc_range * 4096
                         ring_area = (rw * rh) / (16 * 16)
-                        if ring_area >= min_hole_area:
+                        if ring_area >= K_VISIBILITY * K_HOLE_FACTOR:
                             filtered_rings.append(ring)
                 inner_rings = filtered_rings
 
@@ -1140,24 +1143,9 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                         total_points += len(projected_ring)
 
                 if is_polygon:
-                    # Minimum area filter: discard polygons smaller than 4 pixels squared
-                    if len(projected_rings[0]) >= 3:
-                        area = 0.0
-                        pts = projected_rings[0]
-                        for i in range(len(pts)):
-                            x1, y1 = pts[i]
-                            x2, y2 = pts[(i + 1) % len(pts)]
-                            area += (x1 * y2 - x2 * y1)
-                        if abs(area) < 32: # Area in coordinate units (4096 scale), 4px^2 * (4096/256)^2 = 1024. Wait, let's use a simpler pixel-based check.
-                            pass # We'll check actual pixel area below
-
-                # Simple bounding box area check in pixels (more efficient)
-                # Filter tiny polygons (invisible on screen)
-                pixel_area = (f_max_x - f_min_x) * (f_max_y - f_min_y) / (16 * 16)
-                if is_polygon:
-                    min_pixel_area = 1280.0 / (2 ** zoom)
-                if is_polygon and pixel_area < min_pixel_area:
-                    continue
+                    pixel_area = (f_max_x - f_min_x) * (f_max_y - f_min_y) / (16 * 16)
+                    if pixel_area < K_VISIBILITY:
+                        continue
 
                 # Hard limit: skip features exceeding uint16 capacity
                 # Impossible to render on ESP32 and would corrupt binary format
