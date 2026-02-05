@@ -928,6 +928,9 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 else:
                     merged = shapely_unary_union(shapely_polys)
 
+                # Simplify merged result (merge creates complex polygons with too many vertices)
+                merged = merged.simplify(pixel_deg, preserve_topology=True)
+
                 parts = []
                 if isinstance(merged, ShapelyMultiPolygon):
                     parts = list(merged.geoms)
