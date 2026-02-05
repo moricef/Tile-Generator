@@ -1022,6 +1022,10 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             inner_rings = feature.get('inner_rings', [])
             is_polygon = feature['geom_type'] == GEOM_POLYGON
 
+            # Ignorer les trous (inner_rings) à bas zoom pour solidifier les polygones
+            if zoom <= 9 and is_polygon:
+                inner_rings = []
+
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
             final_features_data = []
 
@@ -1120,12 +1124,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 # Filter tiny polygons (invisible on screen)
                 pixel_area = (f_max_x - f_min_x) * (f_max_y - f_min_y) / (16 * 16)
                 if is_polygon:
-                    if zoom <= 9:
-                        min_pixel_area = 1.2
-                    elif zoom <= 12:
-                        min_pixel_area = 2.0
-                    else:
-                        min_pixel_area = 4.0
+                    min_pixel_area = 10.0
                 if is_polygon and pixel_area < min_pixel_area:
                     continue
 
