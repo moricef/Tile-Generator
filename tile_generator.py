@@ -1347,22 +1347,45 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
             if prepared_count % 25000 == 0:
                 print(f"\r  Zoom {zoom:2d}: Preparing features... {prepared_count:,} / {total_to_process:,}", end='', flush=True)
 
-        # Phase 1b: Text label collision detection
+        # Phase 1b: Text label collision detection - keep only highest population when too close
         if text_candidates:
             tile_width_deg = 360.0 / (2.0 ** zoom)
             pixel_deg = tile_width_deg / 256.0
-            # Approximate label size: ~8 pixels per char width, ~12 pixels height
+
+            # Define proximity threshold (distance within which we keep only highest population)
+            # Scale with zoom: larger radius at low zoom, smaller at high zoom
+            proximity_threshold = pixel_deg * (30 if zoom <= 8 else 20 if zoom <= 10 else 15)
+
+            # Sort by population ONLY - highest population wins
+            text_candidates.sort(key=lambda f: -f.get('population', 0))
+
+            # Filter by proximity: keep only highest population within threshold
+            filtered_candidates = []
+            for candidate in text_candidates:
+                lon, lat = candidate['coords'][0]
+
+                # Check if too close to already selected candidate
+                too_close = False
+                for selected in filtered_candidates:
+                    sel_lon, sel_lat = selected['coords'][0]
+                    dist = math.sqrt((lon - sel_lon)**2 + (lat - sel_lat)**2)
+                    if dist < proximity_threshold:
+                        too_close = True
+                        break
+
+                if not too_close:
+                    filtered_candidates.append(candidate)
+
+            # Now place labels with collision detection based on actual label size
             char_w = pixel_deg * 4  # half-width per char in degrees
             label_h = pixel_deg * 8  # half-height in degrees
 
-            # Sort by font_size desc (city>town>village), then population desc
-            text_candidates.sort(key=lambda f: (-f.get('font_size', 0), -f.get('population', 0)))
-
             placed_boxes = []  # list of (min_lon, min_lat, max_lon, max_lat)
             labels_placed = 0
-            labels_dropped = 0
+            labels_dropped_proximity = len(text_candidates) - len(filtered_candidates)
+            labels_dropped_overlap = 0
 
-            for tf in text_candidates:
+            for tf in filtered_candidates:
                 lon, lat = tf['coords'][0]
                 text_len = len(tf['text'])
                 half_w = char_w * text_len / 2
@@ -1370,7 +1393,7 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
 
                 box = (lon - half_w, lat - half_h, lon + half_w, lat + half_h)
 
-                # Check overlap with placed labels
+                # Check overlap with placed label boxes
                 overlap = False
                 for pb in placed_boxes:
                     if (box[0] < pb[2] and box[2] > pb[0] and
@@ -1379,7 +1402,7 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                         break
 
                 if overlap:
-                    labels_dropped += 1
+                    labels_dropped_overlap += 1
                     continue
 
                 placed_boxes.append(box)
@@ -1395,8 +1418,8 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                 for tile in expanded:
                     tile_features[tile].append(tf)
 
-            if labels_dropped > 0:
-                print(f"\r  Zoom {zoom:2d}: Labels: {labels_placed} placed, {labels_dropped} dropped (overlap)")
+            if labels_dropped_proximity > 0 or labels_dropped_overlap > 0:
+                print(f"\r  Zoom {zoom:2d}: Labels: {labels_placed} placed, {labels_dropped_proximity} filtered (proximity), {labels_dropped_overlap} dropped (overlap)")
 
         # Phase 2: Calculate tile grid from global bbox and write all tiles
         min_tx = lon_to_tile_x(min_lon, zoom)
