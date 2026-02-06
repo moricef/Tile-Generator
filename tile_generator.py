@@ -59,7 +59,9 @@ GEOM_TEXT = 4
 # Perceptual filtering: minimum visible area in pixels squared
 K_VISIBILITY = 2.0
 # Anti-pitting: holes must be N times more visible than objects to be kept
-K_HOLE_FACTOR = 3.0
+K_HOLE_FACTOR = 10.0
+# Below this zoom, no buffer merge (avoids creating fake forests from bocage)
+ZOOM_BUFFER_MERGE = 10
 
 # Point features to extract from nodes (rendered as symbols)
 # shape: 'triangle' for peaks, 'circle' for places
@@ -897,8 +899,9 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 other_features.append(feat)
 
         merged_features = []
+        merge_stats = {'holes_total': 0, 'holes_removed': 0, 'sharding_fallbacks': 0, 'groups_merged': 0}
         for (color, priority), poly_list in polygons_by_style.items():
-            if len(poly_list) < 2:
+            if len(poly_list) < 2 or zoom < ZOOM_BUFFER_MERGE:
                 merged_features.extend(poly_list)
                 continue
             try:
@@ -924,7 +927,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 # landuse(1-2), terrain(2-3) only — NOT water(4-5) to avoid flooding
                 is_landcover = priority_nibble <= 3
 
-                if is_landcover:
+                if is_landcover and zoom >= ZOOM_BUFFER_MERGE:
                     # Small buffer to close sub-pixel cracks between adjacent polygons
                     buffer_size = pixel_deg * 0.5
                     buffered = [p.buffer(buffer_size) for p in shapely_polys]
@@ -950,8 +953,11 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     if not part.is_empty and part.exterior and len(part.exterior.coords) >= 4:
                         inner_rings = []
                         for interior in part.interiors:
+                            merge_stats['holes_total'] += 1
                             if len(interior.coords) >= 4 and ShapelyPolygon(interior).area >= min_hole_deg2:
                                 inner_rings.append(list(interior.coords))
+                            else:
+                                merge_stats['holes_removed'] += 1
                         ext_coords = list(part.exterior.coords)
                         pt_count = len(ext_coords) + sum(len(r) for r in inner_rings)
                         total_merged_points += pt_count
@@ -966,16 +972,23 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
                 if total_merged_points > 65535:
                     # Merge too complex, keep original separate polygons
+                    merge_stats['sharding_fallbacks'] += 1
                     merged_features.extend(poly_list)
                 else:
+                    merge_stats['groups_merged'] += 1
                     merged_features.extend(candidate_features)
             except Exception:
                 merged_features.extend(poly_list)
 
         features = other_features + merged_features
+        logger.debug(f"  Tile {tile_x},{tile_y}: Merge: {merge_stats['groups_merged']} groups merged, "
+                     f"{merge_stats['holes_removed']}/{merge_stats['holes_total']} holes removed, "
+                     f"{merge_stats['sharding_fallbacks']} sharding fallbacks")
 
     written_features = 0
     filtered_by_size = 0
+    filtered_holes_write = 0
+    total_holes_write = 0
     with open(output_path, 'wb') as f:
         f.write(struct.pack('<4sHiiii', NAV_MAGIC, 0,
                            int(tile_min_lon * COORD_SCALE),
@@ -1046,19 +1059,29 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             inner_rings = feature.get('inner_rings', [])
             is_polygon = feature['geom_type'] == GEOM_POLYGON
 
-            # Filter inner_rings too small to be visible at this zoom
+            # Filter inner_rings: strip all at low zoom, size-filter at high zoom
             if is_polygon and inner_rings:
-                filtered_rings = []
-                for ring in inner_rings:
-                    if len(ring) >= 4:
-                        rx = [c[0] for c in ring]
-                        ry = [c[1] for c in ring]
-                        rw = (max(rx) - min(rx)) / (tile_max_lon - tile_min_lon) * 4096
-                        rh = (max(ry) - min(ry)) / merc_range * 4096
-                        ring_area = (rw * rh) / (16 * 16)
-                        if ring_area >= K_VISIBILITY * K_HOLE_FACTOR:
-                            filtered_rings.append(ring)
-                inner_rings = filtered_rings
+                if zoom < ZOOM_BUFFER_MERGE:
+                    filtered_holes_write += len(inner_rings)
+                    total_holes_write += len(inner_rings)
+                    inner_rings = []
+                else:
+                    filtered_rings = []
+                    for ring in inner_rings:
+                        total_holes_write += 1
+                        if len(ring) >= 4:
+                            rx = [c[0] for c in ring]
+                            ry = [c[1] for c in ring]
+                            rw = (max(rx) - min(rx)) / (tile_max_lon - tile_min_lon) * 4096
+                            rh = (max(ry) - min(ry)) / merc_range * 4096
+                            ring_area = (rw * rh) / (16 * 16)
+                            if ring_area >= K_VISIBILITY * K_HOLE_FACTOR:
+                                filtered_rings.append(ring)
+                            else:
+                                filtered_holes_write += 1
+                        else:
+                            filtered_holes_write += 1
+                    inner_rings = filtered_rings
 
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
             final_features_data = []
@@ -1144,7 +1167,9 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
                 if is_polygon:
                     pixel_area = (f_max_x - f_min_x) * (f_max_y - f_min_y) / (16 * 16)
-                    if pixel_area < K_VISIBILITY:
+                    min_area = K_VISIBILITY * 8 if zoom < ZOOM_BUFFER_MERGE else K_VISIBILITY
+                    if pixel_area < min_area:
+                        filtered_by_size += 1
                         continue
 
                 # Hard limit: skip features exceeding uint16 capacity
@@ -1191,6 +1216,10 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
         f.seek(4)
         f.write(struct.pack('<H', written_features))
+
+    logger.debug(f"  Tile {tile_x},{tile_y}: Write: {written_features} features, "
+                 f"{filtered_by_size} filtered by area (<{K_VISIBILITY}px²), "
+                 f"{filtered_holes_write}/{total_holes_write} holes removed (<{K_VISIBILITY * K_HOLE_FACTOR}px²)")
 
     return True
 
@@ -1538,8 +1567,13 @@ NAV Format - IceNav Navigation Tiles:
     parser.add_argument('config_file', help='Features configuration JSON file')
     parser.add_argument('--zoom', default='6-17',
                         help='Zoom level range (e.g., "6-17" or "12")')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='Verbose logging (show per-tile filtering stats)')
 
     args = parser.parse_args()
+
+    if args.verbose:
+        logger.setLevel(logging.DEBUG)
 
     if not os.path.exists(args.input_pbf):
         logger.error(f"Input file not found: {args.input_pbf}")

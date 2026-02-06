@@ -8,17 +8,17 @@
     "priority": 22
   },
   "natural=grassland": {
-    "zoom": 8,
+    "zoom": 10,
     "color": "#cdebb0",
     "priority": 22
   },
   "natural=heath": {
-    "zoom": 8,
+    "zoom": 10,
     "color": "#d6d99f",
     "priority": 22
   },
   "natural=scrub": {
-    "zoom": 8,
+    "zoom": 10,
     "color": "#c8d7ab",
     "priority": 22
   },
@@ -28,27 +28,27 @@
     "priority": 22
   },
   "natural=wood": {
-    "zoom": 8,
+    "zoom": 10,
     "color": "#add19e",
     "priority": 22
   },
   "natural=forest": {
-    "zoom": 8,
+    "zoom": 10,
     "color": "#add19e",
     "priority": 22
   },
   "landuse=farmland": {
-    "zoom": 8,
+    "zoom": 10,
     "color": "#eef0d5",
     "priority": 23
   },
   "landuse=grass": {
-    "zoom": 8,
+    "zoom": 10,
     "color": "#cdebb0",
     "priority": 23
   },
   "landuse=meadow": {
-    "zoom": 8,
+    "zoom": 10,
     "color": "#cdebb0",
     "priority": 23
   },
@@ -58,7 +58,7 @@
     "priority": 24
   },
   "landuse=commercial": {
-    "zoom": 8,
+    "zoom": 10,
     "color": "#f2dad9",
     "priority": 24
   },
@@ -68,17 +68,17 @@
     "priority": 24
   },
   "landuse=industrial": {
-    "zoom": 8,
+    "zoom": 10,
     "color": "#ebdbe8",
     "priority": 24
   },
   "landuse=residential": {
     "zoom": 8,
-    "color": "#e0dfdf",
+    "color": "#d1d1d1",
     "priority": 24
   },
   "landuse=quarry": {
-    "zoom": 8,
+    "zoom": 10,
     "color": "#c1c1c1",
     "priority": 25
   },
@@ -375,7 +375,7 @@
     "priority": 40
   },
   "water=canal": {
-    "zoom": 8,
+    "zoom": 10,
     "color": "#aad3df",
     "priority": 40
   },
@@ -430,12 +430,12 @@
     "priority": 42
   },
   "waterway=river": {
-    "zoom": 6,
+    "zoom": 10,
     "color": "#aad3df",
     "priority": 43
   },
   "waterway=canal": {
-    "zoom": 8,
+    "zoom": 10,
     "color": "#aad3df",
     "priority": 44
   },
@@ -512,8 +512,8 @@
     "priority": 52
   },
   "highway=secondary": {
-    "zoom": 8,
-    "color": "#f7f496",
+    "zoom": 9,
+    "color": "#fbb49e",
     "priority": 53
   },
   "highway=tertiary": {
@@ -592,7 +592,7 @@
     "priority": 64
   },
   "aeroway=aerodrome": {
-    "zoom": 11,
+    "zoom": 10,
     "color": "#dadae0",
     "priority": 65
   },
