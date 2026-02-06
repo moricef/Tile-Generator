@@ -192,6 +192,7 @@ LAYER_MAPPING = {
         'natural=fell', 'natural=moor', 'natural=shrubbery', 'landuse=quarry',
         'landuse=grass', 'landuse=orchard', 'landuse=vineyard',
         'landuse=farmland', 'landuse=farmyard', 'landuse=park', 'leisure=park',
+        'aeroway=aerodrome', 'aeroway=apron', 'aeroway=helipad', 'aeroway=hangar',
         'leisure=nature_reserve', 'leisure=garden', 'leisure=pitch',
         'leisure=golf_course', 'leisure=recreation_ground', 'landuse=recreation_ground',
         'landuse=residential', 'place=suburb', 'place=island', 'place=islet',
