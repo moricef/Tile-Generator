@@ -82,7 +82,7 @@ TEXT_FEATURES = {
     },
     'place=village': {
         'font_size': 0,
-        'zoom_rules': [(350, 10), (0, 11)],
+        'zoom_rules': [(500, 10), (0, 11)],
     },
     'place=suburb': {
         'font_size': 0,
