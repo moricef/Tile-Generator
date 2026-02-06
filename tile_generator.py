@@ -930,6 +930,16 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     continue
 
                 pixel_deg = 360.0 / (2**zoom * 256)
+
+                # OpenMapTiles-style area filter: min_area = power(zres(zoom-1), 2)
+                # Eliminates small polygons at low zooms (they appear at higher zooms)
+                if zoom < 14:
+                    zres_prev = 360.0 / (2**(zoom - 1) * 256)
+                    min_area_deg2 = zres_prev ** 2
+                    shapely_polys = [sp for sp in shapely_polys if sp.area >= min_area_deg2]
+                    if not shapely_polys:
+                        continue  # All polygons too small for this zoom
+
                 # Extract priority nibble from packed byte (zoom_priority = zoom<<4 | prio)
                 priority_nibble = priority & 0x0F
                 # landuse(1-2), terrain(2-3) only — NOT water(4-5) to avoid flooding
