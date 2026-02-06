@@ -1092,29 +1092,11 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             inner_rings = feature.get('inner_rings', [])
             is_polygon = feature['geom_type'] == GEOM_POLYGON
 
-            # Filter inner_rings: strip all at z8-z11, size-filter at z12+
+            # Filter inner_rings: strip all holes at all zooms to eliminate pitting
             if is_polygon and inner_rings:
-                if zoom <= 11:
-                    filtered_holes_write += len(inner_rings)
-                    total_holes_write += len(inner_rings)
-                    inner_rings = []
-                else:
-                    filtered_rings = []
-                    for ring in inner_rings:
-                        total_holes_write += 1
-                        if len(ring) >= 4:
-                            rx = [c[0] for c in ring]
-                            ry = [c[1] for c in ring]
-                            rw = (max(rx) - min(rx)) / (tile_max_lon - tile_min_lon) * 4096
-                            rh = (max(ry) - min(ry)) / merc_range * 4096
-                            ring_area = (rw * rh) / (16 * 16)
-                            if ring_area >= K_VISIBILITY * K_HOLE_FACTOR:
-                                filtered_rings.append(ring)
-                            else:
-                                filtered_holes_write += 1
-                        else:
-                            filtered_holes_write += 1
-                    inner_rings = filtered_rings
+                filtered_holes_write += len(inner_rings)
+                total_holes_write += len(inner_rings)
+                inner_rings = []
 
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
             final_features_data = []
