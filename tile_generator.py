@@ -901,7 +901,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             min_area_deg2 = zres_prev ** 2
             # Tuned multipliers: z10 filters less than z11 for progressive detail
             if zoom == 10:
-                min_area_deg2 *= 0.31  # ~2900 m²
+                min_area_deg2 *= 0.43  # ~4000 m²
             elif zoom == 11:
                 min_area_deg2 *= 6  # ~1390 m²
 
