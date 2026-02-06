@@ -255,7 +255,7 @@
   "place=island": {
     "zoom": 10,
     "color": "#f2efe9",
-    "priority": 28
+    "priority": 46
   },
   "place=islet": {
     "zoom": 12,
@@ -614,12 +614,14 @@
   "aeroway=runway": {
     "zoom": 12,
     "color": "#bbbbcc",
-    "priority": 65
+    "priority": 65,
+    "width": 2
   },
   "aeroway=taxiway": {
     "zoom": 12,
     "color": "#bbbbcc",
-    "priority": 65
+    "priority": 65,
+    "width": 1
   },
   "man_made=embankment": {
     "zoom": 12,
