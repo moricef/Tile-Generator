@@ -225,7 +225,7 @@
   "leisure=track": {
     "zoom": 12,
     "color": "#88e0be",
-    "priority": 25
+    "priority": 32
   },
   "natural=beach": {
     "zoom": 10,
