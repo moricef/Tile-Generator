@@ -61,10 +61,6 @@ K_VISIBILITY = 2.0
 # Anti-pitting: holes must be N times more visible than objects to be kept
 K_HOLE_FACTOR = 10.0
 
-# Density-based generalization thresholds
-DENSITY_MERGE_MAX_ZOOM = 11  # Apply density-based merge up to z11
-DENSITY_THRESHOLD = 0.65     # 65% tile coverage → merge, <65% → discard
-
 # Point features to extract from nodes (rendered as symbols)
 # shape: 'triangle' for peaks, 'circle' for places
 POINT_FEATURES = {
@@ -696,13 +692,17 @@ class OSMHandler(osmium.SimpleHandler):
             combined_priority = layer_base_priority + (priority % 10)
 
         if is_closed and is_area_tags and 'highway' not in tags:
+            # Extract subclass for landcover discrimination (wood/forest vs farmland)
+            subclass = tags.get('natural', '') or tags.get('landuse', '') or tags.get('leisure', '')
+
             feature = {
                 'id': w.id,
                 'geom_type': GEOM_POLYGON,
                 'coords': coords,
                 'color_rgb565': color_rgb565,
                 'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
-                'width_meters': 0.0  # Polygons don't use width
+                'width_meters': 0.0,  # Polygons don't use width
+                'subclass': subclass  # Store for merge logic
             }
             self.features.append(feature)
             self.stats['features_extracted'] += 1
@@ -800,6 +800,9 @@ class OSMHandler(osmium.SimpleHandler):
             layer_base_priority = LAYER_PRIORITY.get(layer, 50)
             combined_priority = layer_base_priority + (priority % 10)
 
+            # Extract subclass for landcover discrimination (wood/forest vs farmland)
+            subclass = tags.get('natural', '') or tags.get('landuse', '') or tags.get('leisure', '')
+
             polygons = []
             if geom.geom_type == 'Polygon':
                 polygons = [geom]
@@ -821,6 +824,7 @@ class OSMHandler(osmium.SimpleHandler):
                     'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
                     'width_meters': 0.0,
                     'inner_rings': inner_rings,
+                    'subclass': subclass  # Store for merge logic
                 })
                 self.stats['features_extracted'] += 1
         except Exception as e:
@@ -895,14 +899,16 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
         for feat in features:
             if feat['geom_type'] == GEOM_POLYGON:
-                style_key = (feat['color_rgb565'], feat['zoom_priority'])
+                # Group by color, priority AND subclass to separate wood/forest from farmland
+                subclass = feat.get('subclass', '')
+                style_key = (feat['color_rgb565'], feat['zoom_priority'], subclass)
                 polygons_by_style[style_key].append(feat)
             else:
                 other_features.append(feat)
 
         merged_features = []
         merge_stats = {'holes_total': 0, 'holes_removed': 0, 'sharding_fallbacks': 0, 'groups_merged': 0}
-        for (color, priority), poly_list in polygons_by_style.items():
+        for (color, priority, subclass), poly_list in polygons_by_style.items():
             if len(poly_list) < 2:
                 merged_features.extend(poly_list)
                 continue
@@ -929,34 +935,16 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 # landuse(1-2), terrain(2-3) only — NOT water(4-5) to avoid flooding
                 is_landcover = priority_nibble <= 3
 
-                # Density-based generalization for landcover at z8-z11
-                if is_landcover and zoom <= DENSITY_MERGE_MAX_ZOOM:
-                    # Step 1: Merge all polygons to calculate total coverage
+                # OpenMapTiles-style merge: only wood/forest, keep farmland/grass individual
+                should_merge = is_landcover and subclass in ('wood', 'forest')
+
+                if should_merge:
+                    # Merge wood/forest to reduce fragmentation
                     merged = shapely_unary_union(shapely_polys)
-
-                    # Step 2: Calculate coverage ratio (actual merged area vs tile area)
-                    tile_area_deg2 = (tile_max_lon - tile_min_lon) * (tile_max_lat - tile_min_lat)
-                    coverage_ratio = merged.area / tile_area_deg2
-
-                    merge_stats['coverage_ratio'] = coverage_ratio
-
-                    # Step 3: Decision based on density
-                    if coverage_ratio >= DENSITY_THRESHOLD:
-                        # High density → keep merged result with aggressive simplification
-                        merged = merged.simplify(pixel_deg * 2, preserve_topology=True)
-                        merge_stats['density_decision'] = 'merged'
-                        # Continue processing merged result (lines 939-976)
-                    else:
-                        # Low density → discard scattered polygons, show background
-                        merge_stats['density_decision'] = 'discarded'
-                        continue  # Skip to next color group
-
-                elif is_landcover and zoom > DENSITY_MERGE_MAX_ZOOM:
-                    # z12+ : Keep individual polygons, no merge
-                    merged_features.extend(poly_list)
-                    continue
+                    # Simplify merged result (merge creates complex polygons with too many vertices)
+                    merged = merged.simplify(pixel_deg, preserve_topology=True)
                 else:
-                    # Water/roads : never merge
+                    # Keep individual: farmland, grass, water, roads
                     merged_features.extend(poly_list)
                     continue
 
@@ -989,6 +977,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                             'color_rgb565': color,
                             'zoom_priority': priority,
                             'width_meters': 0.0,
+                            'subclass': subclass  # Preserve subclass after merge
                         })
 
                 if total_merged_points > 65535:
@@ -1003,8 +992,6 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
         features = other_features + merged_features
         logger.debug(f"  Tile {tile_x},{tile_y}: Merge: {merge_stats['groups_merged']} groups merged, "
-                     f"coverage={merge_stats.get('coverage_ratio', 0):.2%}, "
-                     f"decision={merge_stats.get('density_decision', 'n/a')}, "
                      f"{merge_stats['holes_removed']}/{merge_stats['holes_total']} holes removed, "
                      f"{merge_stats['sharding_fallbacks']} sharding fallbacks")
 
