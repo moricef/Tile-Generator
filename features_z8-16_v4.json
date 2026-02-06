@@ -39,7 +39,7 @@
   },
   "landuse=farmland": {
     "zoom": 10,
-    "color": "#eef0d5",
+    "color": "#eef0d6",
     "priority": 23
   },
   "landuse=grass": {
@@ -74,12 +74,12 @@
   },
   "landuse=residential": {
     "zoom": 8,
-    "color": "#d1d1d1",
+    "color": "#c4c4c4",
     "priority": 24
   },
   "landuse=quarry": {
     "zoom": 10,
-    "color": "#c1c1c1",
+    "color": "#adadad",
     "priority": 25
   },
   "landuse=military": {
@@ -203,7 +203,7 @@
     "priority": 25
   },
   "leisure=sports_centre": {
-    "zoom": 13,
+    "zoom": 12,
     "color": "#c8facc",
     "priority": 25
   },
@@ -290,7 +290,7 @@
 
   "natural=bare_rock": {
     "zoom": 8,
-    "color": "#eee8dc",
+    "color": "#d9c4b0",
     "priority": 30
   },
   "natural=peak": {
@@ -517,7 +517,7 @@
     "priority": 53
   },
   "highway=tertiary": {
-    "zoom": 11,
+    "zoom": 12,
     "color": "#ffffff",
     "priority": 54
   },
