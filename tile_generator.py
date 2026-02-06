@@ -165,11 +165,12 @@ LAYER_PRIORITY = {
     'landuse': 10,
     'terrain': 20,
     'water': 30,
-    'amenities': 35,
-    'railways': 40,
-    'roads': 50,
-    'infrastructure': 60,
-    'buildings': 70,
+    'islands': 35,
+    'amenities': 40,
+    'railways': 45,
+    'roads': 55,
+    'infrastructure': 65,
+    'buildings': 75,
     'boundaries': 85,
     'places': 90
 }
@@ -184,6 +185,9 @@ LAYER_MAPPING = {
         'natural=spring', 'natural=wetland',
         'water=river', 'water=canal', 'water=reservoir', 'water=pond', 'water=lake', 'water=basin'
     ],
+    'islands': [
+        'place=island', 'place=islet'
+    ],
     'landuse': [
         'natural=beach', 'natural=sand', 'natural=wood',
         'landuse=forest', 'natural=forest', 'natural=scrub',
@@ -195,7 +199,7 @@ LAYER_MAPPING = {
         'aeroway=aerodrome', 'aeroway=apron', 'aeroway=helipad', 'aeroway=hangar', 'aeroway=runway', 'aeroway=taxiway',
         'leisure=nature_reserve', 'leisure=garden', 'leisure=pitch',
         'leisure=golf_course', 'leisure=recreation_ground', 'landuse=recreation_ground',
-        'landuse=residential', 'place=suburb', 'place=island', 'place=islet',
+        'landuse=residential', 'place=suburb',
         'place=isolated_dwelling', 'place=locality', 'place=neighbourhood',
         'place=quarter', 'place=farm',
         'landuse=commercial', 'landuse=retail', 'landuse=industrial',
