@@ -931,11 +931,18 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
                 pixel_deg = 360.0 / (2**zoom * 256)
 
-                # OpenMapTiles-style area filter: min_area = power(zres(zoom-1), 2)
-                # Eliminates small polygons at low zooms (they appear at higher zooms)
+                # OpenMapTiles-style area filter with aggressive thresholds for z10-11
+                # z10: 20000 m² (~3 football fields), z11: 10000 m² (~1.5 fields)
                 if zoom < 14:
                     zres_prev = 360.0 / (2**(zoom - 1) * 256)
                     min_area_deg2 = zres_prev ** 2
+
+                    # Aggressive multipliers for z10-11 to reduce clutter
+                    if zoom == 10:
+                        min_area_deg2 *= 8  # ~20000 m²
+                    elif zoom == 11:
+                        min_area_deg2 *= 6  # ~10000 m²
+
                     shapely_polys = [sp for sp in shapely_polys if sp.area >= min_area_deg2]
                     if not shapely_polys:
                         continue  # All polygons too small for this zoom
