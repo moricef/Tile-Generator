@@ -61,6 +61,10 @@ K_VISIBILITY = 2.0
 # Anti-pitting: holes must be N times more visible than objects to be kept
 K_HOLE_FACTOR = 10.0
 
+# Density-based generalization thresholds
+DENSITY_MERGE_MAX_ZOOM = 11  # Apply density-based merge up to z11
+DENSITY_THRESHOLD = 0.65     # 65% tile coverage → merge, <65% → discard
+
 # Point features to extract from nodes (rendered as symbols)
 # shape: 'triangle' for peaks, 'circle' for places
 POINT_FEATURES = {
@@ -82,7 +86,7 @@ TEXT_FEATURES = {
     },
     'place=village': {
         'font_size': 0,
-        'zoom_rules': [(0, 12)],
+        'zoom_rules': [(350, 10), (0, 11)],
     },
     'place=suburb': {
         'font_size': 0,
@@ -925,17 +929,36 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 # landuse(1-2), terrain(2-3) only — NOT water(4-5) to avoid flooding
                 is_landcover = priority_nibble <= 3
 
-                if False:  # Buffer merge disabled at all zooms to prevent pitting
-                    # Small buffer to close sub-pixel cracks between adjacent polygons
-                    buffer_size = pixel_deg * 0.5
-                    buffered = [p.buffer(buffer_size) for p in shapely_polys]
-                    merged = shapely_unary_union(buffered)
-                    merged = merged.buffer(-buffer_size)
-                else:
+                # Density-based generalization for landcover at z8-z11
+                if is_landcover and zoom <= DENSITY_MERGE_MAX_ZOOM:
+                    # Step 1: Merge all polygons to calculate total coverage
                     merged = shapely_unary_union(shapely_polys)
 
-                # Simplify merged result (merge creates complex polygons with too many vertices)
-                merged = merged.simplify(pixel_deg, preserve_topology=True)
+                    # Step 2: Calculate coverage ratio (actual merged area vs tile area)
+                    tile_area_deg2 = (tile_max_lon - tile_min_lon) * (tile_max_lat - tile_min_lat)
+                    coverage_ratio = merged.area / tile_area_deg2
+
+                    merge_stats['coverage_ratio'] = coverage_ratio
+
+                    # Step 3: Decision based on density
+                    if coverage_ratio >= DENSITY_THRESHOLD:
+                        # High density → keep merged result with aggressive simplification
+                        merged = merged.simplify(pixel_deg * 2, preserve_topology=True)
+                        merge_stats['density_decision'] = 'merged'
+                        # Continue processing merged result (lines 939-976)
+                    else:
+                        # Low density → discard scattered polygons, show background
+                        merge_stats['density_decision'] = 'discarded'
+                        continue  # Skip to next color group
+
+                elif is_landcover and zoom > DENSITY_MERGE_MAX_ZOOM:
+                    # z12+ : Keep individual polygons, no merge
+                    merged_features.extend(poly_list)
+                    continue
+                else:
+                    # Water/roads : never merge
+                    merged_features.extend(poly_list)
+                    continue
 
                 parts = []
                 if isinstance(merged, ShapelyMultiPolygon):
@@ -980,6 +1003,8 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
         features = other_features + merged_features
         logger.debug(f"  Tile {tile_x},{tile_y}: Merge: {merge_stats['groups_merged']} groups merged, "
+                     f"coverage={merge_stats.get('coverage_ratio', 0):.2%}, "
+                     f"decision={merge_stats.get('density_decision', 'n/a')}, "
                      f"{merge_stats['holes_removed']}/{merge_stats['holes_total']} holes removed, "
                      f"{merge_stats['sharding_fallbacks']} sharding fallbacks")
 
@@ -1057,24 +1082,29 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             inner_rings = feature.get('inner_rings', [])
             is_polygon = feature['geom_type'] == GEOM_POLYGON
 
-            # Filter inner_rings by size at all zooms
+            # Filter inner_rings: strip all at z8-z11, size-filter at z12+
             if is_polygon and inner_rings:
-                filtered_rings = []
-                for ring in inner_rings:
-                    total_holes_write += 1
-                    if len(ring) >= 4:
-                        rx = [c[0] for c in ring]
-                        ry = [c[1] for c in ring]
-                        rw = (max(rx) - min(rx)) / (tile_max_lon - tile_min_lon) * 4096
-                        rh = (max(ry) - min(ry)) / merc_range * 4096
-                        ring_area = (rw * rh) / (16 * 16)
-                        if ring_area >= K_VISIBILITY * K_HOLE_FACTOR:
-                            filtered_rings.append(ring)
+                if zoom <= 11:
+                    filtered_holes_write += len(inner_rings)
+                    total_holes_write += len(inner_rings)
+                    inner_rings = []
+                else:
+                    filtered_rings = []
+                    for ring in inner_rings:
+                        total_holes_write += 1
+                        if len(ring) >= 4:
+                            rx = [c[0] for c in ring]
+                            ry = [c[1] for c in ring]
+                            rw = (max(rx) - min(rx)) / (tile_max_lon - tile_min_lon) * 4096
+                            rh = (max(ry) - min(ry)) / merc_range * 4096
+                            ring_area = (rw * rh) / (16 * 16)
+                            if ring_area >= K_VISIBILITY * K_HOLE_FACTOR:
+                                filtered_rings.append(ring)
+                            else:
+                                filtered_holes_write += 1
                         else:
                             filtered_holes_write += 1
-                    else:
-                        filtered_holes_write += 1
-                inner_rings = filtered_rings
+                    inner_rings = filtered_rings
 
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
             final_features_data = []
@@ -1160,7 +1190,16 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
                 if is_polygon:
                     pixel_area = (f_max_x - f_min_x) * (f_max_y - f_min_y) / (16 * 16)
-                    min_area = K_VISIBILITY * 16 if zoom <= 9 else K_VISIBILITY
+                    if zoom <= 9:
+                        min_area = K_VISIBILITY * 12
+                    elif zoom <= 11:
+                        min_area = K_VISIBILITY * 8
+                    elif zoom == 12:
+                        min_area = K_VISIBILITY * 5
+                    elif zoom == 13:
+                        min_area = K_VISIBILITY * 3
+                    else:
+                        min_area = K_VISIBILITY
                     if pixel_area < min_area:
                         filtered_by_size += 1
                         continue
