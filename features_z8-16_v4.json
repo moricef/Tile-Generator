@@ -10,7 +10,7 @@
   "natural=grassland": {
     "zoom": 10,
     "color": "#cdebb0",
-    "priority": 22
+    "priority": 66
   },
   "natural=heath": {
     "zoom": 10,
@@ -614,13 +614,13 @@
   "aeroway=runway": {
     "zoom": 12,
     "color": "#bbbbcc",
-    "priority": 65,
+    "priority": 68,
     "width": 2
   },
   "aeroway=taxiway": {
     "zoom": 12,
     "color": "#bbbbcc",
-    "priority": 65,
+    "priority": 67,
     "width": 1
   },
   "man_made=embankment": {

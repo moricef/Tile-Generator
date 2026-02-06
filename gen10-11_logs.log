@@ -1,715 +1,715 @@
-2026-02-06 23:01:30,250 - INFO - Loading configuration from features_z8-16_v4.json
-2026-02-06 23:01:30,250 - INFO - Processing PBF file: midi-sud.pbf (191.8 MB)
-2026-02-06 23:01:30,250 - INFO - Zoom range: 10-11
-2026-02-06 23:01:30,250 - INFO - Output format: NAV binary tiles (.nav)
-2026-02-06 23:01:30,250 - INFO - Pass 1: Scanning boundary relations...
-2026-02-06 23:01:30,930 - INFO -   Boundary ways found: 7,898
-2026-02-06 23:01:30,930 - INFO - Pass 2: Processing OSM data...
-  Progress: 1 ways, 0 features [3m 44s]  Progress: 78,818 ways, 15,461 features [3m 49s]  Progress: 163,156 ways, 16,609 features [3m 54s]  Progress: 247,801 ways, 16,857 features [3m 59s]  Progress: 332,282 ways, 17,172 features [4m 04s]  Progress: 416,597 ways, 17,880 features [4m 09s]  Progress: 499,835 ways, 18,533 features [4m 14s]  Progress: 583,616 ways, 18,808 features [4m 19s]  Progress: 667,122 ways, 19,850 features [4m 24s]  Progress: 752,938 ways, 21,290 features [4m 29s]  Progress: 837,687 ways, 23,394 features [4m 34s]  Progress: 922,837 ways, 24,391 features [4m 39s]  Progress: 1,012,424 ways, 26,367 features [4m 44s]  Progress: 1,099,963 ways, 30,448 features [4m 49s]  Progress: 1,184,467 ways, 39,764 features [4m 54s]  Progress: 1,256,586 ways, 54,012 features [4m 59s]  Progress: 1,331,416 ways, 67,335 features [5m 04s]  Progress: 1,397,648 ways, 84,402 features [5m 09s]  Progress: 1,466,170 ways, 98,829 features [5m 14s]  Progress: 1,529,248 ways, 117,734 features [5m 19s]  Progress: 1,591,126 ways, 142,878 features [5m 24s]  Progress: 1,645,028 ways, 166,726 features [5m 29s]  Progress: 1,706,468 ways, 187,036 features [5m 34s]  Progress: 1,767,693 ways, 206,181 features [5m 39s]  Progress: 1,851,125 ways, 211,108 features [5m 44s]  Progress: 1,932,999 ways, 219,598 features [5m 49s]  Progress: 2,017,770 ways, 223,641 features [5m 54s]  Progress: 2,088,632 ways, 240,361 features [5m 59s]  Progress: 2,146,279 ways, 261,956 features [6m 04s]  Progress: 2,223,682 ways, 278,368 features [6m 09s]  Progress: 2,299,700 ways, 299,122 features [6m 14s]  Progress: 2,380,351 ways, 314,004 features [6m 19s]  Progress: 2,470,731 ways, 329,683 features [6m 24s]  Progress: 2,564,863 ways, 350,371 features [6m 29s]  Progress: 2,661,103 ways, 373,093 features [6m 34s]  Progress: 2,730,713 ways, 394,728 features [6m 39s]  Progress: 2,797,620 ways, 429,792 features [6m 44s]  Progress: 2,866,288 ways, 464,276 features [6m 49s]  Progress: 2,920,149 ways, 498,311 features [6m 54s]2026-02-06 23:08:27,444 - INFO - Processing completed in 417.19s
-2026-02-06 23:08:27,444 - INFO - Statistics:
-2026-02-06 23:08:27,444 - INFO -   Nodes (peaks): 0
-2026-02-06 23:08:27,444 - INFO -   Text labels (places): 1,883
-2026-02-06 23:08:27,444 - INFO -   Ways processed: 2,939,213
-2026-02-06 23:08:27,444 - INFO -   Areas processed: 2,299,320
-2026-02-06 23:08:27,444 - INFO -   Boundary ways extracted: 2,954
-2026-02-06 23:08:27,444 - INFO -   Features extracted: 517,415
-2026-02-06 23:08:27,444 - INFO -   Features filtered: 2,668,640
-2026-02-06 23:08:27,444 - INFO -   Area filter breakdown:
-2026-02-06 23:08:27,444 - INFO -     - Boundary admin: 1,923
-2026-02-06 23:08:27,444 - INFO -     - Not in config: 26,526
-2026-02-06 23:08:27,444 - INFO -     - No layer mapping: 0
-2026-02-06 23:08:27,444 - INFO -     - Zoom filtered: 2,024,375
-2026-02-06 23:08:27,444 - INFO -     - Exceptions: 0
-2026-02-06 23:08:27,444 - INFO - Calculating bounding box from polygons only (useful area)...
-2026-02-06 23:08:28,835 - INFO -   BBox from 483,717 polygons
-2026-02-06 23:08:28,835 - INFO -   BBox: lon=[-0.4198, 2.5557], lat=[42.5621, 43.8353]
-2026-02-06 23:08:28,835 - INFO - Generating NAV tile files...
+2026-02-06 23:19:37,891 - INFO - Loading configuration from features_z8-16_v4.json
+2026-02-06 23:19:37,892 - INFO - Processing PBF file: midi-sud.pbf (191.8 MB)
+2026-02-06 23:19:37,892 - INFO - Zoom range: 10-11
+2026-02-06 23:19:37,892 - INFO - Output format: NAV binary tiles (.nav)
+2026-02-06 23:19:37,892 - INFO - Pass 1: Scanning boundary relations...
+2026-02-06 23:19:38,838 - INFO -   Boundary ways found: 7,898
+2026-02-06 23:19:38,838 - INFO - Pass 2: Processing OSM data...
+  Progress: 1 ways, 0 features [3m 44s]  Progress: 80,601 ways, 15,484 features [3m 49s]  Progress: 166,481 ways, 16,609 features [3m 54s]  Progress: 254,085 ways, 16,953 features [3m 59s]  Progress: 342,895 ways, 17,243 features [4m 04s]  Progress: 428,128 ways, 17,981 features [4m 09s]  Progress: 515,140 ways, 18,547 features [4m 14s]  Progress: 601,302 ways, 19,403 features [4m 19s]  Progress: 688,816 ways, 20,177 features [4m 24s]  Progress: 776,932 ways, 21,987 features [4m 29s]  Progress: 865,796 ways, 23,538 features [4m 34s]  Progress: 953,396 ways, 25,053 features [4m 39s]  Progress: 1,045,481 ways, 29,475 features [4m 44s]  Progress: 1,135,383 ways, 32,967 features [4m 49s]  Progress: 1,213,532 ways, 46,622 features [4m 54s]  Progress: 1,285,456 ways, 63,418 features [4m 59s]  Progress: 1,361,457 ways, 76,192 features [5m 04s]  Progress: 1,437,950 ways, 88,380 features [5m 09s]  Progress: 1,499,107 ways, 110,823 features [5m 14s]  Progress: 1,562,298 ways, 131,797 features [5m 19s]  Progress: 1,622,587 ways, 155,234 features [5m 24s]  Progress: 1,681,797 ways, 180,241 features [5m 29s]  Progress: 1,741,150 ways, 199,635 features [5m 34s]  Progress: 1,821,478 ways, 210,179 features [5m 39s]  Progress: 1,906,380 ways, 217,853 features [5m 44s]  Progress: 1,993,034 ways, 222,396 features [5m 49s]  Progress: 2,073,037 ways, 235,772 features [5m 54s]  Progress: 2,135,335 ways, 256,283 features [5m 59s]  Progress: 2,209,069 ways, 274,638 features [6m 04s]  Progress: 2,288,427 ways, 296,843 features [6m 09s]  Progress: 2,366,597 ways, 313,645 features [6m 14s]  Progress: 2,461,493 ways, 326,603 features [6m 19s]  Progress: 2,553,519 ways, 348,195 features [6m 24s]  Progress: 2,651,476 ways, 369,176 features [6m 29s]  Progress: 2,722,301 ways, 393,072 features [6m 34s]  Progress: 2,792,537 ways, 427,368 features [6m 39s]  Progress: 2,864,016 ways, 462,617 features [6m 44s]  Progress: 2,916,586 ways, 496,579 features [6m 49s]2026-02-06 23:26:30,456 - INFO - Processing completed in 412.56s
+2026-02-06 23:26:30,457 - INFO - Statistics:
+2026-02-06 23:26:30,457 - INFO -   Nodes (peaks): 0
+2026-02-06 23:26:30,457 - INFO -   Text labels (places): 1,883
+2026-02-06 23:26:30,457 - INFO -   Ways processed: 2,939,213
+2026-02-06 23:26:30,457 - INFO -   Areas processed: 2,299,320
+2026-02-06 23:26:30,457 - INFO -   Boundary ways extracted: 2,954
+2026-02-06 23:26:30,457 - INFO -   Features extracted: 517,415
+2026-02-06 23:26:30,457 - INFO -   Features filtered: 2,668,640
+2026-02-06 23:26:30,457 - INFO -   Area filter breakdown:
+2026-02-06 23:26:30,457 - INFO -     - Boundary admin: 1,923
+2026-02-06 23:26:30,457 - INFO -     - Not in config: 26,526
+2026-02-06 23:26:30,457 - INFO -     - No layer mapping: 0
+2026-02-06 23:26:30,457 - INFO -     - Zoom filtered: 2,024,375
+2026-02-06 23:26:30,457 - INFO -     - Exceptions: 0
+2026-02-06 23:26:30,457 - INFO - Calculating bounding box from polygons only (useful area)...
+2026-02-06 23:26:31,773 - INFO -   BBox from 483,717 polygons
+2026-02-06 23:26:31,773 - INFO -   BBox: lon=[-0.4198, 2.5557], lat=[42.5621, 43.8353]
+2026-02-06 23:26:31,773 - INFO - Generating NAV tile files...
 
   Zoom 10: Preparing features... 25,000 / 522,252  Zoom 10: Preparing features... 50,000 / 522,252  Zoom 10: Preparing features... 75,000 / 522,252  Zoom 10: Preparing features... 100,000 / 522,252  Zoom 10: Preparing features... 125,000 / 522,252  Zoom 10: Preparing features... 150,000 / 522,252  Zoom 10: Preparing features... 175,000 / 522,252  Zoom 10: Preparing features... 200,000 / 522,252  Zoom 10: Preparing features... 225,000 / 522,252  Zoom 10: Preparing features... 250,000 / 522,252  Zoom 10: Preparing features... 275,000 / 522,252  Zoom 10: Preparing features... 300,000 / 522,252  Zoom 10: Preparing features... 325,000 / 522,252  Zoom 10: Preparing features... 350,000 / 522,252  Zoom 10: Preparing features... 375,000 / 522,252  Zoom 10: Preparing features... 400,000 / 522,252  Zoom 10: Preparing features... 425,000 / 522,252  Zoom 10: Preparing features... 450,000 / 522,252  Zoom 10: Preparing features... 475,000 / 522,252  Zoom 10: Preparing features... 500,000 / 522,252  Zoom 10: Labels: 274 placed, 122 filtered (proximity), 95 dropped (overlap)
 
-2026-02-06 23:09:01,636 - DEBUG -   Tile 510,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:01,636 - DEBUG -   Tile 511,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:01,636 - DEBUG -   Tile 513,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:01,636 - DEBUG -   Tile 512,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:01,637 - DEBUG -   Tile 510,372: Write: 8 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:01,637 - DEBUG -   Tile 511,372: Write: 12 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:01,637 - DEBUG -   Tile 512,372: Write: 26 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:01,637 - DEBUG -   Tile 513,372: Write: 28 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:01,637 - DEBUG -   Tile 514,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:01,637 - DEBUG -   Tile 515,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-  Zoom 10: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 1/602026-02-06 23:09:01,637 - DEBUG -   Tile 516,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-  Zoom 10: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 2/60  Zoom 10: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 3/602026-02-06 23:09:01,637 - DEBUG -   Tile 517,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:01,638 - DEBUG -   Tile 516,372: Write: 49 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:01,639 - DEBUG -   Tile 518,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:01,639 - DEBUG -   Tile 517,372: Write: 42 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:01,639 - DEBUG -   Tile 514,372: Write: 48 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:01,639 - DEBUG -   Tile 519,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:01,639 - DEBUG -   Tile 510,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:01,640 - DEBUG -   Tile 510,373: Write: 8 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:01,640 - DEBUG -   Tile 519,372: Write: 14 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:01,640 - DEBUG -   Tile 515,372: Write: 54 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:01,641 - DEBUG -   Tile 518,372: Write: 27 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 10: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 4/60  Zoom 10: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 5/60  Zoom 10: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 6/60  Zoom 10: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 7/60  Zoom 10: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 8/60  Zoom 10: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 9/60  Zoom 10: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 10/60  Zoom 10: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 11/602026-02-06 23:09:01,880 - DEBUG -   Tile 511,373: Filtered 10721 polygons by area at z10
-2026-02-06 23:09:01,902 - DEBUG -   Tile 511,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:01,957 - DEBUG -   Tile 512,373: Filtered 11824 polygons by area at z10
-2026-02-06 23:09:01,974 - DEBUG -   Tile 512,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:02,036 - DEBUG -   Tile 513,373: Filtered 13125 polygons by area at z10
-2026-02-06 23:09:02,041 - DEBUG -   Tile 511,373: Write: 1096 features, 4 filtered by area (<2.0px²), 35/35 holes removed (<20.0px²)
-  Zoom 10: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 12/602026-02-06 23:09:02,048 - DEBUG -   Tile 513,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:02,077 - DEBUG -   Tile 512,373: Write: 731 features, 9 filtered by area (<2.0px²), 16/16 holes removed (<20.0px²)
-  Zoom 10: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 13/602026-02-06 23:09:02,154 - DEBUG -   Tile 513,373: Write: 901 features, 7 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-  Zoom 10: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 14/602026-02-06 23:09:02,204 - DEBUG -   Tile 514,373: Filtered 18095 polygons by area at z10
-2026-02-06 23:09:02,229 - DEBUG -   Tile 514,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:02,235 - DEBUG -   Tile 517,373: Filtered 3062 polygons by area at z10
-2026-02-06 23:09:02,259 - DEBUG -   Tile 517,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:02,385 - DEBUG -   Tile 514,373: Write: 1258 features, 22 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
-  Zoom 10: Tiles [██████░░░░░░░░░░░░░░░░░░░] 15/602026-02-06 23:09:02,435 - DEBUG -   Tile 517,373: Write: 1249 features, 24 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 10: Tiles [██████░░░░░░░░░░░░░░░░░░░] 16/602026-02-06 23:09:02,440 - DEBUG -   Tile 519,373: Filtered 45 polygons by area at z10
-2026-02-06 23:09:02,444 - DEBUG -   Tile 519,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:02,468 - DEBUG -   Tile 519,373: Write: 165 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 10: Tiles [███████░░░░░░░░░░░░░░░░░░] 17/602026-02-06 23:09:02,468 - DEBUG -   Tile 510,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:02,469 - DEBUG -   Tile 510,374: Write: 14 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 10: Tiles [███████░░░░░░░░░░░░░░░░░░] 18/602026-02-06 23:09:02,475 - DEBUG -   Tile 518,373: Filtered 3839 polygons by area at z10
-2026-02-06 23:09:02,477 - DEBUG -   Tile 516,373: Filtered 16666 polygons by area at z10
-2026-02-06 23:09:02,496 - DEBUG -   Tile 518,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:02,511 - DEBUG -   Tile 516,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:02,578 - DEBUG -   Tile 511,374: Filtered 5624 polygons by area at z10
-2026-02-06 23:09:02,586 - DEBUG -   Tile 515,373: Filtered 26066 polygons by area at z10
-2026-02-06 23:09:02,587 - DEBUG -   Tile 511,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:02,620 - DEBUG -   Tile 515,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:02,672 - DEBUG -   Tile 511,374: Write: 692 features, 22 filtered by area (<2.0px²), 12/12 holes removed (<20.0px²)
-  Zoom 10: Tiles [███████░░░░░░░░░░░░░░░░░░] 19/602026-02-06 23:09:02,690 - DEBUG -   Tile 518,373: Write: 1535 features, 9 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 10: Tiles [████████░░░░░░░░░░░░░░░░░] 20/602026-02-06 23:09:02,938 - DEBUG -   Tile 513,374: Filtered 10225 polygons by area at z10
-2026-02-06 23:09:02,955 - DEBUG -   Tile 513,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:03,039 - DEBUG -   Tile 512,374: Filtered 19105 polygons by area at z10
-2026-02-06 23:09:03,064 - DEBUG -   Tile 512,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:03,065 - DEBUG -   Tile 516,373: Write: 5290 features, 21 filtered by area (<2.0px²), 23/23 holes removed (<20.0px²)
-  Zoom 10: Tiles [████████░░░░░░░░░░░░░░░░░] 21/602026-02-06 23:09:03,091 - DEBUG -   Tile 513,374: Write: 976 features, 20 filtered by area (<2.0px²), 6/6 holes removed (<20.0px²)
-2026-02-06 23:09:03,159 - DEBUG -   Tile 515,373: Write: 4936 features, 21 filtered by area (<2.0px²), 32/32 holes removed (<20.0px²)
-  Zoom 10: Tiles [█████████░░░░░░░░░░░░░░░░] 22/60  Zoom 10: Tiles [█████████░░░░░░░░░░░░░░░░] 23/602026-02-06 23:09:03,268 - DEBUG -   Tile 512,374: Write: 1524 features, 21 filtered by area (<2.0px²), 36/36 holes removed (<20.0px²)
-  Zoom 10: Tiles [██████████░░░░░░░░░░░░░░░] 24/602026-02-06 23:09:03,396 - DEBUG -   Tile 517,374: Filtered 5901 polygons by area at z10
-2026-02-06 23:09:03,418 - DEBUG -   Tile 517,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:03,502 - DEBUG -   Tile 516,374: Filtered 13088 polygons by area at z10
-2026-02-06 23:09:03,536 - DEBUG -   Tile 515,374: Filtered 18737 polygons by area at z10
-2026-02-06 23:09:03,540 - DEBUG -   Tile 516,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:03,569 - DEBUG -   Tile 515,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:03,597 - DEBUG -   Tile 517,374: Write: 1346 features, 19 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 10: Tiles [██████████░░░░░░░░░░░░░░░] 25/602026-02-06 23:09:03,632 - DEBUG -   Tile 518,374: Filtered 1309 polygons by area at z10
-2026-02-06 23:09:03,647 - DEBUG -   Tile 518,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:03,796 - DEBUG -   Tile 518,374: Write: 1189 features, 22 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
-  Zoom 10: Tiles [██████████░░░░░░░░░░░░░░░] 26/602026-02-06 23:09:03,801 - DEBUG -   Tile 514,374: Filtered 39173 polygons by area at z10
-2026-02-06 23:09:03,801 - DEBUG -   Tile 519,374: Filtered 100 polygons by area at z10
-2026-02-06 23:09:03,804 - DEBUG -   Tile 519,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:03,822 - DEBUG -   Tile 519,374: Write: 123 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:03,823 - DEBUG -   Tile 510,375: Filtered 23 polygons by area at z10
-2026-02-06 23:09:03,823 - DEBUG -   Tile 510,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:03,825 - DEBUG -   Tile 510,375: Write: 17 features, 2 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:03,826 - DEBUG -   Tile 514,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-  Zoom 10: Tiles [███████████░░░░░░░░░░░░░░] 27/60  Zoom 10: Tiles [███████████░░░░░░░░░░░░░░] 28/602026-02-06 23:09:04,002 - DEBUG -   Tile 516,374: Write: 4148 features, 19 filtered by area (<2.0px²), 53/53 holes removed (<20.0px²)
-2026-02-06 23:09:04,018 - DEBUG -   Tile 514,374: Write: 1412 features, 25 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 10: Tiles [████████████░░░░░░░░░░░░░] 29/60  Zoom 10: Tiles [████████████░░░░░░░░░░░░░] 30/602026-02-06 23:09:04,040 - DEBUG -   Tile 515,374: Write: 4124 features, 30 filtered by area (<2.0px²), 51/51 holes removed (<20.0px²)
-  Zoom 10: Tiles [████████████░░░░░░░░░░░░░] 31/602026-02-06 23:09:04,143 - DEBUG -   Tile 511,375: Filtered 15115 polygons by area at z10
-2026-02-06 23:09:04,156 - DEBUG -   Tile 511,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:04,308 - DEBUG -   Tile 511,375: Write: 1315 features, 10 filtered by area (<2.0px²), 10/10 holes removed (<20.0px²)
-  Zoom 10: Tiles [█████████████░░░░░░░░░░░░] 32/602026-02-06 23:09:04,632 - DEBUG -   Tile 515,375: Filtered 15465 polygons by area at z10
-2026-02-06 23:09:04,656 - DEBUG -   Tile 513,375: Filtered 26189 polygons by area at z10
-2026-02-06 23:09:04,663 - DEBUG -   Tile 515,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:04,691 - DEBUG -   Tile 513,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:04,831 - DEBUG -   Tile 514,375: Filtered 29051 polygons by area at z10
-2026-02-06 23:09:04,859 - DEBUG -   Tile 514,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:04,861 - DEBUG -   Tile 512,375: Filtered 43229 polygons by area at z10
-2026-02-06 23:09:04,896 - DEBUG -   Tile 512,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:04,909 - DEBUG -   Tile 515,375: Write: 1680 features, 21 filtered by area (<2.0px²), 29/29 holes removed (<20.0px²)
-  Zoom 10: Tiles [█████████████░░░░░░░░░░░░] 33/602026-02-06 23:09:04,973 - DEBUG -   Tile 513,375: Write: 1967 features, 23 filtered by area (<2.0px²), 24/24 holes removed (<20.0px²)
-  Zoom 10: Tiles [██████████████░░░░░░░░░░░] 34/602026-02-06 23:09:04,998 - DEBUG -   Tile 517,375: Filtered 378 polygons by area at z10
-2026-02-06 23:09:05,008 - DEBUG -   Tile 517,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:05,079 - DEBUG -   Tile 517,375: Write: 489 features, 6 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:05,080 - DEBUG -   Tile 518,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:05,081 - DEBUG -   Tile 518,375: Write: 30 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:05,081 - DEBUG -   Tile 519,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:05,082 - DEBUG -   Tile 519,375: Write: 13 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:05,082 - DEBUG -   Tile 510,376: Filtered 1 polygons by area at z10
-2026-02-06 23:09:05,082 - DEBUG -   Tile 510,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:05,084 - DEBUG -   Tile 510,376: Write: 21 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 10: Tiles [██████████████░░░░░░░░░░░] 35/60  Zoom 10: Tiles [███████████████░░░░░░░░░░] 36/60  Zoom 10: Tiles [███████████████░░░░░░░░░░] 37/60  Zoom 10: Tiles [███████████████░░░░░░░░░░] 38/602026-02-06 23:09:05,120 - DEBUG -   Tile 514,375: Write: 2041 features, 22 filtered by area (<2.0px²), 53/53 holes removed (<20.0px²)
-  Zoom 10: Tiles [████████████████░░░░░░░░░] 39/602026-02-06 23:09:05,245 - DEBUG -   Tile 516,375: Filtered 16652 polygons by area at z10
-2026-02-06 23:09:05,249 - DEBUG -   Tile 512,375: Write: 2687 features, 27 filtered by area (<2.0px²), 22/22 holes removed (<20.0px²)
-  Zoom 10: Tiles [████████████████░░░░░░░░░] 40/602026-02-06 23:09:05,273 - DEBUG -   Tile 516,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:05,486 - DEBUG -   Tile 516,375: Write: 1549 features, 18 filtered by area (<2.0px²), 34/34 holes removed (<20.0px²)
-  Zoom 10: Tiles [█████████████████░░░░░░░░] 41/602026-02-06 23:09:05,567 - DEBUG -   Tile 514,376: Filtered 3502 polygons by area at z10
-2026-02-06 23:09:05,574 - DEBUG -   Tile 512,376: Filtered 20004 polygons by area at z10
-2026-02-06 23:09:05,584 - DEBUG -   Tile 514,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:05,596 - DEBUG -   Tile 511,376: Filtered 25748 polygons by area at z10
-2026-02-06 23:09:05,600 - DEBUG -   Tile 512,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:05,620 - DEBUG -   Tile 511,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:05,639 - DEBUG -   Tile 513,376: Filtered 19199 polygons by area at z10
-2026-02-06 23:09:05,660 - DEBUG -   Tile 513,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:05,716 - DEBUG -   Tile 514,376: Write: 927 features, 15 filtered by area (<2.0px²), 28/28 holes removed (<20.0px²)
-  Zoom 10: Tiles [█████████████████░░░░░░░░] 42/602026-02-06 23:09:05,775 - DEBUG -   Tile 515,376: Filtered 2415 polygons by area at z10
-2026-02-06 23:09:05,784 - DEBUG -   Tile 512,376: Write: 1109 features, 21 filtered by area (<2.0px²), 3/3 holes removed (<20.0px²)
-  Zoom 10: Tiles [█████████████████░░░░░░░░] 43/602026-02-06 23:09:05,797 - DEBUG -   Tile 515,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:05,814 - DEBUG -   Tile 511,376: Write: 1319 features, 15 filtered by area (<2.0px²), 20/20 holes removed (<20.0px²)
-  Zoom 10: Tiles [██████████████████░░░░░░░] 44/602026-02-06 23:09:05,850 - DEBUG -   Tile 516,376: Filtered 2266 polygons by area at z10
-2026-02-06 23:09:05,851 - DEBUG -   Tile 513,376: Write: 1419 features, 21 filtered by area (<2.0px²), 31/31 holes removed (<20.0px²)
-  Zoom 10: Tiles [██████████████████░░░░░░░] 45/602026-02-06 23:09:05,858 - DEBUG -   Tile 518,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:05,859 - DEBUG -   Tile 518,376: Write: 11 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:05,859 - DEBUG -   Tile 510,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-  Zoom 10: Tiles [███████████████████░░░░░░] 46/602026-02-06 23:09:05,861 - DEBUG -   Tile 510,377: Write: 24 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 10: Tiles [███████████████████░░░░░░] 47/602026-02-06 23:09:05,876 - DEBUG -   Tile 516,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:05,878 - DEBUG -   Tile 517,376: Filtered 1878 polygons by area at z10
-2026-02-06 23:09:05,903 - DEBUG -   Tile 517,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:05,913 - DEBUG -   Tile 511,377: Filtered 2740 polygons by area at z10
-2026-02-06 23:09:05,918 - DEBUG -   Tile 511,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:05,959 - DEBUG -   Tile 511,377: Write: 228 features, 14 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 10: Tiles [████████████████████░░░░░] 48/602026-02-06 23:09:05,970 - DEBUG -   Tile 515,376: Write: 1167 features, 18 filtered by area (<2.0px²), 35/35 holes removed (<20.0px²)
-  Zoom 10: Tiles [████████████████████░░░░░] 49/602026-02-06 23:09:06,067 - DEBUG -   Tile 512,377: Filtered 5384 polygons by area at z10
-2026-02-06 23:09:06,079 - DEBUG -   Tile 512,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:06,082 - DEBUG -   Tile 517,376: Write: 1140 features, 15 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-  Zoom 10: Tiles [████████████████████░░░░░] 50/602026-02-06 23:09:06,089 - DEBUG -   Tile 514,377: Filtered 216 polygons by area at z10
-2026-02-06 23:09:06,089 - DEBUG -   Tile 516,376: Write: 1472 features, 17 filtered by area (<2.0px²), 31/31 holes removed (<20.0px²)
-2026-02-06 23:09:06,090 - DEBUG -   Tile 514,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-  Zoom 10: Tiles [█████████████████████░░░░] 51/602026-02-06 23:09:06,095 - DEBUG -   Tile 513,377: Filtered 5413 polygons by area at z10
-2026-02-06 23:09:06,106 - DEBUG -   Tile 514,377: Write: 99 features, 5 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-  Zoom 10: Tiles [█████████████████████░░░░] 52/602026-02-06 23:09:06,107 - DEBUG -   Tile 513,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:06,130 - DEBUG -   Tile 515,377: Filtered 1769 polygons by area at z10
-2026-02-06 23:09:06,138 - DEBUG -   Tile 515,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:06,161 - DEBUG -   Tile 516,377: Filtered 2483 polygons by area at z10
-2026-02-06 23:09:06,163 - DEBUG -   Tile 512,377: Write: 500 features, 13 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-  Zoom 10: Tiles [██████████████████████░░░] 53/602026-02-06 23:09:06,175 - DEBUG -   Tile 516,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:06,198 - DEBUG -   Tile 517,377: Filtered 1452 polygons by area at z10
-2026-02-06 23:09:06,202 - DEBUG -   Tile 513,377: Write: 651 features, 5 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-  Zoom 10: Tiles [██████████████████████░░░] 54/602026-02-06 23:09:06,205 - DEBUG -   Tile 518,377: Filtered 11 polygons by area at z10
-2026-02-06 23:09:06,206 - DEBUG -   Tile 515,377: Write: 500 features, 7 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 10: Tiles [██████████████████████░░░] 55/602026-02-06 23:09:06,207 - DEBUG -   Tile 518,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:06,211 - DEBUG -   Tile 517,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:06,219 - DEBUG -   Tile 518,377: Write: 70 features, 4 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 10: Tiles [███████████████████████░░] 56/602026-02-06 23:09:06,277 - DEBUG -   Tile 516,377: Write: 682 features, 14 filtered by area (<2.0px²), 11/11 holes removed (<20.0px²)
-  Zoom 10: Tiles [███████████████████████░░] 57/602026-02-06 23:09:06,320 - DEBUG -   Tile 517,377: Write: 840 features, 6 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 10: Tiles [████████████████████████░] 58/60  Zoom 10: 58 tiles written. (37.6s)                    
+2026-02-06 23:27:04,073 - DEBUG -   Tile 512,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,073 - DEBUG -   Tile 513,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,073 - DEBUG -   Tile 511,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,073 - DEBUG -   Tile 510,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,074 - DEBUG -   Tile 510,372: Write: 8 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:04,074 - DEBUG -   Tile 511,372: Write: 12 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:04,074 - DEBUG -   Tile 513,372: Write: 28 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:04,074 - DEBUG -   Tile 512,372: Write: 26 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:04,074 - DEBUG -   Tile 514,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+  Zoom 10: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 1/602026-02-06 23:27:04,074 - DEBUG -   Tile 515,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+  Zoom 10: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 2/602026-02-06 23:27:04,074 - DEBUG -   Tile 516,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,074 - DEBUG -   Tile 517,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,075 - DEBUG -   Tile 516,372: Write: 49 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:04,076 - DEBUG -   Tile 518,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,076 - DEBUG -   Tile 517,372: Write: 42 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:04,076 - DEBUG -   Tile 519,372: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,076 - DEBUG -   Tile 514,372: Write: 48 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:04,076 - DEBUG -   Tile 510,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,076 - DEBUG -   Tile 519,372: Write: 14 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:04,077 - DEBUG -   Tile 510,373: Write: 8 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:04,077 - DEBUG -   Tile 515,372: Write: 54 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:04,077 - DEBUG -   Tile 518,372: Write: 27 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 10: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 3/60  Zoom 10: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 4/60  Zoom 10: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 5/60  Zoom 10: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 6/60  Zoom 10: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 7/60  Zoom 10: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 8/60  Zoom 10: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 9/60  Zoom 10: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 10/60  Zoom 10: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 11/602026-02-06 23:27:04,307 - DEBUG -   Tile 511,373: Filtered 10721 polygons by area at z10
+2026-02-06 23:27:04,325 - DEBUG -   Tile 511,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,376 - DEBUG -   Tile 512,373: Filtered 11824 polygons by area at z10
+2026-02-06 23:27:04,392 - DEBUG -   Tile 512,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,452 - DEBUG -   Tile 511,373: Write: 1096 features, 4 filtered by area (<2.0px²), 35/35 holes removed (<20.0px²)
+  Zoom 10: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 12/602026-02-06 23:27:04,458 - DEBUG -   Tile 513,373: Filtered 13125 polygons by area at z10
+2026-02-06 23:27:04,471 - DEBUG -   Tile 513,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,488 - DEBUG -   Tile 512,373: Write: 731 features, 9 filtered by area (<2.0px²), 16/16 holes removed (<20.0px²)
+  Zoom 10: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 13/602026-02-06 23:27:04,577 - DEBUG -   Tile 513,373: Write: 901 features, 7 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 10: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 14/602026-02-06 23:27:04,626 - DEBUG -   Tile 514,373: Filtered 18095 polygons by area at z10
+2026-02-06 23:27:04,649 - DEBUG -   Tile 514,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,649 - DEBUG -   Tile 517,373: Filtered 3062 polygons by area at z10
+2026-02-06 23:27:04,672 - DEBUG -   Tile 517,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,799 - DEBUG -   Tile 514,373: Write: 1258 features, 22 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
+  Zoom 10: Tiles [██████░░░░░░░░░░░░░░░░░░░] 15/602026-02-06 23:27:04,841 - DEBUG -   Tile 517,373: Write: 1249 features, 24 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 10: Tiles [██████░░░░░░░░░░░░░░░░░░░] 16/602026-02-06 23:27:04,845 - DEBUG -   Tile 519,373: Filtered 45 polygons by area at z10
+2026-02-06 23:27:04,849 - DEBUG -   Tile 519,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,868 - DEBUG -   Tile 516,373: Filtered 16666 polygons by area at z10
+2026-02-06 23:27:04,872 - DEBUG -   Tile 519,373: Write: 165 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 10: Tiles [███████░░░░░░░░░░░░░░░░░░] 17/602026-02-06 23:27:04,873 - DEBUG -   Tile 510,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,873 - DEBUG -   Tile 510,374: Write: 14 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 10: Tiles [███████░░░░░░░░░░░░░░░░░░] 18/602026-02-06 23:27:04,886 - DEBUG -   Tile 518,373: Filtered 3839 polygons by area at z10
+2026-02-06 23:27:04,899 - DEBUG -   Tile 516,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,905 - DEBUG -   Tile 518,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,943 - DEBUG -   Tile 515,373: Filtered 26066 polygons by area at z10
+2026-02-06 23:27:04,975 - DEBUG -   Tile 511,374: Filtered 5624 polygons by area at z10
+2026-02-06 23:27:04,977 - DEBUG -   Tile 515,373: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:04,984 - DEBUG -   Tile 511,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:05,065 - DEBUG -   Tile 511,374: Write: 692 features, 22 filtered by area (<2.0px²), 12/12 holes removed (<20.0px²)
+  Zoom 10: Tiles [███████░░░░░░░░░░░░░░░░░░] 19/602026-02-06 23:27:05,093 - DEBUG -   Tile 518,373: Write: 1535 features, 9 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 10: Tiles [████████░░░░░░░░░░░░░░░░░] 20/602026-02-06 23:27:05,296 - DEBUG -   Tile 513,374: Filtered 10225 polygons by area at z10
+2026-02-06 23:27:05,313 - DEBUG -   Tile 513,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:05,414 - DEBUG -   Tile 516,373: Write: 5290 features, 21 filtered by area (<2.0px²), 23/23 holes removed (<20.0px²)
+  Zoom 10: Tiles [████████░░░░░░░░░░░░░░░░░] 21/602026-02-06 23:27:05,417 - DEBUG -   Tile 512,374: Filtered 19105 polygons by area at z10
+2026-02-06 23:27:05,441 - DEBUG -   Tile 512,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:05,446 - DEBUG -   Tile 513,374: Write: 976 features, 20 filtered by area (<2.0px²), 6/6 holes removed (<20.0px²)
+2026-02-06 23:27:05,471 - DEBUG -   Tile 515,373: Write: 4936 features, 21 filtered by area (<2.0px²), 32/32 holes removed (<20.0px²)
+  Zoom 10: Tiles [█████████░░░░░░░░░░░░░░░░] 22/60  Zoom 10: Tiles [█████████░░░░░░░░░░░░░░░░] 23/602026-02-06 23:27:05,636 - DEBUG -   Tile 512,374: Write: 1524 features, 21 filtered by area (<2.0px²), 36/36 holes removed (<20.0px²)
+  Zoom 10: Tiles [██████████░░░░░░░░░░░░░░░] 24/602026-02-06 23:27:05,757 - DEBUG -   Tile 517,374: Filtered 5901 polygons by area at z10
+2026-02-06 23:27:05,776 - DEBUG -   Tile 517,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:05,827 - DEBUG -   Tile 516,374: Filtered 13088 polygons by area at z10
+2026-02-06 23:27:05,855 - DEBUG -   Tile 515,374: Filtered 18737 polygons by area at z10
+2026-02-06 23:27:05,862 - DEBUG -   Tile 516,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:05,887 - DEBUG -   Tile 515,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:05,947 - DEBUG -   Tile 517,374: Write: 1346 features, 19 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 10: Tiles [██████████░░░░░░░░░░░░░░░] 25/602026-02-06 23:27:05,981 - DEBUG -   Tile 518,374: Filtered 1309 polygons by area at z10
+2026-02-06 23:27:05,995 - DEBUG -   Tile 518,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:06,107 - DEBUG -   Tile 514,374: Filtered 39173 polygons by area at z10
+2026-02-06 23:27:06,130 - DEBUG -   Tile 514,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:06,141 - DEBUG -   Tile 518,374: Write: 1189 features, 22 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
+  Zoom 10: Tiles [██████████░░░░░░░░░░░░░░░] 26/602026-02-06 23:27:06,146 - DEBUG -   Tile 519,374: Filtered 100 polygons by area at z10
+2026-02-06 23:27:06,148 - DEBUG -   Tile 519,374: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:06,167 - DEBUG -   Tile 519,374: Write: 123 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:06,168 - DEBUG -   Tile 510,375: Filtered 23 polygons by area at z10
+2026-02-06 23:27:06,168 - DEBUG -   Tile 510,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:06,169 - DEBUG -   Tile 510,375: Write: 17 features, 2 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 10: Tiles [███████████░░░░░░░░░░░░░░] 27/60  Zoom 10: Tiles [███████████░░░░░░░░░░░░░░] 28/602026-02-06 23:27:06,296 - DEBUG -   Tile 516,374: Write: 4148 features, 19 filtered by area (<2.0px²), 53/53 holes removed (<20.0px²)
+2026-02-06 23:27:06,307 - DEBUG -   Tile 514,374: Write: 1412 features, 25 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:06,312 - DEBUG -   Tile 515,374: Write: 4124 features, 30 filtered by area (<2.0px²), 51/51 holes removed (<20.0px²)
+  Zoom 10: Tiles [████████████░░░░░░░░░░░░░] 29/60  Zoom 10: Tiles [████████████░░░░░░░░░░░░░] 30/60  Zoom 10: Tiles [████████████░░░░░░░░░░░░░] 31/602026-02-06 23:27:06,463 - DEBUG -   Tile 511,375: Filtered 15115 polygons by area at z10
+2026-02-06 23:27:06,476 - DEBUG -   Tile 511,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:06,633 - DEBUG -   Tile 511,375: Write: 1315 features, 10 filtered by area (<2.0px²), 10/10 holes removed (<20.0px²)
+  Zoom 10: Tiles [█████████████░░░░░░░░░░░░] 32/602026-02-06 23:27:06,925 - DEBUG -   Tile 515,375: Filtered 15465 polygons by area at z10
+2026-02-06 23:27:06,949 - DEBUG -   Tile 515,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:06,957 - DEBUG -   Tile 513,375: Filtered 26189 polygons by area at z10
+2026-02-06 23:27:06,988 - DEBUG -   Tile 513,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:07,103 - DEBUG -   Tile 514,375: Filtered 29051 polygons by area at z10
+2026-02-06 23:27:07,128 - DEBUG -   Tile 514,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:07,156 - DEBUG -   Tile 512,375: Filtered 43229 polygons by area at z10
+2026-02-06 23:27:07,158 - DEBUG -   Tile 515,375: Write: 1680 features, 21 filtered by area (<2.0px²), 29/29 holes removed (<20.0px²)
+  Zoom 10: Tiles [█████████████░░░░░░░░░░░░] 33/602026-02-06 23:27:07,190 - DEBUG -   Tile 512,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:07,244 - DEBUG -   Tile 513,375: Write: 1967 features, 23 filtered by area (<2.0px²), 24/24 holes removed (<20.0px²)
+  Zoom 10: Tiles [██████████████░░░░░░░░░░░] 34/602026-02-06 23:27:07,266 - DEBUG -   Tile 517,375: Filtered 378 polygons by area at z10
+2026-02-06 23:27:07,274 - DEBUG -   Tile 517,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:07,336 - DEBUG -   Tile 517,375: Write: 489 features, 6 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:07,336 - DEBUG -   Tile 518,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:07,337 - DEBUG -   Tile 518,375: Write: 30 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:07,337 - DEBUG -   Tile 519,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:07,337 - DEBUG -   Tile 519,375: Write: 13 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:07,338 - DEBUG -   Tile 510,376: Filtered 1 polygons by area at z10
+2026-02-06 23:27:07,338 - DEBUG -   Tile 510,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:07,340 - DEBUG -   Tile 510,376: Write: 21 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 10: Tiles [██████████████░░░░░░░░░░░] 35/60  Zoom 10: Tiles [███████████████░░░░░░░░░░] 36/60  Zoom 10: Tiles [███████████████░░░░░░░░░░] 37/60  Zoom 10: Tiles [███████████████░░░░░░░░░░] 38/602026-02-06 23:27:07,366 - DEBUG -   Tile 514,375: Write: 2041 features, 22 filtered by area (<2.0px²), 53/53 holes removed (<20.0px²)
+  Zoom 10: Tiles [████████████████░░░░░░░░░] 39/602026-02-06 23:27:07,457 - DEBUG -   Tile 516,375: Filtered 16652 polygons by area at z10
+2026-02-06 23:27:07,482 - DEBUG -   Tile 516,375: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:07,522 - DEBUG -   Tile 512,375: Write: 2687 features, 27 filtered by area (<2.0px²), 22/22 holes removed (<20.0px²)
+  Zoom 10: Tiles [████████████████░░░░░░░░░] 40/602026-02-06 23:27:07,675 - DEBUG -   Tile 516,375: Write: 1549 features, 18 filtered by area (<2.0px²), 34/34 holes removed (<20.0px²)
+  Zoom 10: Tiles [█████████████████░░░░░░░░] 41/602026-02-06 23:27:07,750 - DEBUG -   Tile 514,376: Filtered 3502 polygons by area at z10
+2026-02-06 23:27:07,766 - DEBUG -   Tile 514,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:07,804 - DEBUG -   Tile 512,376: Filtered 20004 polygons by area at z10
+2026-02-06 23:27:07,816 - DEBUG -   Tile 511,376: Filtered 25748 polygons by area at z10
+2026-02-06 23:27:07,831 - DEBUG -   Tile 512,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:07,839 - DEBUG -   Tile 511,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:07,876 - DEBUG -   Tile 513,376: Filtered 19199 polygons by area at z10
+2026-02-06 23:27:07,891 - DEBUG -   Tile 514,376: Write: 927 features, 15 filtered by area (<2.0px²), 28/28 holes removed (<20.0px²)
+  Zoom 10: Tiles [█████████████████░░░░░░░░] 42/602026-02-06 23:27:07,896 - DEBUG -   Tile 513,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:07,946 - DEBUG -   Tile 515,376: Filtered 2415 polygons by area at z10
+2026-02-06 23:27:07,965 - DEBUG -   Tile 515,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:08,009 - DEBUG -   Tile 512,376: Write: 1109 features, 21 filtered by area (<2.0px²), 3/3 holes removed (<20.0px²)
+  Zoom 10: Tiles [█████████████████░░░░░░░░] 43/602026-02-06 23:27:08,023 - DEBUG -   Tile 511,376: Write: 1319 features, 15 filtered by area (<2.0px²), 20/20 holes removed (<20.0px²)
+  Zoom 10: Tiles [██████████████████░░░░░░░] 44/602026-02-06 23:27:08,071 - DEBUG -   Tile 516,376: Filtered 2266 polygons by area at z10
+2026-02-06 23:27:08,075 - DEBUG -   Tile 513,376: Write: 1419 features, 21 filtered by area (<2.0px²), 31/31 holes removed (<20.0px²)
+  Zoom 10: Tiles [██████████████████░░░░░░░] 45/602026-02-06 23:27:08,080 - DEBUG -   Tile 517,376: Filtered 1878 polygons by area at z10
+2026-02-06 23:27:08,083 - DEBUG -   Tile 518,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:08,083 - DEBUG -   Tile 518,376: Write: 11 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:08,083 - DEBUG -   Tile 510,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+  Zoom 10: Tiles [███████████████████░░░░░░] 46/602026-02-06 23:27:08,085 - DEBUG -   Tile 510,377: Write: 24 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 10: Tiles [███████████████████░░░░░░] 47/602026-02-06 23:27:08,096 - DEBUG -   Tile 516,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:08,103 - DEBUG -   Tile 517,376: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:08,124 - DEBUG -   Tile 515,376: Write: 1167 features, 18 filtered by area (<2.0px²), 35/35 holes removed (<20.0px²)
+  Zoom 10: Tiles [████████████████████░░░░░] 48/602026-02-06 23:27:08,135 - DEBUG -   Tile 511,377: Filtered 2740 polygons by area at z10
+2026-02-06 23:27:08,141 - DEBUG -   Tile 511,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:08,179 - DEBUG -   Tile 511,377: Write: 228 features, 14 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 10: Tiles [████████████████████░░░░░] 49/602026-02-06 23:27:08,222 - DEBUG -   Tile 512,377: Filtered 5384 polygons by area at z10
+2026-02-06 23:27:08,233 - DEBUG -   Tile 512,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:08,265 - DEBUG -   Tile 517,376: Write: 1140 features, 15 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 10: Tiles [████████████████████░░░░░] 50/602026-02-06 23:27:08,272 - DEBUG -   Tile 514,377: Filtered 216 polygons by area at z10
+2026-02-06 23:27:08,273 - DEBUG -   Tile 514,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:08,277 - DEBUG -   Tile 513,377: Filtered 5413 polygons by area at z10
+2026-02-06 23:27:08,287 - DEBUG -   Tile 514,377: Write: 99 features, 5 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 10: Tiles [█████████████████████░░░░] 51/602026-02-06 23:27:08,288 - DEBUG -   Tile 513,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:08,293 - DEBUG -   Tile 516,376: Write: 1472 features, 17 filtered by area (<2.0px²), 31/31 holes removed (<20.0px²)
+  Zoom 10: Tiles [█████████████████████░░░░] 52/602026-02-06 23:27:08,312 - DEBUG -   Tile 512,377: Write: 500 features, 13 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+  Zoom 10: Tiles [██████████████████████░░░] 53/602026-02-06 23:27:08,323 - DEBUG -   Tile 515,377: Filtered 1769 polygons by area at z10
+2026-02-06 23:27:08,330 - DEBUG -   Tile 515,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:08,346 - DEBUG -   Tile 517,377: Filtered 1452 polygons by area at z10
+2026-02-06 23:27:08,351 - DEBUG -   Tile 516,377: Filtered 2483 polygons by area at z10
+2026-02-06 23:27:08,357 - DEBUG -   Tile 517,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:08,364 - DEBUG -   Tile 516,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:08,377 - DEBUG -   Tile 513,377: Write: 651 features, 5 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 10: Tiles [██████████████████████░░░] 54/602026-02-06 23:27:08,380 - DEBUG -   Tile 518,377: Filtered 11 polygons by area at z10
+2026-02-06 23:27:08,382 - DEBUG -   Tile 518,377: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:08,393 - DEBUG -   Tile 518,377: Write: 70 features, 4 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 10: Tiles [██████████████████████░░░] 55/602026-02-06 23:27:08,395 - DEBUG -   Tile 515,377: Write: 500 features, 7 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 10: Tiles [███████████████████████░░] 56/602026-02-06 23:27:08,464 - DEBUG -   Tile 516,377: Write: 682 features, 14 filtered by area (<2.0px²), 11/11 holes removed (<20.0px²)
+  Zoom 10: Tiles [███████████████████████░░] 57/602026-02-06 23:27:08,464 - DEBUG -   Tile 517,377: Write: 840 features, 6 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 10: Tiles [████████████████████████░] 58/60  Zoom 10: 58 tiles written. (36.8s)                    
   Zoom 11: Preparing features... 25,000 / 522,252  Zoom 11: Preparing features... 50,000 / 522,252  Zoom 11: Preparing features... 75,000 / 522,252  Zoom 11: Preparing features... 100,000 / 522,252  Zoom 11: Preparing features... 125,000 / 522,252  Zoom 11: Preparing features... 150,000 / 522,252  Zoom 11: Preparing features... 175,000 / 522,252  Zoom 11: Preparing features... 200,000 / 522,252  Zoom 11: Preparing features... 225,000 / 522,252  Zoom 11: Preparing features... 250,000 / 522,252  Zoom 11: Preparing features... 275,000 / 522,252  Zoom 11: Preparing features... 300,000 / 522,252  Zoom 11: Preparing features... 325,000 / 522,252  Zoom 11: Preparing features... 350,000 / 522,252  Zoom 11: Preparing features... 375,000 / 522,252  Zoom 11: Preparing features... 400,000 / 522,252  Zoom 11: Preparing features... 425,000 / 522,252  Zoom 11: Preparing features... 450,000 / 522,252  Zoom 11: Preparing features... 475,000 / 522,252  Zoom 11: Preparing features... 500,000 / 522,252  Zoom 11: Labels: 1362 placed, 114 filtered (proximity), 407 dropped (overlap)
 
-2026-02-06 23:09:42,603 - DEBUG -   Tile 1021,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:42,603 - DEBUG -   Tile 1023,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:42,603 - DEBUG -   Tile 1024,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:42,603 - DEBUG -   Tile 1022,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:42,604 - DEBUG -   Tile 1021,745: Write: 2 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:42,604 - DEBUG -   Tile 1023,745: Write: 23 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:42,604 - DEBUG -   Tile 1024,745: Write: 28 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:42,604 - DEBUG -   Tile 1022,745: Write: 12 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:42,604 - DEBUG -   Tile 1025,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:42,605 - DEBUG -   Tile 1025,745: Write: 25 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:44,151 - DEBUG -   Tile 1026,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,151 - DEBUG -   Tile 1027,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,151 - DEBUG -   Tile 1028,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,151 - DEBUG -   Tile 1029,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,152 - DEBUG -   Tile 1026,745: Write: 25 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:44,152 - DEBUG -   Tile 1027,745: Write: 31 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:44,152 - DEBUG -   Tile 1030,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-  Zoom 11: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 1/198  Zoom 11: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 2/1982026-02-06 23:09:44,153 - DEBUG -   Tile 1031,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-  Zoom 11: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 3/1982026-02-06 23:09:44,153 - DEBUG -   Tile 1029,745: Write: 34 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 4/198  Zoom 11: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 5/1982026-02-06 23:09:44,154 - DEBUG -   Tile 1028,745: Write: 37 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:44,154 - DEBUG -   Tile 1032,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-  Zoom 11: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 6/1982026-02-06 23:09:44,154 - DEBUG -   Tile 1033,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-  Zoom 11: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 7/198  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 8/198  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 9/1982026-02-06 23:09:44,154 - DEBUG -   Tile 1032,745: Write: 25 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 10/1982026-02-06 23:09:44,155 - DEBUG -   Tile 1033,745: Write: 24 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:44,155 - DEBUG -   Tile 1034,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 11/1982026-02-06 23:09:44,155 - DEBUG -   Tile 1035,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,155 - DEBUG -   Tile 1035,745: Write: 18 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:44,156 - DEBUG -   Tile 1036,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,156 - DEBUG -   Tile 1034,745: Write: 21 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:44,156 - DEBUG -   Tile 1036,745: Write: 15 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:44,156 - DEBUG -   Tile 1038,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,156 - DEBUG -   Tile 1038,745: Write: 4 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:44,157 - DEBUG -   Tile 1021,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,157 - DEBUG -   Tile 1037,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,157 - DEBUG -   Tile 1021,746: Write: 12 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:44,157 - DEBUG -   Tile 1031,745: Write: 32 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:44,160 - DEBUG -   Tile 1037,745: Write: 14 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:44,160 - DEBUG -   Tile 1030,745: Write: 30 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 12/198  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 13/198  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 14/198  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 15/198  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 16/198  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 17/198  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 18/198  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 19/1982026-02-06 23:09:44,203 - DEBUG -   Tile 1022,746: Filtered 1311 polygons by area at z11
-2026-02-06 23:09:44,223 - DEBUG -   Tile 1022,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,272 - DEBUG -   Tile 1024,746: Filtered 2714 polygons by area at z11
-2026-02-06 23:09:44,297 - DEBUG -   Tile 1024,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,299 - DEBUG -   Tile 1023,746: Filtered 3822 polygons by area at z11
-2026-02-06 23:09:44,328 - DEBUG -   Tile 1022,746: Write: 433 features, 3 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 20/1982026-02-06 23:09:44,331 - DEBUG -   Tile 1023,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,337 - DEBUG -   Tile 1025,746: Filtered 2657 polygons by area at z11
-2026-02-06 23:09:44,369 - DEBUG -   Tile 1025,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,421 - DEBUG -   Tile 1024,746: Write: 670 features, 10 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 21/1982026-02-06 23:09:44,427 - DEBUG -   Tile 1026,746: Filtered 2071 polygons by area at z11
-2026-02-06 23:09:44,443 - DEBUG -   Tile 1026,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,461 - DEBUG -   Tile 1027,746: Filtered 1539 polygons by area at z11
-2026-02-06 23:09:44,470 - DEBUG -   Tile 1027,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,510 - DEBUG -   Tile 1023,746: Write: 832 features, 23 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 22/1982026-02-06 23:09:44,520 - DEBUG -   Tile 1025,746: Write: 593 features, 6 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:44,524 - DEBUG -   Tile 1027,746: Write: 300 features, 1 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
-2026-02-06 23:09:44,529 - DEBUG -   Tile 1026,746: Write: 380 features, 4 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 23/198  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 24/198  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 25/1982026-02-06 23:09:44,543 - DEBUG -   Tile 1028,746: Filtered 1156 polygons by area at z11
-2026-02-06 23:09:44,549 - DEBUG -   Tile 1028,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,597 - DEBUG -   Tile 1028,746: Write: 305 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 26/1982026-02-06 23:09:44,678 - DEBUG -   Tile 1029,746: Filtered 3563 polygons by area at z11
-2026-02-06 23:09:44,702 - DEBUG -   Tile 1032,746: Filtered 3554 polygons by area at z11
-2026-02-06 23:09:44,732 - DEBUG -   Tile 1032,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,734 - DEBUG -   Tile 1029,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,750 - DEBUG -   Tile 1030,746: Filtered 6302 polygons by area at z11
-2026-02-06 23:09:44,753 - DEBUG -   Tile 1031,746: Filtered 3520 polygons by area at z11
-2026-02-06 23:09:44,807 - DEBUG -   Tile 1030,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,812 - DEBUG -   Tile 1031,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,893 - DEBUG -   Tile 1032,746: Write: 983 features, 13 filtered by area (<2.0px²), 23/23 holes removed (<20.0px²)
-  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 27/1982026-02-06 23:09:44,925 - DEBUG -   Tile 1033,746: Filtered 987 polygons by area at z11
-2026-02-06 23:09:44,939 - DEBUG -   Tile 1029,746: Write: 947 features, 20 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 28/1982026-02-06 23:09:44,942 - DEBUG -   Tile 1033,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:44,982 - DEBUG -   Tile 1034,746: Filtered 543 polygons by area at z11
-2026-02-06 23:09:45,003 - DEBUG -   Tile 1034,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:45,054 - DEBUG -   Tile 1030,746: Write: 1291 features, 31 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 29/1982026-02-06 23:09:45,061 - DEBUG -   Tile 1031,746: Write: 1524 features, 12 filtered by area (<2.0px²), 34/34 holes removed (<20.0px²)
-  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 30/1982026-02-06 23:09:45,071 - DEBUG -   Tile 1035,746: Filtered 345 polygons by area at z11
-2026-02-06 23:09:45,080 - DEBUG -   Tile 1033,746: Write: 871 features, 11 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-2026-02-06 23:09:45,080 - DEBUG -   Tile 1035,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 31/1982026-02-06 23:09:45,080 - DEBUG -   Tile 1036,746: Filtered 546 polygons by area at z11
-2026-02-06 23:09:45,089 - DEBUG -   Tile 1036,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:45,093 - DEBUG -   Tile 1037,746: Filtered 109 polygons by area at z11
-2026-02-06 23:09:45,101 - DEBUG -   Tile 1037,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:45,109 - DEBUG -   Tile 1034,746: Write: 393 features, 5 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 32/1982026-02-06 23:09:45,111 - DEBUG -   Tile 1038,746: Filtered 6 polygons by area at z11
-2026-02-06 23:09:45,114 - DEBUG -   Tile 1038,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:45,129 - DEBUG -   Tile 1038,746: Write: 72 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 33/1982026-02-06 23:09:45,129 - DEBUG -   Tile 1021,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:45,130 - DEBUG -   Tile 1021,747: Write: 12 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 34/1982026-02-06 23:09:45,146 - DEBUG -   Tile 1035,746: Write: 373 features, 11 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 35/1982026-02-06 23:09:45,157 - DEBUG -   Tile 1036,746: Write: 377 features, 12 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 36/1982026-02-06 23:09:45,171 - DEBUG -   Tile 1037,746: Write: 275 features, 12 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 37/1982026-02-06 23:09:45,184 - DEBUG -   Tile 1022,747: Filtered 1675 polygons by area at z11
-2026-02-06 23:09:45,207 - DEBUG -   Tile 1022,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:45,266 - DEBUG -   Tile 1024,747: Filtered 3707 polygons by area at z11
-2026-02-06 23:09:45,278 - DEBUG -   Tile 1023,747: Filtered 4739 polygons by area at z11
-2026-02-06 23:09:45,283 - DEBUG -   Tile 1024,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:45,304 - DEBUG -   Tile 1023,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:45,310 - DEBUG -   Tile 1025,747: Filtered 2992 polygons by area at z11
-2026-02-06 23:09:45,331 - DEBUG -   Tile 1025,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:45,344 - DEBUG -   Tile 1022,747: Write: 553 features, 9 filtered by area (<2.0px²), 12/12 holes removed (<20.0px²)
-  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 38/1982026-02-06 23:09:45,395 - DEBUG -   Tile 1024,747: Write: 633 features, 26 filtered by area (<2.0px²), 18/18 holes removed (<20.0px²)
-  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 39/1982026-02-06 23:09:45,438 - DEBUG -   Tile 1025,747: Write: 470 features, 3 filtered by area (<2.0px²), 3/3 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 40/1982026-02-06 23:09:45,468 - DEBUG -   Tile 1023,747: Write: 1014 features, 24 filtered by area (<2.0px²), 35/35 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 41/1982026-02-06 23:09:45,478 - DEBUG -   Tile 1026,747: Filtered 3260 polygons by area at z11
-2026-02-06 23:09:45,494 - DEBUG -   Tile 1026,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:45,560 - DEBUG -   Tile 1027,747: Filtered 5520 polygons by area at z11
-2026-02-06 23:09:45,578 - DEBUG -   Tile 1026,747: Write: 541 features, 6 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 42/1982026-02-06 23:09:45,587 - DEBUG -   Tile 1027,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:45,682 - DEBUG -   Tile 1028,747: Filtered 5370 polygons by area at z11
-2026-02-06 23:09:45,724 - DEBUG -   Tile 1029,747: Filtered 5278 polygons by area at z11
-2026-02-06 23:09:45,766 - DEBUG -   Tile 1030,747: Filtered 5942 polygons by area at z11
-2026-02-06 23:09:45,770 - DEBUG -   Tile 1028,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:45,801 - DEBUG -   Tile 1027,747: Write: 1235 features, 18 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 43/1982026-02-06 23:09:45,808 - DEBUG -   Tile 1029,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:45,836 - DEBUG -   Tile 1030,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:46,066 - DEBUG -   Tile 1031,747: Filtered 7785 polygons by area at z11
-2026-02-06 23:09:46,100 - DEBUG -   Tile 1031,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:46,107 - DEBUG -   Tile 1029,747: Write: 1633 features, 40 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 44/1982026-02-06 23:09:46,163 - DEBUG -   Tile 1028,747: Write: 1787 features, 37 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 45/1982026-02-06 23:09:46,210 - DEBUG -   Tile 1030,747: Write: 2017 features, 48 filtered by area (<2.0px²), 3/3 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 46/1982026-02-06 23:09:46,252 - DEBUG -   Tile 1034,747: Filtered 967 polygons by area at z11
-2026-02-06 23:09:46,269 - DEBUG -   Tile 1033,747: Filtered 3334 polygons by area at z11
-2026-02-06 23:09:46,271 - DEBUG -   Tile 1034,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:46,305 - DEBUG -   Tile 1033,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:46,403 - DEBUG -   Tile 1034,747: Write: 756 features, 6 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 47/1982026-02-06 23:09:46,446 - DEBUG -   Tile 1035,747: Filtered 1011 polygons by area at z11
-2026-02-06 23:09:46,465 - DEBUG -   Tile 1035,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:46,501 - DEBUG -   Tile 1032,747: Filtered 7690 polygons by area at z11
-2026-02-06 23:09:46,541 - DEBUG -   Tile 1033,747: Write: 1339 features, 28 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 48/1982026-02-06 23:09:46,556 - DEBUG -   Tile 1031,747: Write: 3496 features, 20 filtered by area (<2.0px²), 26/26 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 49/1982026-02-06 23:09:46,561 - DEBUG -   Tile 1032,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:46,580 - DEBUG -   Tile 1037,747: Filtered 624 polygons by area at z11
-2026-02-06 23:09:46,592 - DEBUG -   Tile 1035,747: Write: 614 features, 25 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 50/1982026-02-06 23:09:46,596 - DEBUG -   Tile 1037,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:46,597 - DEBUG -   Tile 1038,747: Filtered 37 polygons by area at z11
-2026-02-06 23:09:46,600 - DEBUG -   Tile 1038,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:46,622 - DEBUG -   Tile 1038,747: Write: 121 features, 2 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 51/1982026-02-06 23:09:46,622 - DEBUG -   Tile 1021,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:46,623 - DEBUG -   Tile 1021,748: Write: 11 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 52/1982026-02-06 23:09:46,624 - DEBUG -   Tile 1022,748: Filtered 22 polygons by area at z11
-2026-02-06 23:09:46,624 - DEBUG -   Tile 1022,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:46,629 - DEBUG -   Tile 1022,748: Write: 46 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 53/1982026-02-06 23:09:46,675 - DEBUG -   Tile 1037,747: Write: 378 features, 10 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 54/1982026-02-06 23:09:46,679 - DEBUG -   Tile 1036,747: Filtered 2299 polygons by area at z11
-2026-02-06 23:09:46,711 - DEBUG -   Tile 1023,748: Filtered 3419 polygons by area at z11
-2026-02-06 23:09:46,722 - DEBUG -   Tile 1036,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:46,730 - DEBUG -   Tile 1023,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:46,838 - DEBUG -   Tile 1024,748: Filtered 6049 polygons by area at z11
-2026-02-06 23:09:46,860 - DEBUG -   Tile 1023,748: Write: 704 features, 21 filtered by area (<2.0px²), 12/12 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 55/1982026-02-06 23:09:46,870 - DEBUG -   Tile 1024,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:46,921 - DEBUG -   Tile 1025,748: Filtered 2427 polygons by area at z11
-2026-02-06 23:09:46,936 - DEBUG -   Tile 1025,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:47,006 - DEBUG -   Tile 1036,747: Write: 1296 features, 10 filtered by area (<2.0px²), 5/5 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 56/1982026-02-06 23:09:47,025 - DEBUG -   Tile 1025,748: Write: 567 features, 14 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 57/1982026-02-06 23:09:47,048 - DEBUG -   Tile 1024,748: Write: 1041 features, 23 filtered by area (<2.0px²), 41/41 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 58/1982026-02-06 23:09:47,064 - DEBUG -   Tile 1026,748: Filtered 1943 polygons by area at z11
-2026-02-06 23:09:47,076 - DEBUG -   Tile 1026,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:47,117 - DEBUG -   Tile 1032,747: Write: 4329 features, 15 filtered by area (<2.0px²), 23/23 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 59/1982026-02-06 23:09:47,142 - DEBUG -   Tile 1027,748: Filtered 2293 polygons by area at z11
-2026-02-06 23:09:47,161 - DEBUG -   Tile 1026,748: Write: 547 features, 7 filtered by area (<2.0px²), 6/6 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 60/1982026-02-06 23:09:47,165 - DEBUG -   Tile 1027,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:47,246 - DEBUG -   Tile 1028,748: Filtered 5872 polygons by area at z11
-2026-02-06 23:09:47,298 - DEBUG -   Tile 1027,748: Write: 790 features, 18 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 61/1982026-02-06 23:09:47,300 - DEBUG -   Tile 1029,748: Filtered 5946 polygons by area at z11
-2026-02-06 23:09:47,316 - DEBUG -   Tile 1030,748: Filtered 5975 polygons by area at z11
-2026-02-06 23:09:47,320 - DEBUG -   Tile 1028,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:47,368 - DEBUG -   Tile 1030,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:47,370 - DEBUG -   Tile 1029,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:47,433 - DEBUG -   Tile 1031,748: Filtered 5262 polygons by area at z11
-2026-02-06 23:09:47,467 - DEBUG -   Tile 1031,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:47,706 - DEBUG -   Tile 1028,748: Write: 1871 features, 70 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 62/1982026-02-06 23:09:47,751 - DEBUG -   Tile 1030,748: Write: 2035 features, 52 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 63/1982026-02-06 23:09:47,795 - DEBUG -   Tile 1029,748: Write: 2124 features, 45 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 64/1982026-02-06 23:09:47,859 - DEBUG -   Tile 1033,748: Filtered 2569 polygons by area at z11
-2026-02-06 23:09:47,906 - DEBUG -   Tile 1033,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:47,922 - DEBUG -   Tile 1032,748: Filtered 5516 polygons by area at z11
-2026-02-06 23:09:47,947 - DEBUG -   Tile 1034,748: Filtered 3489 polygons by area at z11
-2026-02-06 23:09:47,964 - DEBUG -   Tile 1031,748: Write: 2954 features, 30 filtered by area (<2.0px²), 51/51 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 65/1982026-02-06 23:09:47,980 - DEBUG -   Tile 1032,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:47,994 - DEBUG -   Tile 1034,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:48,009 - DEBUG -   Tile 1035,748: Filtered 857 polygons by area at z11
-2026-02-06 23:09:48,031 - DEBUG -   Tile 1035,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:48,172 - DEBUG -   Tile 1035,748: Write: 720 features, 29 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 66/1982026-02-06 23:09:48,176 - DEBUG -   Tile 1033,748: Write: 1254 features, 39 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 67/1982026-02-06 23:09:48,199 - DEBUG -   Tile 1037,748: Filtered 379 polygons by area at z11
-2026-02-06 23:09:48,206 - DEBUG -   Tile 1036,748: Filtered 686 polygons by area at z11
-2026-02-06 23:09:48,216 - DEBUG -   Tile 1037,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:48,228 - DEBUG -   Tile 1036,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:48,229 - DEBUG -   Tile 1034,748: Write: 1124 features, 19 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 68/1982026-02-06 23:09:48,238 - DEBUG -   Tile 1038,748: Filtered 97 polygons by area at z11
-2026-02-06 23:09:48,243 - DEBUG -   Tile 1038,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:48,278 - DEBUG -   Tile 1038,748: Write: 134 features, 2 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 69/1982026-02-06 23:09:48,279 - DEBUG -   Tile 1022,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:48,280 - DEBUG -   Tile 1022,749: Write: 19 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 70/1982026-02-06 23:09:48,346 - DEBUG -   Tile 1037,748: Write: 637 features, 17 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 71/1982026-02-06 23:09:48,347 - DEBUG -   Tile 1023,749: Filtered 2141 polygons by area at z11
-2026-02-06 23:09:48,364 - DEBUG -   Tile 1023,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:48,413 - DEBUG -   Tile 1036,748: Write: 835 features, 23 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 72/1982026-02-06 23:09:48,482 - DEBUG -   Tile 1023,749: Write: 604 features, 20 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 73/1982026-02-06 23:09:48,528 - DEBUG -   Tile 1032,748: Write: 2658 features, 20 filtered by area (<2.0px²), 45/45 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 74/1982026-02-06 23:09:48,541 - DEBUG -   Tile 1026,749: Filtered 1588 polygons by area at z11
-2026-02-06 23:09:48,556 - DEBUG -   Tile 1026,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:48,567 - DEBUG -   Tile 1025,749: Filtered 3104 polygons by area at z11
-2026-02-06 23:09:48,597 - DEBUG -   Tile 1025,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:48,636 - DEBUG -   Tile 1027,749: Filtered 3375 polygons by area at z11
-2026-02-06 23:09:48,662 - DEBUG -   Tile 1026,749: Write: 505 features, 20 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 75/1982026-02-06 23:09:48,665 - DEBUG -   Tile 1027,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:48,707 - DEBUG -   Tile 1024,749: Filtered 6800 polygons by area at z11
-2026-02-06 23:09:48,751 - DEBUG -   Tile 1025,749: Write: 762 features, 15 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 76/1982026-02-06 23:09:48,769 - DEBUG -   Tile 1024,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:48,858 - DEBUG -   Tile 1027,749: Write: 978 features, 28 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 77/1982026-02-06 23:09:48,987 - DEBUG -   Tile 1030,749: Filtered 3983 polygons by area at z11
-2026-02-06 23:09:49,037 - DEBUG -   Tile 1030,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:49,049 - DEBUG -   Tile 1028,749: Filtered 11867 polygons by area at z11
-2026-02-06 23:09:49,057 - DEBUG -   Tile 1024,749: Write: 1213 features, 20 filtered by area (<2.0px²), 35/35 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 78/1982026-02-06 23:09:49,148 - DEBUG -   Tile 1031,749: Filtered 1250 polygons by area at z11
-2026-02-06 23:09:49,154 - DEBUG -   Tile 1028,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:49,177 - DEBUG -   Tile 1031,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:49,193 - DEBUG -   Tile 1029,749: Filtered 10125 polygons by area at z11
-2026-02-06 23:09:49,314 - DEBUG -   Tile 1030,749: Write: 1352 features, 49 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 79/1982026-02-06 23:09:49,317 - DEBUG -   Tile 1029,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:49,367 - DEBUG -   Tile 1031,749: Write: 1031 features, 11 filtered by area (<2.0px²), 27/27 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 80/1982026-02-06 23:09:49,401 - DEBUG -   Tile 1032,749: Filtered 2048 polygons by area at z11
-2026-02-06 23:09:49,428 - DEBUG -   Tile 1032,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:49,441 - DEBUG -   Tile 1033,749: Filtered 1700 polygons by area at z11
-2026-02-06 23:09:49,475 - DEBUG -   Tile 1033,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:49,532 - DEBUG -   Tile 1028,749: Write: 1773 features, 41 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 81/1982026-02-06 23:09:49,561 - DEBUG -   Tile 1034,749: Filtered 685 polygons by area at z11
-2026-02-06 23:09:49,574 - DEBUG -   Tile 1034,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:49,624 - DEBUG -   Tile 1032,749: Write: 1022 features, 26 filtered by area (<2.0px²), 31/31 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 82/1982026-02-06 23:09:49,634 - DEBUG -   Tile 1035,749: Filtered 146 polygons by area at z11
-2026-02-06 23:09:49,641 - DEBUG -   Tile 1035,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:49,666 - DEBUG -   Tile 1034,749: Write: 538 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 83/1982026-02-06 23:09:49,672 - DEBUG -   Tile 1036,749: Filtered 28 polygons by area at z11
-2026-02-06 23:09:49,679 - DEBUG -   Tile 1036,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:49,706 - DEBUG -   Tile 1035,749: Write: 350 features, 8 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 84/1982026-02-06 23:09:49,712 - DEBUG -   Tile 1037,749: Filtered 73 polygons by area at z11
-2026-02-06 23:09:49,714 - DEBUG -   Tile 1036,749: Write: 160 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:49,716 - DEBUG -   Tile 1038,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:49,717 - DEBUG -   Tile 1037,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:49,723 - DEBUG -   Tile 1038,749: Write: 33 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:49,724 - DEBUG -   Tile 1033,749: Write: 1532 features, 17 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:49,724 - DEBUG -   Tile 1021,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:49,724 - DEBUG -   Tile 1021,750: Write: 2 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:49,725 - DEBUG -   Tile 1022,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:49,726 - DEBUG -   Tile 1022,750: Write: 30 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 85/198  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 86/198  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 87/198  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 88/198  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 89/1982026-02-06 23:09:49,746 - DEBUG -   Tile 1037,749: Write: 131 features, 4 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 90/1982026-02-06 23:09:49,849 - DEBUG -   Tile 1029,749: Write: 2126 features, 49 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 91/1982026-02-06 23:09:49,909 - DEBUG -   Tile 1023,750: Filtered 4861 polygons by area at z11
-2026-02-06 23:09:49,947 - DEBUG -   Tile 1023,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:50,021 - DEBUG -   Tile 1025,750: Filtered 9032 polygons by area at z11
-2026-02-06 23:09:50,058 - DEBUG -   Tile 1025,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:50,107 - DEBUG -   Tile 1024,750: Filtered 11275 polygons by area at z11
-2026-02-06 23:09:50,134 - DEBUG -   Tile 1026,750: Filtered 9707 polygons by area at z11
-2026-02-06 23:09:50,145 - DEBUG -   Tile 1024,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:50,176 - DEBUG -   Tile 1026,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:50,189 - DEBUG -   Tile 1023,750: Write: 994 features, 15 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 92/1982026-02-06 23:09:50,274 - DEBUG -   Tile 1025,750: Write: 1262 features, 28 filtered by area (<2.0px²), 10/10 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 93/1982026-02-06 23:09:50,409 - DEBUG -   Tile 1027,750: Filtered 4249 polygons by area at z11
-2026-02-06 23:09:50,438 - DEBUG -   Tile 1026,750: Write: 1257 features, 27 filtered by area (<2.0px²), 3/3 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 94/1982026-02-06 23:09:50,469 - DEBUG -   Tile 1027,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:50,523 - DEBUG -   Tile 1024,750: Write: 2050 features, 27 filtered by area (<2.0px²), 20/20 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 95/1982026-02-06 23:09:50,564 - DEBUG -   Tile 1028,750: Filtered 8071 polygons by area at z11
-2026-02-06 23:09:50,583 - DEBUG -   Tile 1030,750: Filtered 1235 polygons by area at z11
-2026-02-06 23:09:50,605 - DEBUG -   Tile 1030,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:50,616 - DEBUG -   Tile 1028,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:50,714 - DEBUG -   Tile 1027,750: Write: 967 features, 18 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████░░░░░░░░░░░░░] 96/1982026-02-06 23:09:50,783 - DEBUG -   Tile 1029,750: Filtered 7195 polygons by area at z11
-2026-02-06 23:09:50,826 - DEBUG -   Tile 1030,750: Write: 1094 features, 16 filtered by area (<2.0px²), 8/8 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████░░░░░░░░░░░░░] 97/1982026-02-06 23:09:50,866 - DEBUG -   Tile 1029,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:50,924 - DEBUG -   Tile 1028,750: Write: 1265 features, 46 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████░░░░░░░░░░░░░] 98/1982026-02-06 23:09:50,955 - DEBUG -   Tile 1033,750: Filtered 441 polygons by area at z11
-2026-02-06 23:09:50,975 - DEBUG -   Tile 1033,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:51,042 - DEBUG -   Tile 1032,750: Filtered 4079 polygons by area at z11
-2026-02-06 23:09:51,043 - DEBUG -   Tile 1031,750: Filtered 7519 polygons by area at z11
-2026-02-06 23:09:51,091 - DEBUG -   Tile 1033,750: Write: 626 features, 9 filtered by area (<2.0px²), 24/24 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████░░░░░░░░░░░░░] 99/1982026-02-06 23:09:51,092 - DEBUG -   Tile 1034,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:51,092 - DEBUG -   Tile 1031,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:51,093 - DEBUG -   Tile 1034,750: Write: 56 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████░░░░░░░░░░░░░] 100/1982026-02-06 23:09:51,093 - DEBUG -   Tile 1035,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:51,094 - DEBUG -   Tile 1035,750: Write: 23 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:51,094 - DEBUG -   Tile 1036,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:51,095 - DEBUG -   Tile 1036,750: Write: 8 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:51,095 - DEBUG -   Tile 1037,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:51,095 - DEBUG -   Tile 1037,750: Write: 2 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████░░░░░░░░░░░░░] 101/198  Zoom 11: Tiles [████████████░░░░░░░░░░░░░] 102/198  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 103/1982026-02-06 23:09:51,096 - DEBUG -   Tile 1021,751: Filtered 20 polygons by area at z11
-2026-02-06 23:09:51,097 - DEBUG -   Tile 1021,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:51,097 - DEBUG -   Tile 1032,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:51,100 - DEBUG -   Tile 1021,751: Write: 13 features, 2 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:51,106 - DEBUG -   Tile 1022,751: Filtered 213 polygons by area at z11
-2026-02-06 23:09:51,109 - DEBUG -   Tile 1022,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:51,131 - DEBUG -   Tile 1022,751: Write: 135 features, 4 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
-2026-02-06 23:09:51,133 - DEBUG -   Tile 1029,750: Write: 1184 features, 24 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 104/198  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 105/198  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 106/1982026-02-06 23:09:51,406 - DEBUG -   Tile 1032,750: Write: 1113 features, 37 filtered by area (<2.0px²), 13/13 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 107/1982026-02-06 23:09:51,436 - DEBUG -   Tile 1031,750: Write: 1558 features, 35 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-2026-02-06 23:09:51,461 - DEBUG -   Tile 1023,751: Filtered 9554 polygons by area at z11
-  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 108/1982026-02-06 23:09:51,508 - DEBUG -   Tile 1023,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:51,706 - DEBUG -   Tile 1025,751: Filtered 8890 polygons by area at z11
-2026-02-06 23:09:51,738 - DEBUG -   Tile 1025,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:51,812 - DEBUG -   Tile 1023,751: Write: 1325 features, 17 filtered by area (<2.0px²), 9/9 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 109/1982026-02-06 23:09:51,851 - DEBUG -   Tile 1024,751: Filtered 13479 polygons by area at z11
-2026-02-06 23:09:51,852 - DEBUG -   Tile 1027,751: Filtered 861 polygons by area at z11
-2026-02-06 23:09:51,867 - DEBUG -   Tile 1027,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:51,925 - DEBUG -   Tile 1024,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:51,931 - DEBUG -   Tile 1025,751: Write: 1006 features, 24 filtered by area (<2.0px²), 5/5 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 110/1982026-02-06 23:09:52,000 - DEBUG -   Tile 1026,751: Filtered 10447 polygons by area at z11
-2026-02-06 23:09:52,008 - DEBUG -   Tile 1027,751: Write: 780 features, 10 filtered by area (<2.0px²), 19/19 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 111/1982026-02-06 23:09:52,050 - DEBUG -   Tile 1026,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:52,118 - DEBUG -   Tile 1028,751: Filtered 6001 polygons by area at z11
-2026-02-06 23:09:52,146 - DEBUG -   Tile 1028,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:52,174 - DEBUG -   Tile 1029,751: Filtered 5779 polygons by area at z11
-2026-02-06 23:09:52,212 - DEBUG -   Tile 1029,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:52,233 - DEBUG -   Tile 1024,751: Write: 1472 features, 17 filtered by area (<2.0px²), 14/14 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 112/1982026-02-06 23:09:52,280 - DEBUG -   Tile 1030,751: Filtered 1564 polygons by area at z11
-2026-02-06 23:09:52,296 - DEBUG -   Tile 1030,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:52,304 - DEBUG -   Tile 1026,751: Write: 1493 features, 26 filtered by area (<2.0px²), 15/15 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 113/1982026-02-06 23:09:52,334 - DEBUG -   Tile 1028,751: Write: 1254 features, 18 filtered by area (<2.0px²), 18/18 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 114/1982026-02-06 23:09:52,398 - DEBUG -   Tile 1030,751: Write: 551 features, 11 filtered by area (<2.0px²), 24/24 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 115/1982026-02-06 23:09:52,425 - DEBUG -   Tile 1031,751: Filtered 3541 polygons by area at z11
-2026-02-06 23:09:52,428 - DEBUG -   Tile 1033,751: Filtered 881 polygons by area at z11
-2026-02-06 23:09:52,443 - DEBUG -   Tile 1033,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:52,452 - DEBUG -   Tile 1031,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:52,464 - DEBUG -   Tile 1029,751: Write: 1597 features, 15 filtered by area (<2.0px²), 51/51 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 116/1982026-02-06 23:09:52,482 - DEBUG -   Tile 1034,751: Filtered 238 polygons by area at z11
-2026-02-06 23:09:52,497 - DEBUG -   Tile 1034,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:52,557 - DEBUG -   Tile 1033,751: Write: 772 features, 10 filtered by area (<2.0px²), 25/25 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 117/1982026-02-06 23:09:52,560 - DEBUG -   Tile 1035,751: Filtered 46 polygons by area at z11
-2026-02-06 23:09:52,563 - DEBUG -   Tile 1035,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:52,581 - DEBUG -   Tile 1035,751: Write: 121 features, 2 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 118/1982026-02-06 23:09:52,582 - DEBUG -   Tile 1036,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:52,582 - DEBUG -   Tile 1036,751: Write: 6 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████░░░░░░░░░░] 119/1982026-02-06 23:09:52,583 - DEBUG -   Tile 1021,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:52,584 - DEBUG -   Tile 1021,752: Write: 10 features, 2 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████░░░░░░░░░░] 120/1982026-02-06 23:09:52,601 - DEBUG -   Tile 1034,751: Write: 565 features, 21 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-2026-02-06 23:09:52,608 - DEBUG -   Tile 1032,751: Filtered 10000 polygons by area at z11
-2026-02-06 23:09:52,620 - DEBUG -   Tile 1031,751: Write: 974 features, 30 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████░░░░░░░░░░] 121/198  Zoom 11: Tiles [███████████████░░░░░░░░░░] 122/1982026-02-06 23:09:52,644 - DEBUG -   Tile 1032,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:52,684 - DEBUG -   Tile 1022,752: Filtered 3515 polygons by area at z11
-2026-02-06 23:09:52,703 - DEBUG -   Tile 1022,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:52,789 - DEBUG -   Tile 1024,752: Filtered 4903 polygons by area at z11
-2026-02-06 23:09:52,818 - DEBUG -   Tile 1022,752: Write: 492 features, 7 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████░░░░░░░░░░] 123/1982026-02-06 23:09:52,826 - DEBUG -   Tile 1024,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:52,915 - DEBUG -   Tile 1032,751: Write: 1106 features, 20 filtered by area (<2.0px²), 7/7 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████░░░░░░░░░░] 124/1982026-02-06 23:09:52,991 - DEBUG -   Tile 1025,752: Filtered 4986 polygons by area at z11
-2026-02-06 23:09:52,996 - DEBUG -   Tile 1024,752: Write: 648 features, 27 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████░░░░░░░░░░] 125/1982026-02-06 23:09:53,010 - DEBUG -   Tile 1025,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,062 - DEBUG -   Tile 1026,752: Filtered 6607 polygons by area at z11
-2026-02-06 23:09:53,083 - DEBUG -   Tile 1026,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,121 - DEBUG -   Tile 1025,752: Write: 594 features, 26 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████░░░░░░░░░░] 126/1982026-02-06 23:09:53,132 - DEBUG -   Tile 1027,752: Filtered 5759 polygons by area at z11
-2026-02-06 23:09:53,135 - DEBUG -   Tile 1028,752: Filtered 347 polygons by area at z11
-2026-02-06 23:09:53,142 - DEBUG -   Tile 1028,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,151 - DEBUG -   Tile 1027,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,196 - DEBUG -   Tile 1023,752: Filtered 12087 polygons by area at z11
-2026-02-06 23:09:53,202 - DEBUG -   Tile 1028,752: Write: 356 features, 7 filtered by area (<2.0px²), 5/5 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████████░░░░░░░░░] 127/1982026-02-06 23:09:53,213 - DEBUG -   Tile 1026,752: Write: 761 features, 20 filtered by area (<2.0px²), 17/17 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████████░░░░░░░░░] 128/1982026-02-06 23:09:53,223 - DEBUG -   Tile 1023,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,246 - DEBUG -   Tile 1030,752: Filtered 1000 polygons by area at z11
-2026-02-06 23:09:53,261 - DEBUG -   Tile 1030,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,292 - DEBUG -   Tile 1027,752: Write: 883 features, 14 filtered by area (<2.0px²), 18/18 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████████░░░░░░░░░] 129/1982026-02-06 23:09:53,307 - DEBUG -   Tile 1029,752: Filtered 2010 polygons by area at z11
-2026-02-06 23:09:53,311 - DEBUG -   Tile 1031,752: Filtered 562 polygons by area at z11
-2026-02-06 23:09:53,321 - DEBUG -   Tile 1031,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,338 - DEBUG -   Tile 1029,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,370 - DEBUG -   Tile 1030,752: Write: 706 features, 4 filtered by area (<2.0px²), 35/35 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████████░░░░░░░░░] 130/1982026-02-06 23:09:53,403 - DEBUG -   Tile 1032,752: Filtered 811 polygons by area at z11
-2026-02-06 23:09:53,404 - DEBUG -   Tile 1031,752: Write: 439 features, 18 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████████░░░░░░░░░] 131/1982026-02-06 23:09:53,413 - DEBUG -   Tile 1023,752: Write: 1035 features, 25 filtered by area (<2.0px²), 18/18 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████████░░░░░░░░░] 132/1982026-02-06 23:09:53,423 - DEBUG -   Tile 1032,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,455 - DEBUG -   Tile 1033,752: Filtered 517 polygons by area at z11
-2026-02-06 23:09:53,474 - DEBUG -   Tile 1034,752: Filtered 993 polygons by area at z11
-2026-02-06 23:09:53,493 - DEBUG -   Tile 1033,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,518 - DEBUG -   Tile 1034,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,520 - DEBUG -   Tile 1029,752: Write: 617 features, 22 filtered by area (<2.0px²), 24/24 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████████░░░░░░░░░] 133/1982026-02-06 23:09:53,529 - DEBUG -   Tile 1032,752: Write: 498 features, 18 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-2026-02-06 23:09:53,530 - DEBUG -   Tile 1036,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,530 - DEBUG -   Tile 1036,752: Write: 7 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:53,530 - DEBUG -   Tile 1021,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,532 - DEBUG -   Tile 1021,753: Write: 12 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:53,537 - DEBUG -   Tile 1035,752: Filtered 76 polygons by area at z11
-  Zoom 11: Tiles [████████████████░░░░░░░░░] 134/198  Zoom 11: Tiles [█████████████████░░░░░░░░] 135/198  Zoom 11: Tiles [█████████████████░░░░░░░░] 136/1982026-02-06 23:09:53,550 - DEBUG -   Tile 1035,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,620 - DEBUG -   Tile 1035,752: Write: 258 features, 8 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████████░░░░░░░░] 137/1982026-02-06 23:09:53,708 - DEBUG -   Tile 1033,752: Write: 990 features, 26 filtered by area (<2.0px²), 27/27 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████████░░░░░░░░] 138/1982026-02-06 23:09:53,709 - DEBUG -   Tile 1022,753: Filtered 3261 polygons by area at z11
-2026-02-06 23:09:53,744 - DEBUG -   Tile 1022,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,810 - DEBUG -   Tile 1034,752: Write: 992 features, 20 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████████░░░░░░░░] 139/1982026-02-06 23:09:53,850 - DEBUG -   Tile 1024,753: Filtered 4950 polygons by area at z11
-2026-02-06 23:09:53,861 - DEBUG -   Tile 1023,753: Filtered 6256 polygons by area at z11
-2026-02-06 23:09:53,876 - DEBUG -   Tile 1024,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,897 - DEBUG -   Tile 1023,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:53,925 - DEBUG -   Tile 1022,753: Write: 623 features, 5 filtered by area (<2.0px²), 3/3 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████████░░░░░░░░] 140/1982026-02-06 23:09:54,024 - DEBUG -   Tile 1025,753: Filtered 4562 polygons by area at z11
-2026-02-06 23:09:54,039 - DEBUG -   Tile 1024,753: Write: 746 features, 9 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████████░░░░░░░░] 141/1982026-02-06 23:09:54,067 - DEBUG -   Tile 1025,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,106 - DEBUG -   Tile 1027,753: Filtered 1889 polygons by area at z11
-2026-02-06 23:09:54,121 - DEBUG -   Tile 1027,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,148 - DEBUG -   Tile 1023,753: Write: 774 features, 25 filtered by area (<2.0px²), 5/5 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████████░░░░░░░░] 142/1982026-02-06 23:09:54,163 - DEBUG -   Tile 1026,753: Filtered 4628 polygons by area at z11
-2026-02-06 23:09:54,177 - DEBUG -   Tile 1028,753: Filtered 252 polygons by area at z11
-2026-02-06 23:09:54,191 - DEBUG -   Tile 1028,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,191 - DEBUG -   Tile 1026,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,234 - DEBUG -   Tile 1027,753: Write: 636 features, 10 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████████░░░░░░░] 143/1982026-02-06 23:09:54,254 - DEBUG -   Tile 1025,753: Write: 684 features, 26 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████████░░░░░░░] 144/1982026-02-06 23:09:54,256 - DEBUG -   Tile 1029,753: Filtered 814 polygons by area at z11
-2026-02-06 23:09:54,265 - DEBUG -   Tile 1029,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,271 - DEBUG -   Tile 1030,753: Filtered 373 polygons by area at z11
-2026-02-06 23:09:54,277 - DEBUG -   Tile 1028,753: Write: 378 features, 11 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████████░░░░░░░] 145/1982026-02-06 23:09:54,280 - DEBUG -   Tile 1030,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,296 - DEBUG -   Tile 1026,753: Write: 539 features, 13 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████████░░░░░░░] 146/1982026-02-06 23:09:54,305 - DEBUG -   Tile 1031,753: Filtered 509 polygons by area at z11
-2026-02-06 23:09:54,309 - DEBUG -   Tile 1032,753: Filtered 249 polygons by area at z11
-2026-02-06 23:09:54,315 - DEBUG -   Tile 1031,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,317 - DEBUG -   Tile 1032,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,329 - DEBUG -   Tile 1029,753: Write: 392 features, 13 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████████░░░░░░░] 147/1982026-02-06 23:09:54,350 - DEBUG -   Tile 1033,753: Filtered 584 polygons by area at z11
-2026-02-06 23:09:54,360 - DEBUG -   Tile 1030,753: Write: 481 features, 11 filtered by area (<2.0px²), 7/7 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████████░░░░░░░] 148/1982026-02-06 23:09:54,364 - DEBUG -   Tile 1033,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,374 - DEBUG -   Tile 1032,753: Write: 326 features, 13 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████████░░░░░░░] 149/1982026-02-06 23:09:54,377 - DEBUG -   Tile 1035,753: Filtered 58 polygons by area at z11
-2026-02-06 23:09:54,379 - DEBUG -   Tile 1035,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,380 - DEBUG -   Tile 1034,753: Filtered 476 polygons by area at z11
-2026-02-06 23:09:54,391 - DEBUG -   Tile 1031,753: Write: 327 features, 8 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████████░░░░░░░] 150/1982026-02-06 23:09:54,392 - DEBUG -   Tile 1036,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,392 - DEBUG -   Tile 1036,753: Write: 9 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████████░░░░░░] 151/1982026-02-06 23:09:54,392 - DEBUG -   Tile 1021,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,392 - DEBUG -   Tile 1034,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,394 - DEBUG -   Tile 1021,754: Write: 7 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████████░░░░░░] 152/1982026-02-06 23:09:54,396 - DEBUG -   Tile 1035,753: Write: 122 features, 2 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████████░░░░░░] 153/1982026-02-06 23:09:54,400 - DEBUG -   Tile 1022,754: Filtered 112 polygons by area at z11
-2026-02-06 23:09:54,403 - DEBUG -   Tile 1022,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,424 - DEBUG -   Tile 1022,754: Write: 69 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████████░░░░░░] 154/1982026-02-06 23:09:54,454 - DEBUG -   Tile 1023,754: Filtered 2403 polygons by area at z11
-2026-02-06 23:09:54,470 - DEBUG -   Tile 1023,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,478 - DEBUG -   Tile 1033,753: Write: 677 features, 15 filtered by area (<2.0px²), 9/9 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████████░░░░░░] 155/1982026-02-06 23:09:54,495 - DEBUG -   Tile 1034,753: Write: 647 features, 17 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████████░░░░░░] 156/1982026-02-06 23:09:54,527 - DEBUG -   Tile 1024,754: Filtered 2028 polygons by area at z11
-2026-02-06 23:09:54,555 - DEBUG -   Tile 1025,754: Filtered 2864 polygons by area at z11
-2026-02-06 23:09:54,559 - DEBUG -   Tile 1024,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,573 - DEBUG -   Tile 1025,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,576 - DEBUG -   Tile 1023,754: Write: 525 features, 17 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████████░░░░░░] 157/1982026-02-06 23:09:54,588 - DEBUG -   Tile 1026,754: Filtered 4064 polygons by area at z11
-2026-02-06 23:09:54,606 - DEBUG -   Tile 1027,754: Filtered 1136 polygons by area at z11
-2026-02-06 23:09:54,607 - DEBUG -   Tile 1026,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,617 - DEBUG -   Tile 1027,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,700 - DEBUG -   Tile 1025,754: Write: 607 features, 18 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████████░░░░░░] 158/1982026-02-06 23:09:54,703 - DEBUG -   Tile 1028,754: Filtered 6 polygons by area at z11
-2026-02-06 23:09:54,704 - DEBUG -   Tile 1028,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,708 - DEBUG -   Tile 1024,754: Write: 663 features, 21 filtered by area (<2.0px²), 7/7 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████████████░░░░░] 159/1982026-02-06 23:09:54,709 - DEBUG -   Tile 1028,754: Write: 36 features, 4 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████████████░░░░░] 160/1982026-02-06 23:09:54,715 - DEBUG -   Tile 1027,754: Write: 539 features, 17 filtered by area (<2.0px²), 6/6 holes removed (<20.0px²)
-2026-02-06 23:09:54,715 - DEBUG -   Tile 1029,754: Filtered 195 polygons by area at z11
-2026-02-06 23:09:54,718 - DEBUG -   Tile 1029,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-  Zoom 11: Tiles [████████████████████░░░░░] 161/1982026-02-06 23:09:54,731 - DEBUG -   Tile 1026,754: Write: 613 features, 6 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████████████░░░░░] 162/1982026-02-06 23:09:54,734 - DEBUG -   Tile 1030,754: Filtered 334 polygons by area at z11
-2026-02-06 23:09:54,741 - DEBUG -   Tile 1030,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,750 - DEBUG -   Tile 1029,754: Write: 170 features, 7 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████████████░░░░░] 163/1982026-02-06 23:09:54,754 - DEBUG -   Tile 1031,754: Filtered 1254 polygons by area at z11
-2026-02-06 23:09:54,766 - DEBUG -   Tile 1031,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,773 - DEBUG -   Tile 1032,754: Filtered 665 polygons by area at z11
-2026-02-06 23:09:54,779 - DEBUG -   Tile 1033,754: Filtered 374 polygons by area at z11
-2026-02-06 23:09:54,791 - DEBUG -   Tile 1032,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,793 - DEBUG -   Tile 1030,754: Write: 303 features, 12 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████████████░░░░░] 164/1982026-02-06 23:09:54,799 - DEBUG -   Tile 1033,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,807 - DEBUG -   Tile 1034,754: Filtered 312 polygons by area at z11
-2026-02-06 23:09:54,818 - DEBUG -   Tile 1034,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,869 - DEBUG -   Tile 1031,754: Write: 762 features, 3 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████████████░░░░░] 165/1982026-02-06 23:09:54,876 - DEBUG -   Tile 1035,754: Filtered 128 polygons by area at z11
-2026-02-06 23:09:54,881 - DEBUG -   Tile 1035,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,902 - DEBUG -   Tile 1032,754: Write: 446 features, 13 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-  Zoom 11: Tiles [████████████████████░░░░░] 166/1982026-02-06 23:09:54,906 - DEBUG -   Tile 1034,754: Write: 567 features, 32 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████████████░░░░] 167/1982026-02-06 23:09:54,906 - DEBUG -   Tile 1036,754: Filtered 8 polygons by area at z11
-2026-02-06 23:09:54,907 - DEBUG -   Tile 1022,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,907 - DEBUG -   Tile 1022,755: Write: 2 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████████████░░░░] 168/1982026-02-06 23:09:54,908 - DEBUG -   Tile 1023,755: Filtered 6 polygons by area at z11
-2026-02-06 23:09:54,908 - DEBUG -   Tile 1023,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,911 - DEBUG -   Tile 1036,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,911 - DEBUG -   Tile 1033,754: Write: 442 features, 20 filtered by area (<2.0px²), 8/8 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████████████░░░░] 169/1982026-02-06 23:09:54,911 - DEBUG -   Tile 1023,755: Write: 14 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████████████░░░░] 170/1982026-02-06 23:09:54,912 - DEBUG -   Tile 1024,755: Filtered 2 polygons by area at z11
-2026-02-06 23:09:54,913 - DEBUG -   Tile 1024,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,914 - DEBUG -   Tile 1025,755: Filtered 24 polygons by area at z11
-2026-02-06 23:09:54,915 - DEBUG -   Tile 1025,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,917 - DEBUG -   Tile 1024,755: Write: 20 features, 3 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████████████░░░░] 171/1982026-02-06 23:09:54,918 - DEBUG -   Tile 1026,755: Filtered 4 polygons by area at z11
-2026-02-06 23:09:54,919 - DEBUG -   Tile 1026,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,922 - DEBUG -   Tile 1025,755: Write: 28 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████████████░░░░] 172/1982026-02-06 23:09:54,924 - DEBUG -   Tile 1026,755: Write: 26 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:54,924 - DEBUG -   Tile 1028,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,925 - DEBUG -   Tile 1028,755: Write: 4 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:54,925 - DEBUG -   Tile 1029,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,925 - DEBUG -   Tile 1027,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,925 - DEBUG -   Tile 1029,755: Write: 2 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:54,925 - DEBUG -   Tile 1030,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,926 - DEBUG -   Tile 1030,755: Write: 5 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:54,927 - DEBUG -   Tile 1035,754: Write: 217 features, 4 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:54,929 - DEBUG -   Tile 1031,755: Filtered 110 polygons by area at z11
-  Zoom 11: Tiles [█████████████████████░░░░] 173/1982026-02-06 23:09:54,930 - DEBUG -   Tile 1031,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,933 - DEBUG -   Tile 1027,755: Write: 27 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-2026-02-06 23:09:54,933 - DEBUG -   Tile 1036,754: Write: 65 features, 6 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [█████████████████████░░░░] 174/198  Zoom 11: Tiles [██████████████████████░░░] 175/198  Zoom 11: Tiles [██████████████████████░░░] 176/198  Zoom 11: Tiles [██████████████████████░░░] 177/198  Zoom 11: Tiles [██████████████████████░░░] 178/1982026-02-06 23:09:54,943 - DEBUG -   Tile 1031,755: Write: 85 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████████████░░░] 179/198  Zoom 11: Tiles [██████████████████████░░░] 180/1982026-02-06 23:09:54,959 - DEBUG -   Tile 1033,755: Filtered 763 polygons by area at z11
-2026-02-06 23:09:54,961 - DEBUG -   Tile 1032,755: Filtered 710 polygons by area at z11
-2026-02-06 23:09:54,963 - DEBUG -   Tile 1035,755: Filtered 336 polygons by area at z11
-2026-02-06 23:09:54,966 - DEBUG -   Tile 1033,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,970 - DEBUG -   Tile 1035,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,971 - DEBUG -   Tile 1032,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:54,977 - DEBUG -   Tile 1034,755: Filtered 676 polygons by area at z11
-2026-02-06 23:09:54,991 - DEBUG -   Tile 1034,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:55,003 - DEBUG -   Tile 1035,755: Write: 99 features, 7 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████████████░░░] 181/1982026-02-06 23:09:55,007 - DEBUG -   Tile 1036,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
-2026-02-06 23:09:55,015 - DEBUG -   Tile 1036,755: Write: 30 features, 3 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
-  Zoom 11: Tiles [██████████████████████░░░] 182/1982026-02-06 23:09:55,027 - DEBUG -   Tile 1033,755: Write: 260 features, 6 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████████████░░] 183/1982026-02-06 23:09:55,036 - DEBUG -   Tile 1032,755: Write: 226 features, 6 filtered by area (<2.0px²), 3/3 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████████████░░] 184/1982026-02-06 23:09:55,073 - DEBUG -   Tile 1034,755: Write: 344 features, 12 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
-  Zoom 11: Tiles [███████████████████████░░] 185/1982026-02-06 23:09:55,317 - INFO - ==================================================
-2026-02-06 23:09:55,321 - INFO - Conversion Summary
-2026-02-06 23:09:55,321 - INFO - ==================================================
-2026-02-06 23:09:55,321 - INFO - Input: midi-sud.pbf
-2026-02-06 23:09:55,321 - INFO - Output directory: output_vect/ariege
-2026-02-06 23:09:55,321 - INFO - Format: NAV binary tiles (.nav)
-2026-02-06 23:09:55,321 - INFO - Total tiles: 243
-2026-02-06 23:09:55,321 - INFO - Total size: 8.44 MB
-2026-02-06 23:09:55,321 - INFO - Total time: 8m 25s
-2026-02-06 23:09:55,321 - INFO - ==================================================
-  Zoom 11: 185 tiles written. (48.9s)                    
+2026-02-06 23:27:43,240 - DEBUG -   Tile 1021,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:43,240 - DEBUG -   Tile 1023,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:43,240 - DEBUG -   Tile 1022,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:43,240 - DEBUG -   Tile 1024,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:43,241 - DEBUG -   Tile 1021,745: Write: 2 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:43,241 - DEBUG -   Tile 1022,745: Write: 12 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:43,241 - DEBUG -   Tile 1023,745: Write: 23 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:43,241 - DEBUG -   Tile 1025,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:43,241 - DEBUG -   Tile 1024,745: Write: 28 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:43,241 - DEBUG -   Tile 1025,745: Write: 25 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:44,513 - DEBUG -   Tile 1026,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,513 - DEBUG -   Tile 1027,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,513 - DEBUG -   Tile 1028,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,513 - DEBUG -   Tile 1029,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+  Zoom 11: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 1/198  Zoom 11: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 2/198  Zoom 11: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 3/198  Zoom 11: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 4/1982026-02-06 23:27:44,514 - DEBUG -   Tile 1026,745: Write: 25 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 5/1982026-02-06 23:27:44,514 - DEBUG -   Tile 1027,745: Write: 31 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 6/1982026-02-06 23:27:44,514 - DEBUG -   Tile 1030,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,514 - DEBUG -   Tile 1031,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+  Zoom 11: Tiles [░░░░░░░░░░░░░░░░░░░░░░░░░] 7/1982026-02-06 23:27:44,515 - DEBUG -   Tile 1029,745: Write: 34 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:44,515 - DEBUG -   Tile 1028,745: Write: 37 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:44,515 - DEBUG -   Tile 1030,745: Write: 30 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:44,516 - DEBUG -   Tile 1032,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,516 - DEBUG -   Tile 1034,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,516 - DEBUG -   Tile 1033,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 8/198  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 9/198  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 10/1982026-02-06 23:27:44,516 - DEBUG -   Tile 1032,745: Write: 25 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:44,516 - DEBUG -   Tile 1033,745: Write: 24 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 11/1982026-02-06 23:27:44,516 - DEBUG -   Tile 1035,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,516 - DEBUG -   Tile 1031,745: Write: 32 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:44,516 - DEBUG -   Tile 1036,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,516 - DEBUG -   Tile 1034,745: Write: 21 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:44,517 - DEBUG -   Tile 1038,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,517 - DEBUG -   Tile 1036,745: Write: 15 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:44,517 - DEBUG -   Tile 1035,745: Write: 18 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:44,517 - DEBUG -   Tile 1038,745: Write: 4 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:44,517 - DEBUG -   Tile 1037,745: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,517 - DEBUG -   Tile 1021,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,517 - DEBUG -   Tile 1021,746: Write: 12 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:44,518 - DEBUG -   Tile 1037,745: Write: 14 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 12/198  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 13/198  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 14/198  Zoom 11: Tiles [█░░░░░░░░░░░░░░░░░░░░░░░░] 15/198  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 16/198  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 17/198  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 18/198  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 19/1982026-02-06 23:27:44,548 - DEBUG -   Tile 1022,746: Filtered 1311 polygons by area at z11
+2026-02-06 23:27:44,559 - DEBUG -   Tile 1022,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,606 - DEBUG -   Tile 1024,746: Filtered 2714 polygons by area at z11
+2026-02-06 23:27:44,611 - DEBUG -   Tile 1025,746: Filtered 2657 polygons by area at z11
+2026-02-06 23:27:44,611 - DEBUG -   Tile 1023,746: Filtered 3822 polygons by area at z11
+2026-02-06 23:27:44,616 - DEBUG -   Tile 1022,746: Write: 433 features, 3 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 20/1982026-02-06 23:27:44,628 - DEBUG -   Tile 1025,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,629 - DEBUG -   Tile 1024,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,635 - DEBUG -   Tile 1023,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,655 - DEBUG -   Tile 1026,746: Filtered 2071 polygons by area at z11
+2026-02-06 23:27:44,663 - DEBUG -   Tile 1026,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,714 - DEBUG -   Tile 1026,746: Write: 380 features, 4 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 21/1982026-02-06 23:27:44,718 - DEBUG -   Tile 1025,746: Write: 593 features, 6 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 22/1982026-02-06 23:27:44,733 - DEBUG -   Tile 1024,746: Write: 670 features, 10 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██░░░░░░░░░░░░░░░░░░░░░░░] 23/1982026-02-06 23:27:44,744 - DEBUG -   Tile 1028,746: Filtered 1156 polygons by area at z11
+2026-02-06 23:27:44,744 - DEBUG -   Tile 1027,746: Filtered 1539 polygons by area at z11
+2026-02-06 23:27:44,749 - DEBUG -   Tile 1028,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,750 - DEBUG -   Tile 1027,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,762 - DEBUG -   Tile 1023,746: Write: 832 features, 23 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 24/1982026-02-06 23:27:44,787 - DEBUG -   Tile 1028,746: Write: 305 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 25/1982026-02-06 23:27:44,789 - DEBUG -   Tile 1027,746: Write: 300 features, 1 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
+  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 26/1982026-02-06 23:27:44,811 - DEBUG -   Tile 1029,746: Filtered 3563 polygons by area at z11
+2026-02-06 23:27:44,838 - DEBUG -   Tile 1029,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,866 - DEBUG -   Tile 1031,746: Filtered 3520 polygons by area at z11
+2026-02-06 23:27:44,872 - DEBUG -   Tile 1032,746: Filtered 3554 polygons by area at z11
+2026-02-06 23:27:44,892 - DEBUG -   Tile 1032,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,892 - DEBUG -   Tile 1030,746: Filtered 6302 polygons by area at z11
+2026-02-06 23:27:44,894 - DEBUG -   Tile 1031,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,929 - DEBUG -   Tile 1030,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:44,976 - DEBUG -   Tile 1029,746: Write: 947 features, 20 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 27/1982026-02-06 23:27:45,004 - DEBUG -   Tile 1033,746: Filtered 987 polygons by area at z11
+2026-02-06 23:27:45,017 - DEBUG -   Tile 1033,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,022 - DEBUG -   Tile 1032,746: Write: 983 features, 13 filtered by area (<2.0px²), 23/23 holes removed (<20.0px²)
+  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 28/1982026-02-06 23:27:45,040 - DEBUG -   Tile 1034,746: Filtered 543 polygons by area at z11
+2026-02-06 23:27:45,050 - DEBUG -   Tile 1034,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,084 - DEBUG -   Tile 1031,746: Write: 1524 features, 12 filtered by area (<2.0px²), 34/34 holes removed (<20.0px²)
+  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 29/1982026-02-06 23:27:45,097 - DEBUG -   Tile 1035,746: Filtered 345 polygons by area at z11
+2026-02-06 23:27:45,104 - DEBUG -   Tile 1035,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,113 - DEBUG -   Tile 1034,746: Write: 393 features, 5 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 30/1982026-02-06 23:27:45,124 - DEBUG -   Tile 1030,746: Write: 1291 features, 31 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███░░░░░░░░░░░░░░░░░░░░░░] 31/1982026-02-06 23:27:45,128 - DEBUG -   Tile 1036,746: Filtered 546 polygons by area at z11
+2026-02-06 23:27:45,131 - DEBUG -   Tile 1033,746: Write: 871 features, 11 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 32/1982026-02-06 23:27:45,133 - DEBUG -   Tile 1038,746: Filtered 6 polygons by area at z11
+2026-02-06 23:27:45,134 - DEBUG -   Tile 1037,746: Filtered 109 polygons by area at z11
+2026-02-06 23:27:45,135 - DEBUG -   Tile 1036,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,135 - DEBUG -   Tile 1038,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,142 - DEBUG -   Tile 1037,746: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,148 - DEBUG -   Tile 1038,746: Write: 72 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 33/1982026-02-06 23:27:45,148 - DEBUG -   Tile 1021,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,149 - DEBUG -   Tile 1021,747: Write: 12 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 34/1982026-02-06 23:27:45,157 - DEBUG -   Tile 1035,746: Write: 373 features, 11 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 35/1982026-02-06 23:27:45,184 - DEBUG -   Tile 1022,747: Filtered 1675 polygons by area at z11
+2026-02-06 23:27:45,191 - DEBUG -   Tile 1036,746: Write: 377 features, 12 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 36/1982026-02-06 23:27:45,192 - DEBUG -   Tile 1037,746: Write: 275 features, 12 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:45,195 - DEBUG -   Tile 1022,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 37/1982026-02-06 23:27:45,254 - DEBUG -   Tile 1025,747: Filtered 2992 polygons by area at z11
+2026-02-06 23:27:45,256 - DEBUG -   Tile 1023,747: Filtered 4739 polygons by area at z11
+2026-02-06 23:27:45,263 - DEBUG -   Tile 1024,747: Filtered 3707 polygons by area at z11
+2026-02-06 23:27:45,265 - DEBUG -   Tile 1025,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,270 - DEBUG -   Tile 1022,747: Write: 553 features, 9 filtered by area (<2.0px²), 12/12 holes removed (<20.0px²)
+  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 38/1982026-02-06 23:27:45,278 - DEBUG -   Tile 1023,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,278 - DEBUG -   Tile 1024,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,327 - DEBUG -   Tile 1025,747: Write: 470 features, 3 filtered by area (<2.0px²), 3/3 holes removed (<20.0px²)
+  Zoom 11: Tiles [████░░░░░░░░░░░░░░░░░░░░░] 39/1982026-02-06 23:27:45,335 - DEBUG -   Tile 1026,747: Filtered 3260 polygons by area at z11
+2026-02-06 23:27:45,347 - DEBUG -   Tile 1026,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,367 - DEBUG -   Tile 1024,747: Write: 633 features, 26 filtered by area (<2.0px²), 18/18 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 40/1982026-02-06 23:27:45,419 - DEBUG -   Tile 1023,747: Write: 1014 features, 24 filtered by area (<2.0px²), 35/35 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 41/1982026-02-06 23:27:45,421 - DEBUG -   Tile 1026,747: Write: 541 features, 6 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 42/1982026-02-06 23:27:45,438 - DEBUG -   Tile 1027,747: Filtered 5520 polygons by area at z11
+2026-02-06 23:27:45,463 - DEBUG -   Tile 1027,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,486 - DEBUG -   Tile 1028,747: Filtered 5370 polygons by area at z11
+2026-02-06 23:27:45,529 - DEBUG -   Tile 1028,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,538 - DEBUG -   Tile 1029,747: Filtered 5278 polygons by area at z11
+2026-02-06 23:27:45,571 - DEBUG -   Tile 1030,747: Filtered 5942 polygons by area at z11
+2026-02-06 23:27:45,581 - DEBUG -   Tile 1029,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,623 - DEBUG -   Tile 1030,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,640 - DEBUG -   Tile 1027,747: Write: 1235 features, 18 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 43/1982026-02-06 23:27:45,803 - DEBUG -   Tile 1031,747: Filtered 7785 polygons by area at z11
+2026-02-06 23:27:45,814 - DEBUG -   Tile 1028,747: Write: 1787 features, 37 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 44/1982026-02-06 23:27:45,820 - DEBUG -   Tile 1029,747: Write: 1633 features, 40 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 45/1982026-02-06 23:27:45,829 - DEBUG -   Tile 1031,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,903 - DEBUG -   Tile 1033,747: Filtered 3334 polygons by area at z11
+2026-02-06 23:27:45,925 - DEBUG -   Tile 1030,747: Write: 2017 features, 48 filtered by area (<2.0px²), 3/3 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 46/1982026-02-06 23:27:45,934 - DEBUG -   Tile 1033,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,955 - DEBUG -   Tile 1034,747: Filtered 967 polygons by area at z11
+2026-02-06 23:27:45,970 - DEBUG -   Tile 1034,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:45,973 - DEBUG -   Tile 1032,747: Filtered 7690 polygons by area at z11
+2026-02-06 23:27:46,000 - DEBUG -   Tile 1032,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:46,078 - DEBUG -   Tile 1034,747: Write: 756 features, 6 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████░░░░░░░░░░░░░░░░░░░░] 47/1982026-02-06 23:27:46,106 - DEBUG -   Tile 1035,747: Filtered 1011 polygons by area at z11
+2026-02-06 23:27:46,122 - DEBUG -   Tile 1033,747: Write: 1339 features, 28 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:46,122 - DEBUG -   Tile 1035,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 48/1982026-02-06 23:27:46,175 - DEBUG -   Tile 1036,747: Filtered 2299 polygons by area at z11
+2026-02-06 23:27:46,188 - DEBUG -   Tile 1031,747: Write: 3496 features, 20 filtered by area (<2.0px²), 26/26 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 49/1982026-02-06 23:27:46,192 - DEBUG -   Tile 1036,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:46,209 - DEBUG -   Tile 1037,747: Filtered 624 polygons by area at z11
+2026-02-06 23:27:46,218 - DEBUG -   Tile 1037,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:46,223 - DEBUG -   Tile 1035,747: Write: 614 features, 25 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 50/1982026-02-06 23:27:46,227 - DEBUG -   Tile 1038,747: Filtered 37 polygons by area at z11
+2026-02-06 23:27:46,230 - DEBUG -   Tile 1038,747: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:46,250 - DEBUG -   Tile 1038,747: Write: 121 features, 2 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 51/1982026-02-06 23:27:46,250 - DEBUG -   Tile 1021,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:46,251 - DEBUG -   Tile 1021,748: Write: 11 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 52/1982026-02-06 23:27:46,252 - DEBUG -   Tile 1022,748: Filtered 22 polygons by area at z11
+2026-02-06 23:27:46,252 - DEBUG -   Tile 1022,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:46,256 - DEBUG -   Tile 1022,748: Write: 46 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 53/1982026-02-06 23:27:46,281 - DEBUG -   Tile 1037,747: Write: 378 features, 10 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 54/1982026-02-06 23:27:46,326 - DEBUG -   Tile 1023,748: Filtered 3419 polygons by area at z11
+2026-02-06 23:27:46,341 - DEBUG -   Tile 1023,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:46,347 - DEBUG -   Tile 1036,747: Write: 1296 features, 10 filtered by area (<2.0px²), 5/5 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████░░░░░░░░░░░░░░░░░░░] 55/1982026-02-06 23:27:46,398 - DEBUG -   Tile 1025,748: Filtered 2427 polygons by area at z11
+2026-02-06 23:27:46,402 - DEBUG -   Tile 1024,748: Filtered 6049 polygons by area at z11
+2026-02-06 23:27:46,410 - DEBUG -   Tile 1025,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:46,426 - DEBUG -   Tile 1024,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:46,435 - DEBUG -   Tile 1032,747: Write: 4329 features, 15 filtered by area (<2.0px²), 23/23 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 56/1982026-02-06 23:27:46,437 - DEBUG -   Tile 1023,748: Write: 704 features, 21 filtered by area (<2.0px²), 12/12 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 57/1982026-02-06 23:27:46,478 - DEBUG -   Tile 1026,748: Filtered 1943 polygons by area at z11
+2026-02-06 23:27:46,486 - DEBUG -   Tile 1025,748: Write: 567 features, 14 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 58/1982026-02-06 23:27:46,488 - DEBUG -   Tile 1026,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:46,496 - DEBUG -   Tile 1027,748: Filtered 2293 polygons by area at z11
+2026-02-06 23:27:46,514 - DEBUG -   Tile 1027,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:46,558 - DEBUG -   Tile 1026,748: Write: 547 features, 7 filtered by area (<2.0px²), 6/6 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 59/1982026-02-06 23:27:46,571 - DEBUG -   Tile 1024,748: Write: 1041 features, 23 filtered by area (<2.0px²), 41/41 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 60/1982026-02-06 23:27:46,623 - DEBUG -   Tile 1028,748: Filtered 5872 polygons by area at z11
+2026-02-06 23:27:46,635 - DEBUG -   Tile 1027,748: Write: 790 features, 18 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 61/1982026-02-06 23:27:46,675 - DEBUG -   Tile 1028,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:46,700 - DEBUG -   Tile 1029,748: Filtered 5946 polygons by area at z11
+2026-02-06 23:27:46,716 - DEBUG -   Tile 1030,748: Filtered 5975 polygons by area at z11
+2026-02-06 23:27:46,748 - DEBUG -   Tile 1031,748: Filtered 5262 polygons by area at z11
+2026-02-06 23:27:46,755 - DEBUG -   Tile 1029,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:46,760 - DEBUG -   Tile 1030,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:46,778 - DEBUG -   Tile 1031,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:46,952 - DEBUG -   Tile 1028,748: Write: 1871 features, 70 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 62/1982026-02-06 23:27:47,046 - DEBUG -   Tile 1030,748: Write: 2035 features, 52 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████░░░░░░░░░░░░░░░░░░] 63/1982026-02-06 23:27:47,064 - DEBUG -   Tile 1029,748: Write: 2124 features, 45 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 64/1982026-02-06 23:27:47,071 - DEBUG -   Tile 1032,748: Filtered 5516 polygons by area at z11
+2026-02-06 23:27:47,101 - DEBUG -   Tile 1031,748: Write: 2954 features, 30 filtered by area (<2.0px²), 51/51 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 65/1982026-02-06 23:27:47,102 - DEBUG -   Tile 1032,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,112 - DEBUG -   Tile 1033,748: Filtered 2569 polygons by area at z11
+2026-02-06 23:27:47,129 - DEBUG -   Tile 1035,748: Filtered 857 polygons by area at z11
+2026-02-06 23:27:47,138 - DEBUG -   Tile 1033,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,143 - DEBUG -   Tile 1035,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,145 - DEBUG -   Tile 1034,748: Filtered 3489 polygons by area at z11
+2026-02-06 23:27:47,172 - DEBUG -   Tile 1034,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,245 - DEBUG -   Tile 1035,748: Write: 720 features, 29 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 66/1982026-02-06 23:27:47,267 - DEBUG -   Tile 1036,748: Filtered 686 polygons by area at z11
+2026-02-06 23:27:47,281 - DEBUG -   Tile 1036,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,312 - DEBUG -   Tile 1033,748: Write: 1254 features, 39 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 67/1982026-02-06 23:27:47,327 - DEBUG -   Tile 1037,748: Filtered 379 polygons by area at z11
+2026-02-06 23:27:47,337 - DEBUG -   Tile 1034,748: Write: 1124 features, 19 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 68/1982026-02-06 23:27:47,338 - DEBUG -   Tile 1037,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,343 - DEBUG -   Tile 1038,748: Filtered 97 polygons by area at z11
+2026-02-06 23:27:47,347 - DEBUG -   Tile 1038,748: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,372 - DEBUG -   Tile 1038,748: Write: 134 features, 2 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 69/1982026-02-06 23:27:47,372 - DEBUG -   Tile 1022,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,373 - DEBUG -   Tile 1022,749: Write: 19 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 70/1982026-02-06 23:27:47,398 - DEBUG -   Tile 1036,748: Write: 835 features, 23 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████░░░░░░░░░░░░░░░░░] 71/1982026-02-06 23:27:47,400 - DEBUG -   Tile 1032,748: Write: 2658 features, 20 filtered by area (<2.0px²), 45/45 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 72/1982026-02-06 23:27:47,416 - DEBUG -   Tile 1023,749: Filtered 2141 polygons by area at z11
+2026-02-06 23:27:47,427 - DEBUG -   Tile 1023,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,428 - DEBUG -   Tile 1037,748: Write: 637 features, 17 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 73/1982026-02-06 23:27:47,462 - DEBUG -   Tile 1026,749: Filtered 1588 polygons by area at z11
+2026-02-06 23:27:47,471 - DEBUG -   Tile 1026,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,473 - DEBUG -   Tile 1025,749: Filtered 3104 polygons by area at z11
+2026-02-06 23:27:47,490 - DEBUG -   Tile 1025,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,510 - DEBUG -   Tile 1023,749: Write: 604 features, 20 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 74/1982026-02-06 23:27:47,537 - DEBUG -   Tile 1026,749: Write: 505 features, 20 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 75/1982026-02-06 23:27:47,540 - DEBUG -   Tile 1024,749: Filtered 6800 polygons by area at z11
+2026-02-06 23:27:47,569 - DEBUG -   Tile 1024,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,584 - DEBUG -   Tile 1027,749: Filtered 3375 polygons by area at z11
+2026-02-06 23:27:47,600 - DEBUG -   Tile 1025,749: Write: 762 features, 15 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 76/1982026-02-06 23:27:47,607 - DEBUG -   Tile 1027,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,744 - DEBUG -   Tile 1024,749: Write: 1213 features, 20 filtered by area (<2.0px²), 35/35 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 77/1982026-02-06 23:27:47,745 - DEBUG -   Tile 1027,749: Write: 978 features, 28 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 78/1982026-02-06 23:27:47,774 - DEBUG -   Tile 1028,749: Filtered 11867 polygons by area at z11
+2026-02-06 23:27:47,786 - DEBUG -   Tile 1031,749: Filtered 1250 polygons by area at z11
+2026-02-06 23:27:47,802 - DEBUG -   Tile 1031,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,813 - DEBUG -   Tile 1029,749: Filtered 10125 polygons by area at z11
+2026-02-06 23:27:47,819 - DEBUG -   Tile 1028,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,836 - DEBUG -   Tile 1030,749: Filtered 3983 polygons by area at z11
+2026-02-06 23:27:47,867 - DEBUG -   Tile 1030,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,868 - DEBUG -   Tile 1029,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:47,933 - DEBUG -   Tile 1031,749: Write: 1031 features, 11 filtered by area (<2.0px²), 27/27 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████░░░░░░░░░░░░░░░░] 79/1982026-02-06 23:27:47,979 - DEBUG -   Tile 1032,749: Filtered 2048 polygons by area at z11
+2026-02-06 23:27:47,997 - DEBUG -   Tile 1032,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,058 - DEBUG -   Tile 1030,749: Write: 1352 features, 49 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 80/1982026-02-06 23:27:48,081 - DEBUG -   Tile 1028,749: Write: 1773 features, 41 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 81/1982026-02-06 23:27:48,104 - DEBUG -   Tile 1033,749: Filtered 1700 polygons by area at z11
+2026-02-06 23:27:48,106 - DEBUG -   Tile 1034,749: Filtered 685 polygons by area at z11
+2026-02-06 23:27:48,116 - DEBUG -   Tile 1034,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,127 - DEBUG -   Tile 1033,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,135 - DEBUG -   Tile 1032,749: Write: 1022 features, 26 filtered by area (<2.0px²), 31/31 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 82/1982026-02-06 23:27:48,142 - DEBUG -   Tile 1035,749: Filtered 146 polygons by area at z11
+2026-02-06 23:27:48,148 - DEBUG -   Tile 1035,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,177 - DEBUG -   Tile 1029,749: Write: 2126 features, 49 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 83/1982026-02-06 23:27:48,185 - DEBUG -   Tile 1036,749: Filtered 28 polygons by area at z11
+2026-02-06 23:27:48,189 - DEBUG -   Tile 1036,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,190 - DEBUG -   Tile 1034,749: Write: 538 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 84/1982026-02-06 23:27:48,194 - DEBUG -   Tile 1035,749: Write: 350 features, 8 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:48,195 - DEBUG -   Tile 1037,749: Filtered 73 polygons by area at z11
+2026-02-06 23:27:48,195 - DEBUG -   Tile 1038,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,198 - DEBUG -   Tile 1037,749: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,200 - DEBUG -   Tile 1038,749: Write: 33 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:48,200 - DEBUG -   Tile 1021,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,200 - DEBUG -   Tile 1021,750: Write: 2 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:48,201 - DEBUG -   Tile 1022,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,202 - DEBUG -   Tile 1022,750: Write: 30 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 85/198  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 86/198  Zoom 11: Tiles [██████████░░░░░░░░░░░░░░░] 87/198  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 88/1982026-02-06 23:27:48,214 - DEBUG -   Tile 1036,749: Write: 160 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:48,219 - DEBUG -   Tile 1037,749: Write: 131 features, 4 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 89/198  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 90/1982026-02-06 23:27:48,298 - DEBUG -   Tile 1023,750: Filtered 4861 polygons by area at z11
+2026-02-06 23:27:48,315 - DEBUG -   Tile 1023,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,320 - DEBUG -   Tile 1033,749: Write: 1532 features, 17 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 91/1982026-02-06 23:27:48,433 - DEBUG -   Tile 1025,750: Filtered 9032 polygons by area at z11
+2026-02-06 23:27:48,444 - DEBUG -   Tile 1023,750: Write: 994 features, 15 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 92/1982026-02-06 23:27:48,452 - DEBUG -   Tile 1024,750: Filtered 11275 polygons by area at z11
+2026-02-06 23:27:48,467 - DEBUG -   Tile 1025,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,482 - DEBUG -   Tile 1024,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,517 - DEBUG -   Tile 1026,750: Filtered 9707 polygons by area at z11
+2026-02-06 23:27:48,537 - DEBUG -   Tile 1027,750: Filtered 4249 polygons by area at z11
+2026-02-06 23:27:48,551 - DEBUG -   Tile 1026,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,558 - DEBUG -   Tile 1027,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,657 - DEBUG -   Tile 1025,750: Write: 1262 features, 28 filtered by area (<2.0px²), 10/10 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 93/1982026-02-06 23:27:48,695 - DEBUG -   Tile 1027,750: Write: 967 features, 18 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 94/1982026-02-06 23:27:48,736 - DEBUG -   Tile 1024,750: Write: 2050 features, 27 filtered by area (<2.0px²), 20/20 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████░░░░░░░░░░░░░░] 95/1982026-02-06 23:27:48,759 - DEBUG -   Tile 1026,750: Write: 1257 features, 27 filtered by area (<2.0px²), 3/3 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████░░░░░░░░░░░░░] 96/1982026-02-06 23:27:48,773 - DEBUG -   Tile 1030,750: Filtered 1235 polygons by area at z11
+2026-02-06 23:27:48,787 - DEBUG -   Tile 1030,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,825 - DEBUG -   Tile 1028,750: Filtered 8071 polygons by area at z11
+2026-02-06 23:27:48,832 - DEBUG -   Tile 1029,750: Filtered 7195 polygons by area at z11
+2026-02-06 23:27:48,857 - DEBUG -   Tile 1029,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,859 - DEBUG -   Tile 1028,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:48,916 - DEBUG -   Tile 1031,750: Filtered 7519 polygons by area at z11
+2026-02-06 23:27:48,917 - DEBUG -   Tile 1030,750: Write: 1094 features, 16 filtered by area (<2.0px²), 8/8 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████░░░░░░░░░░░░░] 97/1982026-02-06 23:27:48,955 - DEBUG -   Tile 1031,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,004 - DEBUG -   Tile 1032,750: Filtered 4079 polygons by area at z11
+2026-02-06 23:27:49,018 - DEBUG -   Tile 1029,750: Write: 1184 features, 24 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████░░░░░░░░░░░░░] 98/1982026-02-06 23:27:49,031 - DEBUG -   Tile 1032,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,036 - DEBUG -   Tile 1033,750: Filtered 441 polygons by area at z11
+2026-02-06 23:27:49,049 - DEBUG -   Tile 1033,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,052 - DEBUG -   Tile 1028,750: Write: 1265 features, 46 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████░░░░░░░░░░░░░] 99/1982026-02-06 23:27:49,056 - DEBUG -   Tile 1034,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,057 - DEBUG -   Tile 1034,750: Write: 56 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████░░░░░░░░░░░░░] 100/1982026-02-06 23:27:49,057 - DEBUG -   Tile 1035,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,058 - DEBUG -   Tile 1035,750: Write: 23 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:49,058 - DEBUG -   Tile 1036,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,058 - DEBUG -   Tile 1036,750: Write: 8 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:49,058 - DEBUG -   Tile 1037,750: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,059 - DEBUG -   Tile 1037,750: Write: 2 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████░░░░░░░░░░░░░] 101/198  Zoom 11: Tiles [████████████░░░░░░░░░░░░░] 102/198  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 103/1982026-02-06 23:27:49,059 - DEBUG -   Tile 1021,751: Filtered 20 polygons by area at z11
+2026-02-06 23:27:49,060 - DEBUG -   Tile 1021,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,062 - DEBUG -   Tile 1021,751: Write: 13 features, 2 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:49,067 - DEBUG -   Tile 1022,751: Filtered 213 polygons by area at z11
+2026-02-06 23:27:49,069 - DEBUG -   Tile 1022,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 104/1982026-02-06 23:27:49,087 - DEBUG -   Tile 1022,751: Write: 135 features, 4 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 105/1982026-02-06 23:27:49,132 - DEBUG -   Tile 1033,750: Write: 626 features, 9 filtered by area (<2.0px²), 24/24 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 106/1982026-02-06 23:27:49,193 - DEBUG -   Tile 1031,750: Write: 1558 features, 35 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 107/1982026-02-06 23:27:49,200 - DEBUG -   Tile 1032,750: Write: 1113 features, 37 filtered by area (<2.0px²), 13/13 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 108/1982026-02-06 23:27:49,267 - DEBUG -   Tile 1023,751: Filtered 9554 polygons by area at z11
+2026-02-06 23:27:49,291 - DEBUG -   Tile 1023,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,363 - DEBUG -   Tile 1025,751: Filtered 8890 polygons by area at z11
+2026-02-06 23:27:49,386 - DEBUG -   Tile 1025,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,391 - DEBUG -   Tile 1024,751: Filtered 13479 polygons by area at z11
+2026-02-06 23:27:49,425 - DEBUG -   Tile 1026,751: Filtered 10447 polygons by area at z11
+2026-02-06 23:27:49,427 - DEBUG -   Tile 1024,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,458 - DEBUG -   Tile 1026,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,471 - DEBUG -   Tile 1023,751: Write: 1325 features, 17 filtered by area (<2.0px²), 9/9 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 109/1982026-02-06 23:27:49,498 - DEBUG -   Tile 1027,751: Filtered 861 polygons by area at z11
+2026-02-06 23:27:49,510 - DEBUG -   Tile 1027,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,540 - DEBUG -   Tile 1025,751: Write: 1006 features, 24 filtered by area (<2.0px²), 5/5 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████░░░░░░░░░░░░] 110/1982026-02-06 23:27:49,607 - DEBUG -   Tile 1027,751: Write: 780 features, 10 filtered by area (<2.0px²), 19/19 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 111/1982026-02-06 23:27:49,658 - DEBUG -   Tile 1028,751: Filtered 6001 polygons by area at z11
+2026-02-06 23:27:49,659 - DEBUG -   Tile 1024,751: Write: 1472 features, 17 filtered by area (<2.0px²), 14/14 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 112/1982026-02-06 23:27:49,676 - DEBUG -   Tile 1026,751: Write: 1493 features, 26 filtered by area (<2.0px²), 15/15 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 113/1982026-02-06 23:27:49,681 - DEBUG -   Tile 1028,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,701 - DEBUG -   Tile 1030,751: Filtered 1564 polygons by area at z11
+2026-02-06 23:27:49,715 - DEBUG -   Tile 1030,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,732 - DEBUG -   Tile 1029,751: Filtered 5779 polygons by area at z11
+2026-02-06 23:27:49,757 - DEBUG -   Tile 1031,751: Filtered 3541 polygons by area at z11
+2026-02-06 23:27:49,762 - DEBUG -   Tile 1029,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,780 - DEBUG -   Tile 1031,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,800 - DEBUG -   Tile 1030,751: Write: 551 features, 11 filtered by area (<2.0px²), 24/24 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 114/1982026-02-06 23:27:49,842 - DEBUG -   Tile 1028,751: Write: 1254 features, 18 filtered by area (<2.0px²), 18/18 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 115/1982026-02-06 23:27:49,868 - DEBUG -   Tile 1033,751: Filtered 881 polygons by area at z11
+2026-02-06 23:27:49,882 - DEBUG -   Tile 1033,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,922 - DEBUG -   Tile 1031,751: Write: 974 features, 30 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 116/1982026-02-06 23:27:49,936 - DEBUG -   Tile 1034,751: Filtered 238 polygons by area at z11
+2026-02-06 23:27:49,948 - DEBUG -   Tile 1034,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,974 - DEBUG -   Tile 1029,751: Write: 1597 features, 15 filtered by area (<2.0px²), 51/51 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 117/1982026-02-06 23:27:49,979 - DEBUG -   Tile 1035,751: Filtered 46 polygons by area at z11
+2026-02-06 23:27:49,981 - DEBUG -   Tile 1033,751: Write: 772 features, 10 filtered by area (<2.0px²), 25/25 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████░░░░░░░░░░░] 118/1982026-02-06 23:27:49,982 - DEBUG -   Tile 1035,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,982 - DEBUG -   Tile 1036,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,983 - DEBUG -   Tile 1036,751: Write: 6 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████░░░░░░░░░░] 119/1982026-02-06 23:27:49,983 - DEBUG -   Tile 1021,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:49,984 - DEBUG -   Tile 1021,752: Write: 10 features, 2 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████░░░░░░░░░░] 120/1982026-02-06 23:27:49,995 - DEBUG -   Tile 1032,751: Filtered 10000 polygons by area at z11
+2026-02-06 23:27:49,998 - DEBUG -   Tile 1035,751: Write: 121 features, 2 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████░░░░░░░░░░] 121/1982026-02-06 23:27:50,024 - DEBUG -   Tile 1032,751: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,031 - DEBUG -   Tile 1034,751: Write: 565 features, 21 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████░░░░░░░░░░] 122/1982026-02-06 23:27:50,051 - DEBUG -   Tile 1022,752: Filtered 3515 polygons by area at z11
+2026-02-06 23:27:50,062 - DEBUG -   Tile 1022,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,124 - DEBUG -   Tile 1024,752: Filtered 4903 polygons by area at z11
+2026-02-06 23:27:50,139 - DEBUG -   Tile 1022,752: Write: 492 features, 7 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████░░░░░░░░░░] 123/1982026-02-06 23:27:50,141 - DEBUG -   Tile 1024,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,199 - DEBUG -   Tile 1032,751: Write: 1106 features, 20 filtered by area (<2.0px²), 7/7 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████░░░░░░░░░░] 124/1982026-02-06 23:27:50,235 - DEBUG -   Tile 1025,752: Filtered 4986 polygons by area at z11
+2026-02-06 23:27:50,243 - DEBUG -   Tile 1023,752: Filtered 12087 polygons by area at z11
+2026-02-06 23:27:50,251 - DEBUG -   Tile 1024,752: Write: 648 features, 27 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+2026-02-06 23:27:50,251 - DEBUG -   Tile 1025,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+  Zoom 11: Tiles [███████████████░░░░░░░░░░] 125/1982026-02-06 23:27:50,267 - DEBUG -   Tile 1023,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,326 - DEBUG -   Tile 1026,752: Filtered 6607 polygons by area at z11
+2026-02-06 23:27:50,344 - DEBUG -   Tile 1026,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,350 - DEBUG -   Tile 1025,752: Write: 594 features, 26 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████░░░░░░░░░░] 126/1982026-02-06 23:27:50,362 - DEBUG -   Tile 1027,752: Filtered 5759 polygons by area at z11
+2026-02-06 23:27:50,362 - DEBUG -   Tile 1028,752: Filtered 347 polygons by area at z11
+2026-02-06 23:27:50,369 - DEBUG -   Tile 1028,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,378 - DEBUG -   Tile 1027,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,413 - DEBUG -   Tile 1028,752: Write: 356 features, 7 filtered by area (<2.0px²), 5/5 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████░░░░░░░░░] 127/1982026-02-06 23:27:50,436 - DEBUG -   Tile 1023,752: Write: 1035 features, 25 filtered by area (<2.0px²), 18/18 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████░░░░░░░░░] 128/1982026-02-06 23:27:50,456 - DEBUG -   Tile 1029,752: Filtered 2010 polygons by area at z11
+2026-02-06 23:27:50,461 - DEBUG -   Tile 1026,752: Write: 761 features, 20 filtered by area (<2.0px²), 17/17 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████░░░░░░░░░] 129/1982026-02-06 23:27:50,469 - DEBUG -   Tile 1030,752: Filtered 1000 polygons by area at z11
+2026-02-06 23:27:50,470 - DEBUG -   Tile 1029,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,479 - DEBUG -   Tile 1031,752: Filtered 562 polygons by area at z11
+2026-02-06 23:27:50,485 - DEBUG -   Tile 1030,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,488 - DEBUG -   Tile 1031,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,493 - DEBUG -   Tile 1027,752: Write: 883 features, 14 filtered by area (<2.0px²), 18/18 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████░░░░░░░░░] 130/1982026-02-06 23:27:50,517 - DEBUG -   Tile 1032,752: Filtered 811 polygons by area at z11
+2026-02-06 23:27:50,528 - DEBUG -   Tile 1032,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,550 - DEBUG -   Tile 1031,752: Write: 439 features, 18 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████░░░░░░░░░] 131/1982026-02-06 23:27:50,557 - DEBUG -   Tile 1029,752: Write: 617 features, 22 filtered by area (<2.0px²), 24/24 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████░░░░░░░░░] 132/1982026-02-06 23:27:50,571 - DEBUG -   Tile 1033,752: Filtered 517 polygons by area at z11
+2026-02-06 23:27:50,588 - DEBUG -   Tile 1033,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,589 - DEBUG -   Tile 1030,752: Write: 706 features, 4 filtered by area (<2.0px²), 35/35 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████░░░░░░░░░] 133/1982026-02-06 23:27:50,592 - DEBUG -   Tile 1034,752: Filtered 993 polygons by area at z11
+2026-02-06 23:27:50,596 - DEBUG -   Tile 1035,752: Filtered 76 polygons by area at z11
+2026-02-06 23:27:50,602 - DEBUG -   Tile 1035,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,605 - DEBUG -   Tile 1032,752: Write: 498 features, 18 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████░░░░░░░░░] 134/1982026-02-06 23:27:50,606 - DEBUG -   Tile 1036,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,606 - DEBUG -   Tile 1036,752: Write: 7 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████████░░░░░░░░] 135/1982026-02-06 23:27:50,606 - DEBUG -   Tile 1021,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,607 - DEBUG -   Tile 1021,753: Write: 12 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████████░░░░░░░░] 136/1982026-02-06 23:27:50,618 - DEBUG -   Tile 1034,752: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,644 - DEBUG -   Tile 1035,752: Write: 258 features, 8 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████████░░░░░░░░] 137/1982026-02-06 23:27:50,678 - DEBUG -   Tile 1022,753: Filtered 3261 polygons by area at z11
+2026-02-06 23:27:50,697 - DEBUG -   Tile 1022,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,719 - DEBUG -   Tile 1033,752: Write: 990 features, 26 filtered by area (<2.0px²), 27/27 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████████░░░░░░░░] 138/1982026-02-06 23:27:50,765 - DEBUG -   Tile 1023,753: Filtered 6256 polygons by area at z11
+2026-02-06 23:27:50,780 - DEBUG -   Tile 1034,752: Write: 992 features, 20 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████████░░░░░░░░] 139/1982026-02-06 23:27:50,784 - DEBUG -   Tile 1023,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,811 - DEBUG -   Tile 1022,753: Write: 623 features, 5 filtered by area (<2.0px²), 3/3 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████████░░░░░░░░] 140/1982026-02-06 23:27:50,819 - DEBUG -   Tile 1024,753: Filtered 4950 polygons by area at z11
+2026-02-06 23:27:50,839 - DEBUG -   Tile 1024,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,869 - DEBUG -   Tile 1025,753: Filtered 4562 polygons by area at z11
+2026-02-06 23:27:50,887 - DEBUG -   Tile 1025,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,908 - DEBUG -   Tile 1026,753: Filtered 4628 polygons by area at z11
+2026-02-06 23:27:50,917 - DEBUG -   Tile 1023,753: Write: 774 features, 25 filtered by area (<2.0px²), 5/5 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████████░░░░░░░░] 141/1982026-02-06 23:27:50,921 - DEBUG -   Tile 1026,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,957 - DEBUG -   Tile 1027,753: Filtered 1889 polygons by area at z11
+2026-02-06 23:27:50,964 - DEBUG -   Tile 1024,753: Write: 746 features, 9 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████████░░░░░░░░] 142/1982026-02-06 23:27:50,967 - DEBUG -   Tile 1027,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,975 - DEBUG -   Tile 1028,753: Filtered 252 polygons by area at z11
+2026-02-06 23:27:50,983 - DEBUG -   Tile 1028,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:50,997 - DEBUG -   Tile 1025,753: Write: 684 features, 26 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████████░░░░░░░] 143/1982026-02-06 23:27:51,008 - DEBUG -   Tile 1026,753: Write: 539 features, 13 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████████░░░░░░░] 144/1982026-02-06 23:27:51,017 - DEBUG -   Tile 1029,753: Filtered 814 polygons by area at z11
+2026-02-06 23:27:51,022 - DEBUG -   Tile 1030,753: Filtered 373 polygons by area at z11
+2026-02-06 23:27:51,024 - DEBUG -   Tile 1029,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,029 - DEBUG -   Tile 1030,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,034 - DEBUG -   Tile 1028,753: Write: 378 features, 11 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████████░░░░░░░] 145/1982026-02-06 23:27:51,047 - DEBUG -   Tile 1031,753: Filtered 509 polygons by area at z11
+2026-02-06 23:27:51,049 - DEBUG -   Tile 1027,753: Write: 636 features, 10 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████████░░░░░░░] 146/1982026-02-06 23:27:51,052 - DEBUG -   Tile 1031,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,060 - DEBUG -   Tile 1032,753: Filtered 249 polygons by area at z11
+2026-02-06 23:27:51,067 - DEBUG -   Tile 1032,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,078 - DEBUG -   Tile 1029,753: Write: 392 features, 13 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████████░░░░░░░] 147/1982026-02-06 23:27:51,094 - DEBUG -   Tile 1030,753: Write: 481 features, 11 filtered by area (<2.0px²), 7/7 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████████░░░░░░░] 148/1982026-02-06 23:27:51,096 - DEBUG -   Tile 1033,753: Filtered 584 polygons by area at z11
+2026-02-06 23:27:51,096 - DEBUG -   Tile 1031,753: Write: 327 features, 8 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████████░░░░░░░] 149/1982026-02-06 23:27:51,099 - DEBUG -   Tile 1035,753: Filtered 58 polygons by area at z11
+2026-02-06 23:27:51,101 - DEBUG -   Tile 1035,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,106 - DEBUG -   Tile 1033,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,109 - DEBUG -   Tile 1034,753: Filtered 476 polygons by area at z11
+2026-02-06 23:27:51,116 - DEBUG -   Tile 1035,753: Write: 122 features, 2 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████████░░░░░░░] 150/1982026-02-06 23:27:51,116 - DEBUG -   Tile 1036,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,116 - DEBUG -   Tile 1032,753: Write: 326 features, 13 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████████░░░░░░] 151/1982026-02-06 23:27:51,117 - DEBUG -   Tile 1036,753: Write: 9 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████████░░░░░░] 152/1982026-02-06 23:27:51,117 - DEBUG -   Tile 1021,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,118 - DEBUG -   Tile 1021,754: Write: 7 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████████░░░░░░] 153/1982026-02-06 23:27:51,119 - DEBUG -   Tile 1034,753: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,120 - DEBUG -   Tile 1022,754: Filtered 112 polygons by area at z11
+2026-02-06 23:27:51,122 - DEBUG -   Tile 1022,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,134 - DEBUG -   Tile 1022,754: Write: 69 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████████░░░░░░] 154/1982026-02-06 23:27:51,167 - DEBUG -   Tile 1023,754: Filtered 2403 polygons by area at z11
+2026-02-06 23:27:51,180 - DEBUG -   Tile 1024,754: Filtered 2028 polygons by area at z11
+2026-02-06 23:27:51,180 - DEBUG -   Tile 1023,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,193 - DEBUG -   Tile 1033,753: Write: 677 features, 15 filtered by area (<2.0px²), 9/9 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████████░░░░░░] 155/1982026-02-06 23:27:51,196 - DEBUG -   Tile 1024,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,202 - DEBUG -   Tile 1034,753: Write: 647 features, 17 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████████░░░░░░] 156/1982026-02-06 23:27:51,251 - DEBUG -   Tile 1025,754: Filtered 2864 polygons by area at z11
+2026-02-06 23:27:51,267 - DEBUG -   Tile 1025,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,269 - DEBUG -   Tile 1023,754: Write: 525 features, 17 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████████░░░░░░] 157/1982026-02-06 23:27:51,284 - DEBUG -   Tile 1026,754: Filtered 4064 polygons by area at z11
+2026-02-06 23:27:51,295 - DEBUG -   Tile 1027,754: Filtered 1136 polygons by area at z11
+2026-02-06 23:27:51,299 - DEBUG -   Tile 1026,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,304 - DEBUG -   Tile 1027,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,305 - DEBUG -   Tile 1024,754: Write: 663 features, 21 filtered by area (<2.0px²), 7/7 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████████░░░░░░] 158/1982026-02-06 23:27:51,307 - DEBUG -   Tile 1028,754: Filtered 6 polygons by area at z11
+2026-02-06 23:27:51,308 - DEBUG -   Tile 1028,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,313 - DEBUG -   Tile 1028,754: Write: 36 features, 4 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████████░░░░░] 159/1982026-02-06 23:27:51,318 - DEBUG -   Tile 1029,754: Filtered 195 polygons by area at z11
+2026-02-06 23:27:51,320 - DEBUG -   Tile 1029,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,341 - DEBUG -   Tile 1029,754: Write: 170 features, 7 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████████░░░░░] 160/1982026-02-06 23:27:51,351 - DEBUG -   Tile 1030,754: Filtered 334 polygons by area at z11
+2026-02-06 23:27:51,357 - DEBUG -   Tile 1030,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,368 - DEBUG -   Tile 1025,754: Write: 607 features, 18 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████████░░░░░] 161/1982026-02-06 23:27:51,379 - DEBUG -   Tile 1027,754: Write: 539 features, 17 filtered by area (<2.0px²), 6/6 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████████░░░░░] 162/1982026-02-06 23:27:51,396 - DEBUG -   Tile 1031,754: Filtered 1254 polygons by area at z11
+2026-02-06 23:27:51,398 - DEBUG -   Tile 1032,754: Filtered 665 polygons by area at z11
+2026-02-06 23:27:51,398 - DEBUG -   Tile 1026,754: Write: 613 features, 6 filtered by area (<2.0px²), 4/4 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████████░░░░░] 163/1982026-02-06 23:27:51,403 - DEBUG -   Tile 1030,754: Write: 303 features, 12 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████████░░░░░] 164/1982026-02-06 23:27:51,404 - DEBUG -   Tile 1031,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,407 - DEBUG -   Tile 1032,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,413 - DEBUG -   Tile 1033,754: Filtered 374 polygons by area at z11
+2026-02-06 23:27:51,415 - DEBUG -   Tile 1034,754: Filtered 312 polygons by area at z11
+2026-02-06 23:27:51,423 - DEBUG -   Tile 1033,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,425 - DEBUG -   Tile 1034,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,475 - DEBUG -   Tile 1032,754: Write: 446 features, 13 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████████░░░░░] 165/1982026-02-06 23:27:51,481 - DEBUG -   Tile 1035,754: Filtered 128 polygons by area at z11
+2026-02-06 23:27:51,486 - DEBUG -   Tile 1035,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,489 - DEBUG -   Tile 1033,754: Write: 442 features, 20 filtered by area (<2.0px²), 8/8 holes removed (<20.0px²)
+  Zoom 11: Tiles [████████████████████░░░░░] 166/1982026-02-06 23:27:51,492 - DEBUG -   Tile 1036,754: Filtered 8 polygons by area at z11
+2026-02-06 23:27:51,494 - DEBUG -   Tile 1036,754: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,496 - DEBUG -   Tile 1031,754: Write: 762 features, 3 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████████████░░░░] 167/1982026-02-06 23:27:51,497 - DEBUG -   Tile 1022,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,498 - DEBUG -   Tile 1022,755: Write: 2 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████████████░░░░] 168/1982026-02-06 23:27:51,498 - DEBUG -   Tile 1023,755: Filtered 6 polygons by area at z11
+2026-02-06 23:27:51,499 - DEBUG -   Tile 1023,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,501 - DEBUG -   Tile 1023,755: Write: 14 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████████████░░░░] 169/1982026-02-06 23:27:51,502 - DEBUG -   Tile 1024,755: Filtered 2 polygons by area at z11
+2026-02-06 23:27:51,502 - DEBUG -   Tile 1024,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,506 - DEBUG -   Tile 1024,755: Write: 20 features, 3 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████████████░░░░] 170/1982026-02-06 23:27:51,506 - DEBUG -   Tile 1034,754: Write: 567 features, 32 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████████████░░░░] 171/1982026-02-06 23:27:51,507 - DEBUG -   Tile 1025,755: Filtered 24 polygons by area at z11
+2026-02-06 23:27:51,507 - DEBUG -   Tile 1036,754: Write: 65 features, 6 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:51,508 - DEBUG -   Tile 1026,755: Filtered 4 polygons by area at z11
+  Zoom 11: Tiles [█████████████████████░░░░] 172/1982026-02-06 23:27:51,508 - DEBUG -   Tile 1025,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,508 - DEBUG -   Tile 1026,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,509 - DEBUG -   Tile 1027,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,513 - DEBUG -   Tile 1025,755: Write: 28 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████████████░░░░] 173/1982026-02-06 23:27:51,513 - DEBUG -   Tile 1026,755: Write: 26 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:51,513 - DEBUG -   Tile 1028,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,513 - DEBUG -   Tile 1029,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,513 - DEBUG -   Tile 1029,755: Write: 2 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:51,513 - DEBUG -   Tile 1028,755: Write: 4 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:51,513 - DEBUG -   Tile 1030,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,514 - DEBUG -   Tile 1030,755: Write: 5 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+2026-02-06 23:27:51,514 - DEBUG -   Tile 1027,755: Write: 27 features, 1 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [█████████████████████░░░░] 174/198  Zoom 11: Tiles [██████████████████████░░░] 175/1982026-02-06 23:27:51,516 - DEBUG -   Tile 1031,755: Filtered 110 polygons by area at z11
+2026-02-06 23:27:51,517 - DEBUG -   Tile 1031,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+  Zoom 11: Tiles [██████████████████████░░░] 176/198  Zoom 11: Tiles [██████████████████████░░░] 177/198  Zoom 11: Tiles [██████████████████████░░░] 178/1982026-02-06 23:27:51,521 - DEBUG -   Tile 1035,754: Write: 217 features, 4 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████████████░░░] 179/1982026-02-06 23:27:51,528 - DEBUG -   Tile 1031,755: Write: 85 features, 0 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████████████░░░] 180/1982026-02-06 23:27:51,532 - DEBUG -   Tile 1032,755: Filtered 710 polygons by area at z11
+2026-02-06 23:27:51,534 - DEBUG -   Tile 1033,755: Filtered 763 polygons by area at z11
+2026-02-06 23:27:51,536 - DEBUG -   Tile 1035,755: Filtered 336 polygons by area at z11
+2026-02-06 23:27:51,537 - DEBUG -   Tile 1034,755: Filtered 676 polygons by area at z11
+2026-02-06 23:27:51,537 - DEBUG -   Tile 1032,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,539 - DEBUG -   Tile 1035,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,539 - DEBUG -   Tile 1033,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,543 - DEBUG -   Tile 1034,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,558 - DEBUG -   Tile 1035,755: Write: 99 features, 7 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████████████░░░] 181/1982026-02-06 23:27:51,560 - DEBUG -   Tile 1036,755: Merge: 0 groups merged, 0/0 holes removed, 0 sharding fallbacks
+2026-02-06 23:27:51,566 - DEBUG -   Tile 1036,755: Write: 30 features, 3 filtered by area (<2.0px²), 0/0 holes removed (<20.0px²)
+  Zoom 11: Tiles [██████████████████████░░░] 182/1982026-02-06 23:27:51,572 - DEBUG -   Tile 1032,755: Write: 226 features, 6 filtered by area (<2.0px²), 3/3 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████████████░░] 183/1982026-02-06 23:27:51,576 - DEBUG -   Tile 1033,755: Write: 260 features, 6 filtered by area (<2.0px²), 2/2 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████████████░░] 184/1982026-02-06 23:27:51,591 - DEBUG -   Tile 1034,755: Write: 344 features, 12 filtered by area (<2.0px²), 1/1 holes removed (<20.0px²)
+  Zoom 11: Tiles [███████████████████████░░] 185/1982026-02-06 23:27:51,798 - INFO - ==================================================
+2026-02-06 23:27:51,798 - INFO - Conversion Summary
+2026-02-06 23:27:51,798 - INFO - ==================================================
+2026-02-06 23:27:51,798 - INFO - Input: midi-sud.pbf
+2026-02-06 23:27:51,798 - INFO - Output directory: output_vect/ariege
+2026-02-06 23:27:51,798 - INFO - Format: NAV binary tiles (.nav)
+2026-02-06 23:27:51,798 - INFO - Total tiles: 243
+2026-02-06 23:27:51,798 - INFO - Total size: 8.44 MB
+2026-02-06 23:27:51,798 - INFO - Total time: 8m 13s
+2026-02-06 23:27:51,798 - INFO - ==================================================
+  Zoom 11: 185 tiles written. (43.2s)                    
