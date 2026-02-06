@@ -60,8 +60,6 @@ GEOM_TEXT = 4
 K_VISIBILITY = 2.0
 # Anti-pitting: holes must be N times more visible than objects to be kept
 K_HOLE_FACTOR = 10.0
-# Below this zoom, no buffer merge (avoids creating fake forests from bocage)
-ZOOM_BUFFER_MERGE = 10
 
 # Point features to extract from nodes (rendered as symbols)
 # shape: 'triangle' for peaks, 'circle' for places
@@ -901,7 +899,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
         merged_features = []
         merge_stats = {'holes_total': 0, 'holes_removed': 0, 'sharding_fallbacks': 0, 'groups_merged': 0}
         for (color, priority), poly_list in polygons_by_style.items():
-            if len(poly_list) < 2 or zoom < ZOOM_BUFFER_MERGE:
+            if len(poly_list) < 2:
                 merged_features.extend(poly_list)
                 continue
             try:
@@ -927,7 +925,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 # landuse(1-2), terrain(2-3) only — NOT water(4-5) to avoid flooding
                 is_landcover = priority_nibble <= 3
 
-                if is_landcover and zoom >= ZOOM_BUFFER_MERGE:
+                if False:  # Buffer merge disabled at all zooms to prevent pitting
                     # Small buffer to close sub-pixel cracks between adjacent polygons
                     buffer_size = pixel_deg * 0.5
                     buffered = [p.buffer(buffer_size) for p in shapely_polys]
@@ -1059,29 +1057,24 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             inner_rings = feature.get('inner_rings', [])
             is_polygon = feature['geom_type'] == GEOM_POLYGON
 
-            # Filter inner_rings: strip all at low zoom, size-filter at high zoom
+            # Filter inner_rings by size at all zooms
             if is_polygon and inner_rings:
-                if zoom < ZOOM_BUFFER_MERGE:
-                    filtered_holes_write += len(inner_rings)
-                    total_holes_write += len(inner_rings)
-                    inner_rings = []
-                else:
-                    filtered_rings = []
-                    for ring in inner_rings:
-                        total_holes_write += 1
-                        if len(ring) >= 4:
-                            rx = [c[0] for c in ring]
-                            ry = [c[1] for c in ring]
-                            rw = (max(rx) - min(rx)) / (tile_max_lon - tile_min_lon) * 4096
-                            rh = (max(ry) - min(ry)) / merc_range * 4096
-                            ring_area = (rw * rh) / (16 * 16)
-                            if ring_area >= K_VISIBILITY * K_HOLE_FACTOR:
-                                filtered_rings.append(ring)
-                            else:
-                                filtered_holes_write += 1
+                filtered_rings = []
+                for ring in inner_rings:
+                    total_holes_write += 1
+                    if len(ring) >= 4:
+                        rx = [c[0] for c in ring]
+                        ry = [c[1] for c in ring]
+                        rw = (max(rx) - min(rx)) / (tile_max_lon - tile_min_lon) * 4096
+                        rh = (max(ry) - min(ry)) / merc_range * 4096
+                        ring_area = (rw * rh) / (16 * 16)
+                        if ring_area >= K_VISIBILITY * K_HOLE_FACTOR:
+                            filtered_rings.append(ring)
                         else:
                             filtered_holes_write += 1
-                    inner_rings = filtered_rings
+                    else:
+                        filtered_holes_write += 1
+                inner_rings = filtered_rings
 
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
             final_features_data = []
@@ -1167,7 +1160,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
                 if is_polygon:
                     pixel_area = (f_max_x - f_min_x) * (f_max_y - f_min_y) / (16 * 16)
-                    min_area = K_VISIBILITY * 8 if zoom < ZOOM_BUFFER_MERGE else K_VISIBILITY
+                    min_area = K_VISIBILITY * 16 if zoom <= 9 else K_VISIBILITY
                     if pixel_area < min_area:
                         filtered_by_size += 1
                         continue
@@ -1485,7 +1478,7 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
         tiles_written = 0
         print() # New line after preparation phase
 
-        num_workers = min(multiprocessing.cpu_count(), num_tiles)
+        num_workers = min(4, num_tiles)  # Limit to 4 workers to avoid OOM on complex tiles
         tile_jobs = []
         for y in range(min_ty, max_ty + 1):
             for x in range(min_tx, max_tx + 1):
