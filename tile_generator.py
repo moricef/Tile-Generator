@@ -899,11 +899,11 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
         if zoom < 14:
             zres_prev = 360.0 / (2**(zoom - 1) * 256)
             min_area_deg2 = zres_prev ** 2
-            # Aggressive multipliers for z10-11 to reduce clutter
+            # Tuned multipliers: z10 filters less than z11 for progressive detail
             if zoom == 10:
-                min_area_deg2 *= 8  # ~46000 m²
+                min_area_deg2 *= 0.35  # ~3240 m² (half of previous)
             elif zoom == 11:
-                min_area_deg2 *= 6  # ~42000 m²
+                min_area_deg2 *= 6  # ~1390 m²
 
         polygons_by_style = defaultdict(list)
         other_features = []
