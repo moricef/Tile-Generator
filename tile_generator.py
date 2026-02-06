@@ -894,17 +894,43 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
         from shapely.geometry import Polygon as ShapelyPolygon, MultiPolygon as ShapelyMultiPolygon
         from shapely.ops import unary_union as shapely_unary_union
 
+        # Area filter thresholds (applied to ALL polygons before grouping)
+        min_area_deg2 = 0.0
+        if zoom < 14:
+            zres_prev = 360.0 / (2**(zoom - 1) * 256)
+            min_area_deg2 = zres_prev ** 2
+            # Aggressive multipliers for z10-11 to reduce clutter
+            if zoom == 10:
+                min_area_deg2 *= 8  # ~46000 m²
+            elif zoom == 11:
+                min_area_deg2 *= 6  # ~42000 m²
+
         polygons_by_style = defaultdict(list)
         other_features = []
+        filtered_by_area = 0
 
         for feat in features:
             if feat['geom_type'] == GEOM_POLYGON:
+                # Apply area filter to ALL polygons (not just grouped ones)
+                if min_area_deg2 > 0:
+                    inner = feat.get('inner_rings', [])
+                    if inner:
+                        sp = ShapelyPolygon(feat['coords'], inner)
+                    else:
+                        sp = ShapelyPolygon(feat['coords'])
+                    if sp.area < min_area_deg2:
+                        filtered_by_area += 1
+                        continue  # Skip small polygons
+
                 # Group by color, priority AND subclass to separate wood/forest from farmland
                 subclass = feat.get('subclass', '')
                 style_key = (feat['color_rgb565'], feat['zoom_priority'], subclass)
                 polygons_by_style[style_key].append(feat)
             else:
                 other_features.append(feat)
+
+        if filtered_by_area > 0:
+            logger.debug(f"  Tile {tile_x},{tile_y}: Filtered {filtered_by_area} polygons by area at z{zoom}")
 
         merged_features = []
         merge_stats = {'holes_total': 0, 'holes_removed': 0, 'sharding_fallbacks': 0, 'groups_merged': 0}
@@ -930,22 +956,6 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     continue
 
                 pixel_deg = 360.0 / (2**zoom * 256)
-
-                # OpenMapTiles-style area filter with aggressive thresholds for z10-11
-                # z10: 20000 m² (~3 football fields), z11: 10000 m² (~1.5 fields)
-                if zoom < 14:
-                    zres_prev = 360.0 / (2**(zoom - 1) * 256)
-                    min_area_deg2 = zres_prev ** 2
-
-                    # Aggressive multipliers for z10-11 to reduce clutter
-                    if zoom == 10:
-                        min_area_deg2 *= 8  # ~20000 m²
-                    elif zoom == 11:
-                        min_area_deg2 *= 6  # ~10000 m²
-
-                    shapely_polys = [sp for sp in shapely_polys if sp.area >= min_area_deg2]
-                    if not shapely_polys:
-                        continue  # All polygons too small for this zoom
 
                 # Extract priority nibble from packed byte (zoom_priority = zoom<<4 | prio)
                 priority_nibble = priority & 0x0F
