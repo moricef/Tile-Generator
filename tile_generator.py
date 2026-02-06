@@ -816,7 +816,8 @@ class OSMHandler(osmium.SimpleHandler):
                 coords = list(poly.exterior.coords)
                 if len(coords) < 4:
                     continue
-                inner_rings = [list(i.coords) for i in poly.interiors if len(i.coords) >= 4]
+                # Strip all inner_rings at extraction to eliminate pitting
+                inner_rings = []
 
                 self.features.append({
                     'geom_type': GEOM_POLYGON,
@@ -984,15 +985,15 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 candidate_features = []
                 for part in parts:
                     if not part.is_empty and part.exterior and len(part.exterior.coords) >= 4:
+                        # Strip all inner_rings during merge to eliminate pitting
                         inner_rings = []
+                        # Count holes for stats but don't keep them
                         for interior in part.interiors:
                             merge_stats['holes_total'] += 1
-                            if len(interior.coords) >= 4 and ShapelyPolygon(interior).area >= min_hole_deg2:
-                                inner_rings.append(list(interior.coords))
-                            else:
-                                merge_stats['holes_removed'] += 1
+                            merge_stats['holes_removed'] += 1
+
                         ext_coords = list(part.exterior.coords)
-                        pt_count = len(ext_coords) + sum(len(r) for r in inner_rings)
+                        pt_count = len(ext_coords)
                         total_merged_points += pt_count
                         candidate_features.append({
                             'geom_type': GEOM_POLYGON,
