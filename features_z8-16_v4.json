@@ -255,7 +255,7 @@
   "place=island": {
     "zoom": 10,
     "color": "#f2efe9",
-    "priority": 46
+    "priority": 99
   },
   "place=islet": {
     "zoom": 12,

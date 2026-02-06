@@ -816,8 +816,11 @@ class OSMHandler(osmium.SimpleHandler):
                 coords = list(poly.exterior.coords)
                 if len(coords) < 4:
                     continue
-                # Strip all inner_rings at extraction to eliminate pitting
-                inner_rings = []
+                # Keep inner_rings for water (islands), strip for landcover (pitting artifacts)
+                if layer == 'water':
+                    inner_rings = [list(interior.coords) for interior in poly.interiors if len(interior.coords) >= 4]
+                else:
+                    inner_rings = []
 
                 self.features.append({
                     'geom_type': GEOM_POLYGON,
@@ -826,7 +829,8 @@ class OSMHandler(osmium.SimpleHandler):
                     'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
                     'width_meters': 0.0,
                     'inner_rings': inner_rings,
-                    'subclass': subclass  # Store for merge logic
+                    'subclass': subclass,  # Store for merge logic
+                    'layer': layer  # Store layer name for inner_rings handling
                 })
                 self.stats['features_extracted'] += 1
         except Exception as e:
@@ -982,15 +986,22 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 min_hole_deg2 = (pixel_deg ** 2) * K_VISIBILITY * K_HOLE_FACTOR
                 total_merged_points = 0
 
+                # Get layer from first feature in group
+                feature_layer = poly_list[0].get('layer', '')
+
                 candidate_features = []
                 for part in parts:
                     if not part.is_empty and part.exterior and len(part.exterior.coords) >= 4:
-                        # Strip all inner_rings during merge to eliminate pitting
-                        inner_rings = []
-                        # Count holes for stats but don't keep them
-                        for interior in part.interiors:
-                            merge_stats['holes_total'] += 1
-                            merge_stats['holes_removed'] += 1
+                        # Keep inner_rings for water (islands), strip for landcover (pitting)
+                        if feature_layer == 'water':
+                            inner_rings = [list(interior.coords) for interior in part.interiors if len(interior.coords) >= 4]
+                            for interior in part.interiors:
+                                merge_stats['holes_total'] += 1
+                        else:
+                            inner_rings = []
+                            for interior in part.interiors:
+                                merge_stats['holes_total'] += 1
+                                merge_stats['holes_removed'] += 1
 
                         ext_coords = list(part.exterior.coords)
                         pt_count = len(ext_coords)
@@ -1002,7 +1013,8 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                             'color_rgb565': color,
                             'zoom_priority': priority,
                             'width_meters': 0.0,
-                            'subclass': subclass  # Preserve subclass after merge
+                            'subclass': subclass,  # Preserve subclass after merge
+                            'layer': feature_layer  # Preserve layer
                         })
 
                 if total_merged_points > 65535:
@@ -1094,11 +1106,13 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             inner_rings = feature.get('inner_rings', [])
             is_polygon = feature['geom_type'] == GEOM_POLYGON
 
-            # Filter inner_rings: strip all holes at all zooms to eliminate pitting
+            # Filter inner_rings: keep for water (islands), strip for landcover (pitting)
+            feature_layer = feature.get('layer', '')
             if is_polygon and inner_rings:
-                filtered_holes_write += len(inner_rings)
                 total_holes_write += len(inner_rings)
-                inner_rings = []
+                if feature_layer != 'water':
+                    filtered_holes_write += len(inner_rings)
+                    inner_rings = []
 
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
             final_features_data = []

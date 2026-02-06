@@ -1,0 +1,7 @@
+2026-02-06 22:56:54,366 - INFO - Loading configuration from features_z8-16_v4.json
+2026-02-06 22:56:54,367 - INFO - Processing PBF file: midi-sud.pbf (191.8 MB)
+2026-02-06 22:56:54,367 - INFO - Zoom range: 14-15
+2026-02-06 22:56:54,367 - INFO - Output format: NAV binary tiles (.nav)
+2026-02-06 22:56:54,367 - INFO - Pass 1: Scanning boundary relations...
+2026-02-06 22:56:55,087 - INFO -   Boundary ways found: 7,898
+2026-02-06 22:56:55,087 - INFO - Pass 2: Processing OSM data...
