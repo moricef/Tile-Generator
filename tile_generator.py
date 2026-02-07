@@ -1314,9 +1314,11 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     elif zoom == 12:
                         min_area = K_VISIBILITY * 5
                     elif zoom == 13:
-                        min_area = K_VISIBILITY * 3
-                    else:  # z14-16
-                        min_area = K_VISIBILITY * 0.5  # 1.0 px² - capture small leisure features
+                        min_area = K_VISIBILITY * 2
+                    elif zoom == 14:
+                        min_area = K_VISIBILITY * 0.5
+                    else:  # z15-16
+                        min_area = K_VISIBILITY * 0.1  # 0.2 px² - capture everything
                     if pixel_area < min_area:
                         filtered_by_size += 1
                         continue

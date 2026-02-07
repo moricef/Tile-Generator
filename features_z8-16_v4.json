@@ -188,12 +188,12 @@
     "priority": 25
   },
   "leisure=pitch": {
-    "zoom": 14,
+    "zoom": 13,
     "color": "#8cd6b8",
     "priority": 25
   },
   "leisure=playground": {
-    "zoom": 13,
+    "zoom": 12,
     "color": "#c8facc",
     "priority": 25
   },
@@ -243,7 +243,7 @@
     "priority": 26
   },
   "leisure=park": {
-    "zoom": 13,
+    "zoom": 12,
     "color": "#c8facc",
     "priority": 26
   },
