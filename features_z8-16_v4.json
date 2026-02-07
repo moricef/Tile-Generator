@@ -74,7 +74,7 @@
   },
   "landuse=residential": {
     "zoom": 8,
-    "color": "#c4c4c4",
+    "color": "#e0dfdf",
     "priority": 24
   },
   "landuse=quarry": {
@@ -290,7 +290,7 @@
 
   "natural=bare_rock": {
     "zoom": 8,
-    "color": "#d9c4b0",
+    "color": "#eee5dc",
     "priority": 30
   },
   "natural=peak": {
