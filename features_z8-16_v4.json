@@ -513,7 +513,7 @@
   },
   "highway=secondary": {
     "zoom": 9,
-    "color": "#fbb49e",
+    "color": "#f7fabf",
     "priority": 53
   },
   "highway=tertiary": {
