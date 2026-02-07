@@ -935,7 +935,7 @@ class OSMHandler(osmium.SimpleHandler):
                             if layer == 'water':
                                 inner_rings.append(list(interior.coords))
                             else:
-                                hole_poly = ShapelyPolygon(interior.coords)
+                                hole_poly = Polygon(interior.coords)
                                 if hole_poly.area >= min_hole_area:
                                     inner_rings.append(list(interior.coords))
 
