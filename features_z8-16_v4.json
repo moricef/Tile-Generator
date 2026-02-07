@@ -252,11 +252,6 @@
     "color": "#eeeeee",
     "priority": 27
   },
-  "place=island": {
-    "zoom": 10,
-    "color": "#f2efe9",
-    "priority": 99
-  },
   "place=islet": {
     "zoom": 12,
     "color": "#f2efe9",
