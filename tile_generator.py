@@ -901,26 +901,43 @@ class OSMHandler(osmium.SimpleHandler):
                 if len(coords) < 4:
                     continue
 
-                # Filter inner_rings by size to prevent "pitting" while preserving structural holes
-                # Always keep holes for water (islands), filter small holes for other layers
+                # Filter inner_rings by zoom and size (ESP32-friendly strategy)
+                # Low zoom: suppress all holes (except water) to avoid huge tiles
+                # High zoom: keep structural holes (stadiums, plazas, ponds)
                 inner_rings = []
-                if poly.interiors:
-                    # Calculate minimum hole size: ~5 pixels at current zoom
-                    # (prevents tiny artifacts while preserving stadiums, plazas, etc.)
-                    tile_width_deg = 360.0 / (2.0 ** min_zoom)
-                    pixel_deg = tile_width_deg / 256.0
-                    min_hole_area = (pixel_deg * 5) ** 2  # 5x5 pixels
+                if poly.interiors and min_zoom <= 16:
+                    # Zoom-based filtering strategy for ESP32
+                    # z6-z12: No holes (except major water bodies)
+                    # z13-z14: Keep large holes (≥10px²)
+                    # z15-z16: Keep medium holes (≥5px²)
+                    if min_zoom <= 12 and layer != 'water':
+                        # Low zoom: suppress all non-water holes
+                        pass  # inner_rings stays empty
+                    else:
+                        # High zoom: filter by area threshold
+                        tile_width_deg = 360.0 / (2.0 ** min_zoom)
+                        pixel_deg = tile_width_deg / 256.0
 
-                    for interior in poly.interiors:
-                        if len(interior.coords) < 4:
-                            continue
-                        # Always keep water holes (islands), filter others by size
-                        if layer == 'water':
-                            inner_rings.append(list(interior.coords))
+                        # Adaptive threshold based on zoom
+                        if min_zoom >= 15:
+                            min_hole_px = 5   # z15+: keep medium holes
+                        elif min_zoom >= 13:
+                            min_hole_px = 10  # z13-z14: keep large holes only
                         else:
-                            hole_poly = ShapelyPolygon(interior.coords)
-                            if hole_poly.area >= min_hole_area:
+                            min_hole_px = 20  # Fallback for water at low zoom
+
+                        min_hole_area = (pixel_deg * min_hole_px) ** 2
+
+                        for interior in poly.interiors:
+                            if len(interior.coords) < 4:
+                                continue
+                            # Water: always keep (islands), others: filter by size
+                            if layer == 'water':
                                 inner_rings.append(list(interior.coords))
+                            else:
+                                hole_poly = ShapelyPolygon(interior.coords)
+                                if hole_poly.area >= min_hole_area:
+                                    inner_rings.append(list(interior.coords))
 
                 self.features.append({
                     'geom_type': GEOM_POLYGON,
