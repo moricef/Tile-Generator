@@ -175,6 +175,7 @@ LAYER_PRIORITY = {
     'roads': 55,
     'infrastructure': 65,
     'buildings': 75,
+    'leisure': 80,      # Sports fields above water (visible on islands)
     'boundaries': 85,
     'places': 90
 }
@@ -201,15 +202,13 @@ LAYER_MAPPING = {
         'landuse=grass', 'landuse=orchard', 'landuse=vineyard',
         'landuse=farmland', 'landuse=farmyard', 'landuse=park', 'leisure=park',
         'aeroway=aerodrome', 'aeroway=apron', 'aeroway=helipad', 'aeroway=hangar', 'aeroway=runway', 'aeroway=taxiway',
-        'leisure=nature_reserve', 'leisure=garden', 'leisure=pitch',
-        'leisure=golf_course', 'leisure=recreation_ground', 'landuse=recreation_ground',
+        'leisure=nature_reserve', 'leisure=garden',
+        'leisure=recreation_ground', 'landuse=recreation_ground',
         'landuse=residential', 'place=suburb',
         'place=isolated_dwelling', 'place=locality', 'place=neighbourhood',
         'place=quarter', 'place=farm',
         'landuse=commercial', 'landuse=retail', 'landuse=industrial',
         'landuse=construction', 'landuse=cemetery', 'landuse=allotments',
-        'leisure=stadium', 'leisure=sports_centre', 'leisure=sports_hall', 'leisure=playground',
-        'leisure=swimming_pool', 'leisure=track',
         'amenity=parking', 'leisure=common', 'landuse=village_green',
         'landuse=quarry', 'landuse=military', 'landuse=landfill', 'landuse=brownfield',
         'landuse=basin', 'landuse=reservoir', 'landuse=railway', 'landuse=education',
@@ -262,6 +261,11 @@ LAYER_MAPPING = {
     ],
     'boundaries': [
         'boundary=administrative'
+    ],
+    'leisure': [
+        'leisure=pitch', 'leisure=stadium', 'leisure=sports_centre',
+        'leisure=sports_hall', 'leisure=track', 'leisure=swimming_pool',
+        'leisure=golf_course', 'leisure=playground'
     ],
     'places': [
         'place=city', 'place=state', 'place=town',
