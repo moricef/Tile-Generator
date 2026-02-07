@@ -9,6 +9,10 @@ NAV format optimized for ESP32:
 - int16 relative coordinates (0-4096 range with safety margin)
 - ~50% size reduction vs previous version
 
+Width field encoding (1 byte):
+- Bit 7 (0x80): Casing flag for two-pass rendering (motorway/trunk/primary)
+- Bits 0-6 (0x7F): Actual width in pixels (0-127)
+
 Usage:
     python tile_generator.py input.pbf output_dir features.json [--zoom 6-17]
 """
@@ -78,11 +82,11 @@ TEXT_FEATURES = {
     },
     'place=town': {
         'font_size': 1,
-        'zoom_rules': [(0, 9)],
+        'zoom_rules': [(35000, 8), (0, 9)],
     },
     'place=village': {
         'font_size': 0,
-        'zoom_rules': [(500, 10), (0, 11)],
+        'zoom_rules': [(1000, 10), (500, 11), (0, 12)],
     },
     'place=suburb': {
         'font_size': 0,
@@ -385,6 +389,28 @@ def hex_to_rgb565(hex_color: str) -> int:
         return 0xFFFF
 
 
+def lighten_rgb565(color: int, factor: float = 0.4) -> int:
+    """Lighten RGB565 color."""
+    r = ((color >> 11) & 0x1F) * 255 // 31
+    g = ((color >> 5) & 0x3F) * 255 // 63
+    b = (color & 0x1F) * 255 // 31
+    r = min(255, int(r + (255 - r) * factor))
+    g = min(255, int(g + (255 - g) * factor))
+    b = min(255, int(b + (255 - b) * factor))
+    return ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3)
+
+
+def darken_rgb565(color: int, factor: float = 0.4) -> int:
+    """Darken RGB565 color."""
+    r = ((color >> 11) & 0x1F) * 255 // 31
+    g = ((color >> 5) & 0x3F) * 255 // 63
+    b = (color & 0x1F) * 255 // 31
+    r = max(0, int(r * (1 - factor)))
+    g = max(0, int(g * (1 - factor)))
+    b = max(0, int(b * (1 - factor)))
+    return ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3)
+
+
 def pack_zoom_priority(min_zoom: int, priority: int) -> int:
     """Pack min_zoom and priority into a single byte."""
     zoom_nibble = min(min_zoom, 15) & 0x0F
@@ -396,7 +422,7 @@ def get_simplify_tolerance(zoom: int) -> float:
     """Calculate simplification tolerance based on zoom level."""
     tile_width_degrees = 360.0 / (2.0 ** zoom)
     pixel_size_degrees = tile_width_degrees / 256.0
-    return pixel_size_degrees
+    return pixel_size_degrees * 0.5  # Keep more detail for smoother curves
 
 
 class BoundaryScanner(osmium.SimpleHandler):
@@ -472,6 +498,7 @@ class OSMHandler(osmium.SimpleHandler):
         self.interesting_tags = self._build_interesting_tags()
         self.processed_way_ids: Set[int] = set()
         self.wkbfab = osmium.geom.WKBFactory()
+        self.road_label_counters: Dict[str, int] = defaultdict(int)  # ref -> segment count
 
     def _build_interesting_tags(self) -> Set[str]:
         """Build set of tag keys we're interested in."""
@@ -581,7 +608,7 @@ class OSMHandler(osmium.SimpleHandler):
                 color_rgb565 = hex_to_rgb565(cfg.get('color', '#000000'))
                 priority = cfg.get('priority', 90)
                 layer_base_priority = LAYER_PRIORITY.get('places', 90)
-                combined_priority = layer_base_priority + (priority % 10)
+                combined_priority = 98  # Force text above roads (priority 14 vs roads 13)
 
                 # Split long names on 2 lines at hyphen or space near middle
                 if len(name) > 12:
@@ -721,18 +748,71 @@ class OSMHandler(osmium.SimpleHandler):
 
         # Store line type for zoom-based width lookup
         highway_type = tags.get('highway', '') or tags.get('railway', '')
+        ref = tags.get('ref', '')
+        old_ref = tags.get('old_ref', '')
+
+        # Force linestrings (roads/railways) to high priority (13) to render above all polygons
+        linestring_priority = 13 * 7  # priority_nibble = 91 // 7 = 13
 
         feature = {
             'id': w.id,
             'geom_type': GEOM_LINESTRING,
             'coords': coords,
             'color_rgb565': color_rgb565,
-            'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
+            'zoom_priority': pack_zoom_priority(min_zoom, linestring_priority),
             'width_meters': width_meters,
             'highway_type': highway_type,
+            'has_ref': bool(ref),
+            'ref': ref,
+            'old_ref': old_ref,
         }
         self.features.append(feature)
         self.stats['features_extracted'] += 1
+
+        # Create road number label for major roads with ref
+        # Display at z10: A* (autoroutes), N* (nationales), D1xxx with old_ref=N* (major former nationales)
+        if ref and highway_type in ('motorway', 'trunk', 'primary', 'secondary'):
+            # Filter by road number (ref), not highway_type:
+            # - A* : motorways (all)
+            # - N* : national roads (all)
+            # - D1000-D1999 : only major former national roads with old_ref=N* (e.g., D1124 was N124)
+            should_create_label = False
+            if ref.startswith('A') or ref.startswith('N'):
+                should_create_label = True
+            elif ref.startswith('D'):
+                # Extract number from D-road (e.g., "D1124" -> 1124)
+                try:
+                    d_number = int(ref[1:])
+                    # Only D1000-D1999 (major former nationales) with old_ref=N*
+                    if 1000 <= d_number <= 1999 and old_ref and old_ref.startswith('N'):
+                        should_create_label = True
+                except (ValueError, IndexError):
+                    pass  # Invalid D-road format, skip
+
+            if should_create_label:
+                # Space out labels: only create one every 10 segments
+                self.road_label_counters[ref] += 1
+                if self.road_label_counters[ref] % 50 == 1:
+                    # Generate 3 candidate positions (25%, 50%, 75%) for collision avoidance
+                    candidates = []
+                    for ratio in [0.25, 0.5, 0.75]:
+                        idx = int(len(coords) * ratio)
+                        candidates.append(coords[idx])
+
+                    ref_label = {
+                        'geom_type': GEOM_TEXT,
+                        'coords': [candidates[1]],
+                        'coords_candidates': candidates,
+                        'color_rgb565': darken_rgb565(color_rgb565),  # Text: dark
+                        'bg_color_rgb565': lighten_rgb565(color_rgb565),  # Background: light
+                        'border_color_rgb565': color_rgb565,  # Border: original
+                        'zoom_priority': pack_zoom_priority(10, 98),
+                        'font_size': 2,
+                        'text': ref.encode('utf-8')[:32],
+                        'population': 0,
+                    }
+                    self.features.append(ref_label)
+                    self.stats['features_extracted'] += 1
 
     def _get_width_meters(self, tags: Dict[str, str]) -> float:
         """Extract width in meters from OSM tags.
@@ -859,7 +939,7 @@ def simplify_coords(coords: List[Tuple[float, float]], tolerance: float) -> List
     return coords
 
 
-def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: int, tile_y: int) -> bool:
+def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: int, tile_y: int, tolerance: float) -> bool:
     """
     Write features to NAV binary tile format using relative coordinates.
     """
@@ -909,7 +989,14 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
         min_area_deg2 = 0.0
         if zoom < 14:
             zres_prev = 360.0 / (2**(zoom - 1) * 256)
-            multiplier = 4.0 if zoom <= 9 else 3.0
+            if zoom <= 7:
+                multiplier = 2.5
+            elif zoom == 8:
+                multiplier = 1.8  # z8 : très permissif pour voir plus de landuse
+            elif zoom == 9:
+                multiplier = 2.5  # z9 : garde le bon niveau actuel
+            else:
+                multiplier = 3.0
             min_area_deg2 = (zres_prev ** 2) * multiplier
 
         polygons_by_style = defaultdict(list)
@@ -976,7 +1063,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     # Merge wood/forest to reduce fragmentation
                     merged = shapely_unary_union(shapely_polys)
                     # Simplify merged result (merge creates complex polygons with too many vertices)
-                    merged = merged.simplify(pixel_deg, preserve_topology=True)
+                    merged = merged.simplify(pixel_deg * 0.5, preserve_topology=True)
                 else:
                     # Keep individual: farmland, grass, water, roads
                     merged_features.extend(poly_list)
@@ -1078,28 +1165,32 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
                 text_bytes = feature['text']
                 text_len = len(text_bytes)
-                # coordCount = ceil((4 + 1 + text_len) / 4) for skip compatibility
-                data_size = 4 + 1 + text_len  # x,y + text_len + text
+                has_shield = 'bg_color_rgb565' in feature
+                # data_size: x,y + text_len + text + (shield colors if present)
+                data_size = 4 + 1 + text_len + (4 if has_shield else 0)
                 coord_count = (data_size + 3) // 4
                 padded_size = coord_count * 4
 
                 bx = max(0, min(255, px >> 4))
                 by = max(0, min(255, py >> 4))
 
-                # Standard 12-byte header
+                # Header
                 f.write(struct.pack('<B', GEOM_TEXT))
                 f.write(struct.pack('<H', feature['color_rgb565']))
                 f.write(struct.pack('<B', feature['zoom_priority']))
                 f.write(struct.pack('<B', feature.get('font_size', 0)))
                 f.write(struct.pack('<BBBB', bx, by, bx, by))
                 f.write(struct.pack('<H', coord_count))
-                f.write(b'\x00')
+                f.write(struct.pack('<B', 1 if has_shield else 0))  # Shield flag
 
-                # Data: position + text
+                # Data: position + text + shield colors
                 f.write(struct.pack('<hh', px, py))
                 f.write(struct.pack('<B', text_len))
                 f.write(text_bytes)
-                # Pad to multiple of 4
+                if has_shield:
+                    f.write(struct.pack('<H', feature['bg_color_rgb565']))
+                    f.write(struct.pack('<H', feature['border_color_rgb565']))
+                # Pad
                 padding = padded_size - data_size
                 if padding > 0:
                     f.write(b'\x00' * padding)
@@ -1149,18 +1240,27 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                 polys = [part] if isinstance(part, Polygon) else list(part.geoms)
                                 for p in polys:
                                     if not p.is_empty and p.exterior and len(p.exterior.coords) >= 4:
-                                        rings = [list(p.exterior.coords)]
-                                        for interior in p.interiors:
+                                        # Simplify polygon AFTER clipping
+                                        simplified_poly = p.simplify(tolerance, preserve_topology=True)
+                                        if simplified_poly.is_empty or not simplified_poly.exterior:
+                                            continue
+                                        rings = [list(simplified_poly.exterior.coords)]
+                                        for interior in simplified_poly.interiors:
                                             if len(interior.coords) >= 4:
                                                 rings.append(list(interior.coords))
                                         final_features_data.append(rings)
                         else:
                             if isinstance(part, LineString) and len(part.coords) >= 2:
-                                final_features_data.append([list(part.coords)])
+                                # Simplify AFTER clipping with preserve_topology
+                                simplified = part.simplify(tolerance, preserve_topology=True)
+                                if len(simplified.coords) >= 2:
+                                    final_features_data.append([list(simplified.coords)])
                             elif isinstance(part, MultiLineString):
                                 for l in part.geoms:
                                     if len(l.coords) >= 2:
-                                        final_features_data.append([list(l.coords)])
+                                        simplified = l.simplify(tolerance, preserve_topology=True)
+                                        if len(simplified.coords) >= 2:
+                                            final_features_data.append([list(simplified.coords)])
                 except Exception as e:
                     # Clipping failed, use unclipped geometry as fallback
                     if is_polygon and inner_rings:
@@ -1203,16 +1303,20 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
                 if is_polygon:
                     pixel_area = (f_max_x - f_min_x) * (f_max_y - f_min_y) / (16 * 16)
-                    if zoom <= 9:
-                        min_area = K_VISIBILITY * 12
+                    if zoom <= 7:
+                        min_area = K_VISIBILITY * 8
+                    elif zoom == 8:
+                        min_area = K_VISIBILITY * 6  # z8 : très permissif (12 pixels²)
+                    elif zoom == 9:
+                        min_area = K_VISIBILITY * 8  # z9 : garde le bon niveau actuel
                     elif zoom <= 11:
                         min_area = K_VISIBILITY * 8
                     elif zoom == 12:
                         min_area = K_VISIBILITY * 5
                     elif zoom == 13:
                         min_area = K_VISIBILITY * 3
-                    else:
-                        min_area = K_VISIBILITY
+                    else:  # z14-16
+                        min_area = K_VISIBILITY * 0.5  # 1.0 px² - capture small leisure features
                     if pixel_area < min_area:
                         filtered_by_size += 1
                         continue
@@ -1231,7 +1335,19 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     else:
                         width_meters = feature.get('width_meters', 0.0)
                         width_pixels = meters_to_pixels(width_meters, zoom) if width_meters > 0 else 1
-                
+
+                # Mark roads that need casing (border rendering)
+                # Bit 7 (0x80) = needs_casing flag, bits 0-6 = actual width (0-127)
+                needs_casing = False
+                hw_type = feature.get('highway_type', '')
+                if hw_type in ('motorway', 'motorway_link', 'trunk', 'trunk_link', 'primary', 'primary_link'):
+                    needs_casing = True
+
+                # Encode width with casing flag
+                width_byte = min(width_pixels, 127)  # Clamp to 7 bits
+                if needs_casing:
+                    width_byte |= 0x80  # Set bit 7
+
                 bx1, by1 = max(0, min(255, f_min_x >> 4)), max(0, min(255, f_min_y >> 4))
                 bx2, by2 = max(0, min(255, f_max_x >> 4)), max(0, min(255, f_max_y >> 4))
 
@@ -1239,7 +1355,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 f.write(struct.pack('<B', feature['geom_type']))
                 f.write(struct.pack('<H', feature['color_rgb565']))
                 f.write(struct.pack('<B', feature['zoom_priority']))
-                f.write(struct.pack('<B', width_pixels))
+                f.write(struct.pack('<B', width_byte))  # Width + casing flag
                 f.write(struct.pack('<BBBB', bx1, by1, bx2, by2))
                 f.write(struct.pack('<H', total_points))
                 f.write(b'\x00')
@@ -1353,11 +1469,13 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
             if min_zoom > zoom:
                 continue
 
-            # Simplify once per zoom level
+            # Filter secondary roads without ref at z9 (keep only numbered departmental roads)
+            if zoom == 9 and feature.get('highway_type') == 'secondary' and not feature.get('has_ref'):
+                continue
+
+            # NOTE: Simplification moved AFTER clipping to avoid inter-tile gaps
             coords = feature['coords']
-            if len(coords) > 2:
-                coords = simplify_coords(coords, tolerance)
-            
+
             if not coords:
                 continue
 
@@ -1481,27 +1599,37 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
             labels_dropped_overlap = 0
 
             for tf in filtered_candidates:
-                lon, lat = tf['coords'][0]
                 text_len = len(tf['text'])
                 half_w = char_w * text_len / 2
                 half_h = label_h
 
-                box = (lon - half_w, lat - half_h, lon + half_w, lat + half_h)
+                # Road labels: try 3 candidate positions
+                candidates_to_try = tf.get('coords_candidates', [tf['coords'][0]])
+                placed = False
 
-                # Check overlap with placed label boxes
-                overlap = False
-                for pb in placed_boxes:
-                    if (box[0] < pb[2] and box[2] > pb[0] and
-                        box[1] < pb[3] and box[3] > pb[1]):
-                        overlap = True
+                for candidate_pos in candidates_to_try:
+                    lon, lat = candidate_pos
+                    box = (lon - half_w, lat - half_h, lon + half_w, lat + half_h)
+
+                    # Check overlap with placed label boxes
+                    overlap = False
+                    for pb in placed_boxes:
+                        if (box[0] < pb[2] and box[2] > pb[0] and
+                            box[1] < pb[3] and box[3] > pb[1]):
+                            overlap = True
+                            break
+
+                    if not overlap:
+                        # Found position without collision
+                        tf['coords'] = [(lon, lat)]
+                        placed_boxes.append(box)
+                        labels_placed += 1
+                        placed = True
                         break
 
-                if overlap:
+                if not placed:
                     labels_dropped_overlap += 1
                     continue
-
-                placed_boxes.append(box)
-                labels_placed += 1
 
                 # Distribute to tiles (including neighbors)
                 tiles = get_feature_tiles(tf['coords'], zoom, False)
@@ -1540,7 +1668,13 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                 tile_dir = os.path.join(output_dir, str(zoom), str(x))
                 tile_path = os.path.join(tile_dir, f"{y}.nav")
                 features.sort(key=lambda f: f['zoom_priority'] & 0x0F)
-                tile_jobs.append((features, tile_path, zoom, x, y))
+                # Debug: log first 5 priorities
+                if zoom == 15 and x == min_tx and y == min_ty:
+                    print(f"\nDebug tile {x},{y} z{zoom}: First 5 priorities:")
+                    for i, f in enumerate(features[:5]):
+                        prio = f['zoom_priority'] & 0x0F
+                        print(f"  {i}: priority={prio}, type={f['geom_type']}")
+                tile_jobs.append((features, tile_path, zoom, x, y, tolerance))
 
         completed = 0
         with ProcessPoolExecutor(max_workers=num_workers) as executor:

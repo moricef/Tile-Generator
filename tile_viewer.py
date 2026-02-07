@@ -82,6 +82,7 @@ class NavFeature:
         self.color_rgb565 = 0xFFFF
         self.zoom_priority = 0
         self.width = 1
+        self.needs_casing = False  # Bit 7 of width byte - for two-pass rendering
         self.bbox = (0, 0, 0, 0)
         self.coords: List[Tuple[int, int]] = []  # All points for all rings
         self.ring_ends: List[int] = []  # Indices where each ring ends
@@ -130,7 +131,12 @@ def read_nav_tile(path: str, tile_x: int, tile_y: int) -> List[NavFeature]:
                 feature.geom_type = struct.unpack('<B', f.read(1))[0]
                 feature.color_rgb565 = struct.unpack('<H', f.read(2))[0]
                 feature.zoom_priority = struct.unpack('<B', f.read(1))[0]
-                feature.width = struct.unpack('<B', f.read(1))[0]
+
+                # Width byte encoding: bit 7 = casing flag, bits 0-6 = actual width
+                width_byte = struct.unpack('<B', f.read(1))[0]
+                feature.needs_casing = (width_byte & 0x80) != 0
+                feature.width = width_byte & 0x7F
+
                 feature.bbox = struct.unpack('<BBBB', f.read(4))
                 coord_count = struct.unpack('<H', f.read(2))[0]
                 f.read(1)
@@ -262,31 +268,21 @@ class NAVViewer:
 
         self.cached_features = features # Update for identify_feature_at
 
-        # Group features by tile for clipped rendering
-        features_by_tile = {}
-        for f in features:
-            tile_key = (f.tile_x, f.tile_y)
-            if tile_key not in features_by_tile:
-                features_by_tile[tile_key] = []
-            features_by_tile[tile_key].append(f)
+        # CRITICAL FIX: Sort ALL features globally by priority before rendering
+        # This ensures proper Z-order (landuse/forests below, roads above)
+        features.sort(key=lambda f: f.priority)
 
-        center_x, center_y = deg2num(self.center_lat, self.center_lon, self.zoom)
-        tl_x, tl_y = center_x - 1.5, center_y - 1.5
+        # TWO-PASS RENDERING for professional road casing
+        # Pass 1: Draw road casings (borders) for roads marked with needs_casing flag
+        # This ensures all borders are below all road cores, creating smooth intersections
+        for feature in features:
+            if feature.geom_type == GEOM_LINESTRING and feature.needs_casing:
+                self._render_road_casing(surface, feature)
 
-        # Render each tile with its own clipping rect
-        for (tx, ty), tile_features in features_by_tile.items():
-            # Calculate tile viewport position
-            sx = int((tx - tl_x) * TILE_SIZE)
-            sy = int((ty - tl_y) * TILE_SIZE)
-            
-            # Set clip to this tile's 256x256 area
-            surface.set_clip(pygame.Rect(sx, sy, TILE_SIZE, TILE_SIZE))
-            
-            tile_features.sort(key=lambda f: f.priority)
-            for feature in tile_features:
-                self._render_feature(surface, feature)
-            
-            surface.set_clip(None)
+        # Pass 2: Render all features normally (including road cores)
+        # Low priority rendered first = below, high priority rendered last = above
+        for feature in features:
+            self._render_feature(surface, feature)
 
         if self.show_tile_grid:
             self._draw_tile_grid(surface)
@@ -301,6 +297,23 @@ class NAVViewer:
         fy = (ty - tl_y) + (py / 4096.0)
         
         return int(fx * TILE_SIZE), int(fy * TILE_SIZE)
+
+    def _render_road_casing(self, surface: pygame.Surface, feature: NavFeature):
+        """Render road casing (border) for two-pass rendering - Pass 1 only."""
+        if not feature.coords or len(feature.coords) < 2:
+            return
+
+        # Convert coordinates to screen space
+        pts = [self._tile_coord_to_screen(feature.tile_x, feature.tile_y, x, y)
+               for x, y in feature.coords]
+
+        # Get road color and darken it for the casing
+        road_color = rgb565_to_rgb888(feature.color_rgb565)
+        casing_color = darken_color(road_color, amount=0.3)  # 30% darker than road color
+
+        # Draw casing: wider than the road core
+        casing_width = feature.width + 2
+        pygame.draw.lines(surface, casing_color, False, pts, casing_width)
 
     def _render_feature(self, surface: pygame.Surface, feature: NavFeature):
         if not feature.coords: return
@@ -331,6 +344,7 @@ class NAVViewer:
         elif feature.geom_type == GEOM_LINESTRING:
             pts = [self._tile_coord_to_screen(feature.tile_x, feature.tile_y, x, y) for x, y in feature.coords]
             if len(pts) >= 2:
+                # Draw road core (casing already drawn in pass 1 for roads with needs_casing flag)
                 pygame.draw.lines(surface, color, False, pts, max(1, feature.width))
 
         elif feature.geom_type == GEOM_POLYGON:
