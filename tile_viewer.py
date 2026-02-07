@@ -168,7 +168,7 @@ def read_nav_tile(path: str, tile_x: int, tile_y: int) -> List[NavFeature]:
 
 class NAVViewer:
     """Main viewer application logic."""
-    def __init__(self, nav_dir: str):
+    def __init__(self, nav_dir: str, config_file: Optional[str] = None):
         self.nav_dir = nav_dir
         self.available_zooms: Set[int] = set()
         self._index_tiles()
@@ -179,12 +179,21 @@ class NAVViewer:
         self.background_color = (255, 255, 255)
         self.fill_polygons = True
         self.show_tile_grid = False
-        
+
         self.last_query_stats = {}
         self.cached_features: Optional[List[NavFeature]] = None
         self.selected_feature = None
         self.last_viewport_key = None
         self.cached_query_features: List[NavFeature] = []
+
+        # New: Priority filter
+        self.priority_filter_min = 0
+        self.priority_filter_max = 15
+
+        # New: Color to OSM tag mapping
+        self.color_to_tags: Dict[str, List[str]] = {}
+        if config_file:
+            self._load_config(config_file)
 
     def _index_tiles(self):
         """Build an index of available zoom levels on disk."""
@@ -193,6 +202,33 @@ class NAVViewer:
         for name in os.listdir(self.nav_dir):
             if name.isdigit() and os.path.isdir(os.path.join(self.nav_dir, name)):
                 self.available_zooms.add(int(name))
+
+    def _load_config(self, config_file: str):
+        """Load features.json and build color to tag mapping."""
+        try:
+            import json
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+
+            # Build reverse mapping: RGB565 hex → OSM tags
+            for tag, props in config.items():
+                if isinstance(props, dict) and 'color' in props:
+                    hex_color = props['color']
+                    # Convert to RGB565 hex
+                    r = int(hex_color[1:3], 16)
+                    g = int(hex_color[3:5], 16)
+                    b = int(hex_color[5:7], 16)
+                    rgb565 = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3)
+                    rgb888 = rgb565_to_rgb888(rgb565)
+                    color_key = f"#{rgb888[0]:02x}{rgb888[1]:02x}{rgb888[2]:02x}"
+
+                    if color_key not in self.color_to_tags:
+                        self.color_to_tags[color_key] = []
+                    self.color_to_tags[color_key].append(tag)
+
+            logger.info(f"Loaded {len(self.color_to_tags)} unique colors from config")
+        except Exception as e:
+            logger.warning(f"Could not load config file: {e}")
 
     def _get_tiles_for_viewport(self) -> List[Tuple[int, int]]:
         """Identify which tiles are needed to cover the 768x768 viewport."""
@@ -267,6 +303,9 @@ class NAVViewer:
             return
 
         self.cached_features = features # Update for identify_feature_at
+
+        # New: Apply priority filter
+        features = [f for f in features if self.priority_filter_min <= f.priority <= self.priority_filter_max]
 
         # CRITICAL FIX: Sort ALL features globally by priority before rendering
         # This ensures proper Z-order (landuse/forests below, roads above)
@@ -350,15 +389,18 @@ class NAVViewer:
         elif feature.geom_type == GEOM_POLYGON:
             rings = feature.get_rings()
             if not rings: return
-            
-            # First ring is exterior, others are holes
+
+            # Only draw exterior ring (first ring)
+            # Inner rings (holes) are NOT drawn - they stay transparent
+            # This allows features below to show through (e.g., islands in rivers)
             for i, ring in enumerate(rings):
+                if i > 0 and self.fill_polygons:
+                    continue  # Skip holes when filling (keep transparent)
+
                 pts = [self._tile_coord_to_screen(feature.tile_x, feature.tile_y, x, y) for x, y in ring]
                 if len(pts) >= 3:
                     if self.fill_polygons:
-                        # Draw exterior with feature color, holes with background color
-                        ring_color = color if i == 0 else self.background_color
-                        pygame.draw.polygon(surface, ring_color, pts)
+                        pygame.draw.polygon(surface, color, pts, 0)  # 0 = filled
                     else:
                         pygame.draw.polygon(surface, color, pts, 1)
 
@@ -388,14 +430,46 @@ class NAVViewer:
         for feature in reversed(self.cached_features):
             if self._point_in_feature(fx, fy, feature):
                 bx1, by1, bx2, by2 = feature.bbox
+                color_hex = f"#{rgb565_to_rgb888(feature.color_rgb565)[0]:02x}{rgb565_to_rgb888(feature.color_rgb565)[1]:02x}{rgb565_to_rgb888(feature.color_rgb565)[2]:02x}"
+
+                # Find OSM tags from color
+                osm_tags = self.color_to_tags.get(color_hex, ['unknown'])
+
                 return {
-                    'type': ['?', 'Point', 'Line', 'Polygon'][feature.geom_type],
-                    'color': f"#{rgb565_to_rgb888(feature.color_rgb565)[0]:02x}{rgb565_to_rgb888(feature.color_rgb565)[1]:02x}{rgb565_to_rgb888(feature.color_rgb565)[2]:02x}",
+                    'type': ['?', 'Point', 'Line', 'Polygon', 'Text'][feature.geom_type if feature.geom_type < 5 else 0],
+                    'color': color_hex,
+                    'tags': ', '.join(osm_tags[:3]),  # Show up to 3 tags
                     'zoom': feature.min_zoom,
+                    'priority': feature.priority,
                     'pts': len(feature.coords),
                     'bbox': f"({bx1},{by1})-({bx2},{by2})"
                 }
         return None
+
+    def get_feature_stats(self) -> Dict:
+        """Calculate detailed statistics about loaded features."""
+        if not self.cached_features:
+            return {}
+
+        stats = {
+            'by_type': {},
+            'by_priority': {},
+            'by_color': {},
+        }
+
+        for f in self.cached_features:
+            # By type
+            type_name = ['?', 'Point', 'Line', 'Polygon', 'Text'][f.geom_type if f.geom_type < 5 else 0]
+            stats['by_type'][type_name] = stats['by_type'].get(type_name, 0) + 1
+
+            # By priority
+            stats['by_priority'][f.priority] = stats['by_priority'].get(f.priority, 0) + 1
+
+            # By color
+            color_hex = f"#{rgb565_to_rgb888(f.color_rgb565)[0]:02x}{rgb565_to_rgb888(f.color_rgb565)[1]:02x}{rgb565_to_rgb888(f.color_rgb565)[2]:02x}"
+            stats['by_color'][color_hex] = stats['by_color'].get(color_hex, 0) + 1
+
+        return stats
 
     def _point_in_feature(self, fx: float, fy: float, feature: NavFeature) -> bool:
         # Convert feature to global tile units for intersection test
@@ -435,6 +509,7 @@ def main():
     parser.add_argument('--lat', type=float, required=True, help='Center latitude')
     parser.add_argument('--lon', type=float, required=True, help='Center longitude')
     parser.add_argument('--zoom', type=int, default=14, help='Zoom level')
+    parser.add_argument('--config', type=str, help='Features JSON config file (optional, for OSM tag mapping)')
 
     args = parser.parse_args()
 
@@ -442,7 +517,7 @@ def main():
         logger.error("pygame required")
         sys.exit(1)
 
-    viewer = NAVViewer(args.nav_dir)
+    viewer = NAVViewer(args.nav_dir, args.config)
     viewer.set_center(args.lat, args.lon, args.zoom)
 
     pygame.init()
@@ -462,6 +537,17 @@ def main():
     bg_button_rect = pygame.Rect(VIEWPORT_SIZE + 10, button_margin, button_width, button_height)
     fill_button_rect = pygame.Rect(VIEWPORT_SIZE + 10, button_margin * 2 + button_height, button_width, button_height)
     grid_button_rect = pygame.Rect(VIEWPORT_SIZE + 10, button_margin * 3 + button_height * 2, button_width, button_height)
+    stats_button_rect = pygame.Rect(VIEWPORT_SIZE + 10, button_margin * 4 + button_height * 3, button_width, button_height)
+    legend_button_rect = pygame.Rect(VIEWPORT_SIZE + 10, button_margin * 5 + button_height * 4, button_width, button_height)
+
+    # Priority filter sliders
+    slider_y_base = button_margin * 6 + button_height * 5 + 40
+    slider_height = 20
+    min_priority_slider_rect = pygame.Rect(VIEWPORT_SIZE + 10, slider_y_base, button_width, slider_height)
+    max_priority_slider_rect = pygame.Rect(VIEWPORT_SIZE + 10, slider_y_base + 40, button_width, slider_height)
+
+    show_stats_window = False
+    show_legend_window = False
 
     dragging = False
     drag_start = None
@@ -509,6 +595,18 @@ def main():
                 elif event.key == pygame.K_g:
                     viewer.show_tile_grid = not viewer.show_tile_grid
                     need_redraw = True
+                elif event.key == pygame.K_r:
+                    # Force reload tiles (clear cache)
+                    viewer.last_viewport_key = None
+                    need_redraw = True
+                elif event.key == pygame.K_s:
+                    show_stats_window = not show_stats_window
+                    show_legend_window = False  # Close legend if stats opened
+                    need_redraw = True
+                elif event.key == pygame.K_l:
+                    show_legend_window = not show_legend_window
+                    show_stats_window = False  # Close stats if legend opened
+                    need_redraw = True
                 elif event.key in (pygame.K_q, pygame.K_ESCAPE):
                     running = False
 
@@ -524,6 +622,22 @@ def main():
                         need_redraw = True
                     elif grid_button_rect.collidepoint(mx, my):
                         viewer.show_tile_grid = not viewer.show_tile_grid
+                        need_redraw = True
+                    elif stats_button_rect.collidepoint(mx, my):
+                        show_stats_window = not show_stats_window
+                        need_redraw = True
+                    elif legend_button_rect.collidepoint(mx, my):
+                        show_legend_window = not show_legend_window
+                        need_redraw = True
+                    elif min_priority_slider_rect.collidepoint(mx, my):
+                        # Set min priority from slider position
+                        ratio = (mx - min_priority_slider_rect.x) / min_priority_slider_rect.width
+                        viewer.priority_filter_min = int(ratio * 15)
+                        need_redraw = True
+                    elif max_priority_slider_rect.collidepoint(mx, my):
+                        # Set max priority from slider position
+                        ratio = (mx - max_priority_slider_rect.x) / max_priority_slider_rect.width
+                        viewer.priority_filter_max = int(ratio * 15)
                         need_redraw = True
                     elif mx < VIEWPORT_SIZE and my < VIEWPORT_SIZE:
                         dragging = True
@@ -588,8 +702,31 @@ def main():
             grid_text = f"Grid: {'ON' if viewer.show_tile_grid else 'OFF'}"
             draw_button(screen, grid_text, grid_button_rect, button_bg, button_fg, button_border, font_small)
 
-            info_y = button_margin * 4 + button_height * 3 + 20
+            stats_text = "Stats" + (" ✓" if show_stats_window else "")
+            draw_button(screen, stats_text, stats_button_rect, button_bg, button_fg, button_border, font_small)
+
+            legend_text = "Legend" + (" ✓" if show_legend_window else "")
+            draw_button(screen, legend_text, legend_button_rect, button_bg, button_fg, button_border, font_small)
+
             info_color = (200, 200, 200)
+
+            # Priority filter sliders
+            slider_label_y = slider_y_base - 25
+            screen.blit(font_small.render("Priority Filter:", True, info_color), (VIEWPORT_SIZE + 10, slider_label_y))
+
+            # Min slider
+            pygame.draw.rect(screen, (60, 60, 60), min_priority_slider_rect)
+            min_handle_x = VIEWPORT_SIZE + 10 + int((viewer.priority_filter_min / 15) * button_width)
+            pygame.draw.circle(screen, (150, 150, 255), (min_handle_x, slider_y_base + slider_height // 2), 8)
+            screen.blit(font_small.render(f"Min: {viewer.priority_filter_min}", True, (150, 150, 150)), (VIEWPORT_SIZE + 10, slider_y_base + 22))
+
+            # Max slider
+            pygame.draw.rect(screen, (60, 60, 60), max_priority_slider_rect)
+            max_handle_x = VIEWPORT_SIZE + 10 + int((viewer.priority_filter_max / 15) * button_width)
+            pygame.draw.circle(screen, (255, 150, 150), (max_handle_x, slider_y_base + 40 + slider_height // 2), 8)
+            screen.blit(font_small.render(f"Max: {viewer.priority_filter_max}", True, (150, 150, 150)), (VIEWPORT_SIZE + 10, slider_y_base + 62))
+
+            info_y = slider_y_base + 100
 
             screen.blit(font_small.render(f"Lat: {viewer.center_lat:.6f}", True, info_color), (VIEWPORT_SIZE + 10, info_y))
             screen.blit(font_small.render(f"Lon: {viewer.center_lon:.6f}", True, info_color), (VIEWPORT_SIZE + 10, info_y + 18))
@@ -606,15 +743,58 @@ def main():
 
             # Feature Identification (Right-click)
             feature_y = stats_y + 80
-            screen.blit(font_small.render("Selected Feature:", True, info_color), (VIEWPORT_SIZE + 10, feature_y))
-            if viewer.selected_feature:
-                line_y = feature_y + 18
-                for key, value in viewer.selected_feature.items():
-                    text = f"  {key}: {value}"
-                    screen.blit(font_small.render(text, True, (100, 200, 100)), (VIEWPORT_SIZE + 10, line_y))
+            if not show_stats_window and not show_legend_window:
+                screen.blit(font_small.render("Selected Feature:", True, info_color), (VIEWPORT_SIZE + 10, feature_y))
+                if viewer.selected_feature:
+                    line_y = feature_y + 18
+                    for key, value in viewer.selected_feature.items():
+                        text = f"  {key}: {value}"
+                        screen.blit(font_small.render(text, True, (100, 200, 100)), (VIEWPORT_SIZE + 10, line_y))
+                        line_y += 14
+                else:
+                    screen.blit(font_small.render("  (Right-click to select)", True, (100, 100, 100)), (VIEWPORT_SIZE + 10, feature_y + 18))
+
+            # Stats window
+            elif show_stats_window:
+                feature_stats = viewer.get_feature_stats()
+                screen.blit(font_small.render("Feature Statistics:", True, (255, 255, 100)), (VIEWPORT_SIZE + 10, feature_y))
+                line_y = feature_y + 20
+
+                screen.blit(font_small.render("By Type:", True, info_color), (VIEWPORT_SIZE + 10, line_y))
+                line_y += 15
+                for type_name, count in sorted(feature_stats.get('by_type', {}).items()):
+                    screen.blit(font_small.render(f"  {type_name}: {count}", True, (150, 150, 150)), (VIEWPORT_SIZE + 15, line_y))
+                    line_y += 13
+
+                line_y += 5
+                screen.blit(font_small.render("By Priority:", True, info_color), (VIEWPORT_SIZE + 10, line_y))
+                line_y += 15
+                for priority, count in sorted(feature_stats.get('by_priority', {}).items()):
+                    screen.blit(font_small.render(f"  P{priority}: {count}", True, (150, 150, 150)), (VIEWPORT_SIZE + 15, line_y))
+                    line_y += 13
+                    if line_y > VIEWPORT_SIZE - 20: break
+
+            # Legend window
+            elif show_legend_window:
+                screen.blit(font_small.render("Color Legend:", True, (255, 255, 100)), (VIEWPORT_SIZE + 10, feature_y))
+                line_y = feature_y + 20
+
+                feature_stats = viewer.get_feature_stats()
+                sorted_colors = sorted(feature_stats.get('by_color', {}).items(), key=lambda x: -x[1])[:15]  # Top 15
+
+                for color_hex, count in sorted_colors:
+                    # Draw color swatch
+                    r = int(color_hex[1:3], 16)
+                    g = int(color_hex[3:5], 16)
+                    b = int(color_hex[5:7], 16)
+                    pygame.draw.rect(screen, (r, g, b), (VIEWPORT_SIZE + 10, line_y, 15, 12))
+
+                    # Draw tags
+                    tags = viewer.color_to_tags.get(color_hex, ['?'])
+                    tag_text = tags[0] if len(tags) == 1 else f"{tags[0]}..."
+                    screen.blit(font_small.render(f"{tag_text} ({count})", True, (150, 150, 150)), (VIEWPORT_SIZE + 30, line_y))
                     line_y += 14
-            else:
-                screen.blit(font_small.render("  (Right-click to select)", True, (100, 100, 100)), (VIEWPORT_SIZE + 10, feature_y + 18))
+                    if line_y > VIEWPORT_SIZE - 20: break
 
             # Status Bar
             pygame.draw.rect(screen, (30, 30, 30), (0, VIEWPORT_SIZE, WINDOW_WIDTH, STATUSBAR_HEIGHT))
