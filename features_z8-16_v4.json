@@ -189,7 +189,7 @@
   },
   "leisure=pitch": {
     "zoom": 14,
-    "color": "#88e0be",
+    "color": "#8cd6b8",
     "priority": 25
   },
   "leisure=playground": {
@@ -204,17 +204,17 @@
   },
   "leisure=sports_centre": {
     "zoom": 12,
-    "color": "#c8facc",
+    "color": "#33cc99",
     "priority": 25
   },
   "leisure=sports_hall": {
     "zoom": 12,
-    "color": "#c8facc",
+    "color": "#33cc99",
     "priority": 25
   },
   "leisure=stadium": {
     "zoom": 11,
-    "color": "#c8facc",
+    "color": "#33cc99",
     "priority": 25
   },
   "leisure=swimming_pool": {
