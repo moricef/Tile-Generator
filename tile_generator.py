@@ -905,11 +905,12 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
         from shapely.ops import unary_union as shapely_unary_union
 
         # Area filter thresholds (applied to ALL polygons before grouping)
-        # OpenMapTiles formula × 3.0 for all zooms < 14
+        # OpenMapTiles formula with zoom-adapted multipliers
         min_area_deg2 = 0.0
         if zoom < 14:
             zres_prev = 360.0 / (2**(zoom - 1) * 256)
-            min_area_deg2 = (zres_prev ** 2) * 3.0  # 3× OpenMapTiles standard
+            multiplier = 4.0 if zoom <= 9 else 3.0
+            min_area_deg2 = (zres_prev ** 2) * multiplier
 
         polygons_by_style = defaultdict(list)
         other_features = []
