@@ -8,7 +8,7 @@
     "priority": 22
   },
   "natural=grassland": {
-    "zoom": 10,
+    "zoom": 9,
     "color": "#cdebb0",
     "priority": 66
   },
@@ -28,22 +28,22 @@
     "priority": 22
   },
   "natural=wood": {
-    "zoom": 10,
+    "zoom": 8,
     "color": "#add19e",
     "priority": 22
   },
   "natural=forest": {
-    "zoom": 10,
+    "zoom": 8,
     "color": "#add19e",
     "priority": 22
   },
   "landuse=farmland": {
-    "zoom": 10,
+    "zoom": 9,
     "color": "#eef0d6",
     "priority": 23
   },
   "landuse=grass": {
-    "zoom": 10,
+    "zoom": 9,
     "color": "#cdebb0",
     "priority": 23
   },
