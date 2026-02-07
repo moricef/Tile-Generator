@@ -900,11 +900,27 @@ class OSMHandler(osmium.SimpleHandler):
                 coords = list(poly.exterior.coords)
                 if len(coords) < 4:
                     continue
-                # Keep inner_rings for water (islands), strip for landcover (pitting artifacts)
-                if layer == 'water':
-                    inner_rings = [list(interior.coords) for interior in poly.interiors if len(interior.coords) >= 4]
-                else:
-                    inner_rings = []
+
+                # Filter inner_rings by size to prevent "pitting" while preserving structural holes
+                # Always keep holes for water (islands), filter small holes for other layers
+                inner_rings = []
+                if poly.interiors:
+                    # Calculate minimum hole size: ~5 pixels at current zoom
+                    # (prevents tiny artifacts while preserving stadiums, plazas, etc.)
+                    tile_width_deg = 360.0 / (2.0 ** min_zoom)
+                    pixel_deg = tile_width_deg / 256.0
+                    min_hole_area = (pixel_deg * 5) ** 2  # 5x5 pixels
+
+                    for interior in poly.interiors:
+                        if len(interior.coords) < 4:
+                            continue
+                        # Always keep water holes (islands), filter others by size
+                        if layer == 'water':
+                            inner_rings.append(list(interior.coords))
+                        else:
+                            hole_poly = ShapelyPolygon(interior.coords)
+                            if hole_poly.area >= min_hole_area:
+                                inner_rings.append(list(interior.coords))
 
                 self.features.append({
                     'geom_type': GEOM_POLYGON,
