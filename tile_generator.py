@@ -727,6 +727,11 @@ class OSMHandler(osmium.SimpleHandler):
         }
         
         has_area_tag = any(k in tags for k in area_qualifiers)
+        # Explicitly force area for specific water body tags
+        if tags.get('natural') == 'bay' or \
+           tags.get('landuse') == 'reservoir' or \
+           tags.get('waterway') == 'riverbank':
+            has_area_tag = True
         is_area_tags = is_closed and (has_area_tag or tags.get('area') == 'yes')
 
         color = get_color_for_tags(tags, self.config)
@@ -762,6 +767,11 @@ class OSMHandler(osmium.SimpleHandler):
         width_meters = 0.0
         if any(tag in tags for tag in WIDTH_TAGS):
             width_meters = self._get_width_meters(tags)
+
+        # Do not draw centerlines for wide water bodies (polygons should be used instead)
+        if layer == 'water' and width_meters >= 2.0:
+            self.stats['features_filtered'] += 1
+            return
 
         # Store line type for zoom-based width lookup
         highway_type = tags.get('highway', '') or tags.get('railway', '')
@@ -888,7 +898,10 @@ class OSMHandler(osmium.SimpleHandler):
             return
 
         # Force water layer identity for correct hole processing (islands)
-        if tags.get('natural') == 'water' or 'waterway' in tags:
+        if (tags.get('natural') == 'water' or 
+            tags.get('natural') == 'bay' or
+            tags.get('waterway') == 'riverbank' or 
+            tags.get('landuse') == 'reservoir'):
             layer = 'water'
 
         # Removed the 'highway in tags' filter that was causing issues
