@@ -205,9 +205,7 @@ LAYER_MAPPING = {
         'aeroway=aerodrome', 'aeroway=apron', 'aeroway=helipad', 'aeroway=hangar', 'aeroway=runway', 'aeroway=taxiway',
         'leisure=nature_reserve', 'leisure=garden',
         'leisure=recreation_ground', 'landuse=recreation_ground',
-        'landuse=residential', 'place=suburb',
-        'place=isolated_dwelling', 'place=locality', 'place=neighbourhood',
-        'place=quarter', 'place=farm',
+        'landuse=residential',
         'landuse=commercial', 'landuse=retail', 'landuse=industrial',
         'landuse=construction', 'landuse=cemetery', 'landuse=allotments',
         'amenity=parking', 'leisure=common', 'landuse=village_green',
@@ -341,24 +339,32 @@ def get_config_value_for_tags(
     default: Any
 ) -> Any:
     """
-    Generic helper to get configuration values for feature tags.
-    
-    Args:
-        tags: Dictionary of OSM tags (key: value pairs)
-        config: Configuration dictionary with feature settings
-        attribute: The attribute to retrieve from config (e.g., 'zoom', 'color', 'priority')
-        default: Default value if nothing found
-        
-    Returns:
-        The configured value for attribute, or default if not found
+    Generic helper to get configuration values for feature tags, with key priority.
     """
+    preferred_keys = ['natural', 'waterway', 'highway', 'railway', 'water']
+
+    # 1. Prioritize preferred keys
+    for key in preferred_keys:
+        if key in tags:
+            value = tags[key]
+            # Try exact match first (key=value)
+            feature_key = f"{key}={value}"
+            if feature_key in config and isinstance(config[feature_key], dict):
+                return config[feature_key].get(attribute, default)
+            
+            # Then try key-only match
+            if key in config and isinstance(config[key], dict):
+                return config[key].get(attribute, default)
+
+    # 2. Check remaining tags
     for key, value in tags.items():
-        # Try exact match first (key=value)
+        if key in preferred_keys:
+            continue
+        
         feature_key = f"{key}={value}"
         if feature_key in config and isinstance(config[feature_key], dict):
             return config[feature_key].get(attribute, default)
         
-        # Then try key-only match
         if key in config and isinstance(config[key], dict):
             return config[key].get(attribute, default)
     
@@ -810,9 +816,9 @@ class OSMHandler(osmium.SimpleHandler):
                     pass  # Invalid D-road format, skip
 
             if should_create_label:
-                # Space out labels: only create one every 10 segments
+                # Space out labels: only create one every 25 segments
                 self.road_label_counters[ref] += 1
-                if self.road_label_counters[ref] % 100 == 1:
+                if self.road_label_counters[ref] % 25 == 1:
                     # Generate 3 candidate positions (25%, 50%, 75%) for collision avoidance
                     candidates = []
                     for ratio in [0.25, 0.5, 0.75]:
@@ -881,6 +887,10 @@ class OSMHandler(osmium.SimpleHandler):
         if layer is None:
             self.stats['area_no_layer'] += 1
             return
+
+        # Force water layer identity for correct hole processing (islands)
+        if tags.get('natural') == 'water' or 'waterway' in tags:
+            layer = 'water'
 
         # Removed the 'highway in tags' filter that was causing issues
 
