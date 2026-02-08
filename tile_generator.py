@@ -189,7 +189,8 @@ LAYER_MAPPING = {
         'waterway=river', 'waterway=stream', 'waterway=canal',
         'waterway=ditch', 'waterway=drain',
         'natural=spring', 'natural=wetland',
-        'water=river', 'water=canal', 'water=reservoir', 'water=pond', 'water=lake', 'water=basin'
+        'water=river', 'water=canal', 'water=reservoir', 'water=pond', 'water=lake', 'water=basin',
+        'landuse=reservoir'
     ],
     'islands': [
         'place=island', 'place=islet'
@@ -210,7 +211,7 @@ LAYER_MAPPING = {
         'landuse=construction', 'landuse=cemetery', 'landuse=allotments',
         'amenity=parking', 'leisure=common', 'landuse=village_green',
         'landuse=quarry', 'landuse=military', 'landuse=landfill', 'landuse=brownfield',
-        'landuse=basin', 'landuse=reservoir', 'landuse=railway', 'landuse=education',
+        'landuse=basin', 'landuse=railway', 'landuse=education',
         'landuse=garages', 'landuse=flowerbed'
     ],
     'roads': [
@@ -320,6 +321,10 @@ def get_feature_tiles(coords: List[Tuple[float, float]], zoom: int, is_polygon: 
 
 def get_layer_for_tags(tags: Dict[str, str]) -> Optional[str]:
     """Determine which layer a feature belongs to based on its tags."""
+    # Explicit rule for deprecated but common tag
+    if tags.get('landuse') == 'reservoir':
+        return 'water'
+
     for layer_name, feature_keys in LAYER_MAPPING.items():
         for feature_key in feature_keys:
             if '=' in feature_key:
