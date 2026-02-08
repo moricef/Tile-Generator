@@ -322,7 +322,10 @@ def get_feature_tiles(coords: List[Tuple[float, float]], zoom: int, is_polygon: 
 def get_layer_for_tags(tags: Dict[str, str]) -> Optional[str]:
     """Determine which layer a feature belongs to based on its tags."""
     # Explicit rule for deprecated but common tag
-    if tags.get('landuse') == 'reservoir':
+    if (tags.get('natural') == 'water' or 
+        'waterway' in tags or 
+        tags.get('water') == 'reservoir' or 
+        tags.get('landuse') == 'reservoir'):
         return 'water'
 
     for layer_name, feature_keys in LAYER_MAPPING.items():
@@ -427,11 +430,9 @@ def darken_rgb565(color: int, factor: float = 0.4) -> int:
     return ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3)
 
 
-def pack_zoom_priority(min_zoom: int, priority: int) -> int:
+def pack_zoom_priority(min_zoom: int, priority_nibble: int) -> int:
     """Pack min_zoom and priority into a single byte."""
-    zoom_nibble = min(min_zoom, 15) & 0x0F
-    priority_nibble = min(priority // 7, 15) & 0x0F
-    return (zoom_nibble << 4) | priority_nibble
+    return (min(min_zoom, 15) << 4) | (min(priority_nibble, 15) & 0x0F)
 
 
 def get_simplify_tolerance(zoom: int) -> float:
@@ -767,30 +768,23 @@ class OSMHandler(osmium.SimpleHandler):
         ref = tags.get('ref', '')
         old_ref = tags.get('old_ref', '')
         
-        # 1. On récupère la base de la couche (ex: roads=55, water=30 dans LAYER_PRIORITY)
-        layer_base = LAYER_PRIORITY.get(layer, 55)
-        
-        # 2. On récupère la priorité spécifique de ton fichier JSON (ex: motorway=55)
-        json_priority = get_priority_for_tags(tags, self.config)
-
-        # 3. Calcul de la priorité finale dynamique
-        if tags.get('bridge') in ('yes', 'viaduct', 'bridge'):
-            # Pont : au-dessus de tout (on vise le nibble 14 ou 15)
-            combined_priority = 100 + (json_priority % 10)
-        elif tags.get('tunnel') in ('yes', 'culvert'):
-            # Tunnel : sous le sol et l'eau (on vise le nibble 1 ou 2)
-            combined_priority = 5 + (json_priority % 10)
-        else:
-            # Route normale : hiérarchisée selon le type (on vise le nibble 7 à 13)
-            # On utilise le layer_base (55) et on ajoute une nuance selon le type de route
-            combined_priority = layer_base + (json_priority // 5)
+        # Fixed Z-order (nibble) for rendering priority
+        priority_map = {
+            'motorway': 13, 'trunk': 12, 'primary': 12, 'secondary': 12,
+            'tertiary': 11, 'unclassified': 11, 'residential': 11, 'living_street': 11,
+            'motorway_link': 9, 'trunk_link': 9, 'primary_link': 9, 'secondary_link': 9, 'tertiary_link': 9,
+            'service': 8, 'track': 8
+        }
+        nibble = priority_map.get(highway_type, 10)  # default for other roads/paths
+        if tags.get('bridge') in ('yes', 'viaduct'): nibble = 15
+        if tags.get('tunnel') in ('yes', 'culvert'): nibble = 1
 
         feature = {
             'id': w.id,
             'geom_type': GEOM_LINESTRING,
             'coords': coords,
             'color_rgb565': color_rgb565,
-            'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
+            'zoom_priority': pack_zoom_priority(min_zoom, nibble),
             'width_meters': width_meters,
             'highway_type': highway_type,
             'has_ref': bool(ref),
@@ -915,10 +909,11 @@ class OSMHandler(osmium.SimpleHandler):
                     return
 
             color = get_color_for_tags(tags, self.config)
-            priority = get_priority_for_tags(tags, self.config)
             color_rgb565 = hex_to_rgb565(color)
-            layer_base_priority = LAYER_PRIORITY.get(layer, 50)
-            combined_priority = layer_base_priority + (priority % 10)
+
+            # Fixed Z-order (nibble) for polygon layers
+            layer_to_nibble = {'water': 5, 'leisure': 4, 'amenities': 4, 'terrain': 3, 'landuse': 2}
+            nibble = layer_to_nibble.get(layer, 2)  # default to landuse layer
 
             # Extract subclass for landcover discrimination (wood/forest vs farmland)
             subclass = tags.get('natural', '') or tags.get('landuse', '') or tags.get('leisure', '')
@@ -978,7 +973,7 @@ class OSMHandler(osmium.SimpleHandler):
                     'geom_type': GEOM_POLYGON,
                     'coords': coords,
                     'color_rgb565': color_rgb565,
-                    'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
+                    'zoom_priority': pack_zoom_priority(min_zoom, nibble),
                     'width_meters': 0.0,
                     'inner_rings': inner_rings,
                     'subclass': subclass,  # Store for merge logic
