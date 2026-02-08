@@ -104,28 +104,29 @@ WIDTH_TAGS = {'highway', 'railway', 'waterway'}
 # Fixed width in pixels per feature type and zoom level (OSM Carto style)
 # Format: type_value -> {zoom: pixels}
 LINE_WIDTH_PER_ZOOM = {
-    # Highway
-    'motorway':      {8: 2, 9: 2, 10: 2, 11: 2, 12: 3, 13: 4, 14: 5, 15: 6, 16: 7},
-    'motorway_link': {8: 1, 9: 1, 10: 1, 11: 1, 12: 2, 13: 2, 14: 3, 15: 3, 16: 4},
-    'trunk':         {8: 2, 9: 2, 10: 2, 11: 2, 12: 3, 13: 3, 14: 4, 15: 5, 16: 6},
-    'trunk_link':    {8: 1, 9: 1, 10: 1, 11: 1, 12: 2, 13: 2, 14: 3, 15: 3, 16: 4},
-    'primary':       {8: 1, 9: 1, 10: 1, 11: 2, 12: 2, 13: 3, 14: 4, 15: 5, 16: 6},
-    'primary_link':  {8: 1, 9: 1, 10: 1, 11: 1, 12: 2, 13: 2, 14: 3, 15: 3, 16: 4},
-    'secondary':     {8: 1, 9: 1, 10: 1, 11: 1, 12: 2, 13: 2, 14: 3, 15: 4, 16: 5},
-    'secondary_link':{8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 2, 14: 2, 15: 3, 16: 4},
-    'tertiary':      {                         12: 1, 13: 2, 14: 2, 15: 3, 16: 4},
-    'tertiary_link': {                         12: 1, 13: 1, 14: 2, 15: 2, 16: 3},
-    'residential':   {                         12: 1, 13: 1, 14: 2, 15: 2, 16: 3},
-    'living_street': {                                13: 1, 14: 1, 15: 2, 16: 2},
-    'unclassified':  {                         12: 1, 13: 1, 14: 2, 15: 2, 16: 3},
-    'service':       {                                       14: 1, 15: 1, 16: 2},
-    'track':         {                                       14: 1, 15: 1, 16: 1},
-    # Railway
-    'rail':          {8: 1, 9: 1, 10: 1, 11: 1, 12: 2, 13: 3, 14: 3, 15: 3, 16: 4},
-    'subway':        {                         12: 1, 13: 2, 14: 2, 15: 2, 16: 3},
-    'tram':          {                         12: 1, 13: 1, 14: 2, 15: 2, 16: 3},
-    'narrow_gauge':  {                                13: 1, 14: 2, 15: 2, 16: 2},
-    'funicular':     {                                13: 1, 14: 2, 15: 2, 16: 2},
+    # Highway (widths increased for visible casing at z11+)
+    # Casing needs ≥10px to be visible (2px border each side)
+    'motorway':      {8: 3,  9: 4,  10: 7,  11: 8,  12: 9,  13: 10, 14: 12, 15: 14, 16: 16},
+    'motorway_link': {8: 2,  9: 2,  10: 3,  11: 8,  12: 9,  13: 10, 14: 11, 15: 9,  16: 12},
+    'trunk':         {8: 3,  9: 4,  10: 6,  11: 10, 12: 9,  13: 10, 14: 16, 15: 13, 16: 14},
+    'trunk_link':    {8: 2,  9: 2,  10: 3,  11: 5,  12: 7,  13: 9,  14: 11, 15: 8,  16: 15},
+    'primary':       {8: 2,  9: 2,  10: 3,  11: 4,  12: 5,  13: 6,  14: 8,  15: 10, 16: 14},
+    'primary_link':  {8: 1,  9: 1,  10: 2,  11: 3,  12: 4,  13: 6,  14: 8,  15: 10, 16: 12},
+    'secondary':     {8: 1,  9: 1,  10: 2,  11: 3,  12: 5,  13: 7,  14: 10, 15: 13, 16: 16},
+    'secondary_link':{8: 1,  9: 1,  10: 1,  11: 2,  12: 3,  13: 4,  14: 6,  15: 8,  16: 10},
+    'tertiary':      {                              12: 2,  13: 3,  14: 6,  15: 5,  16: 10},
+    'tertiary_link': {                              12: 1,  13: 3,  14: 4,  15: 5,  16: 6},
+    'residential':   {                              12: 2,  13: 3,  14: 4,  15: 4,  16: 6},
+    'living_street': {                                      13: 2,  14: 3,  15: 4,  16: 4},
+    'unclassified':  {                              12: 2,  13: 3,  14: 5,  15: 7,  16: 9},
+    'service':       {                                              14: 2,  15: 3,  16: 4},
+    'track':         {                                              14: 1,  15: 2,  16: 2},
+    # Railway (increased for visible casing at z11+)
+    'rail':          {8: 2, 9: 2,  10: 2,   11:2,   12: 2,  13: 3,  14: 3,  15: 3,  16: 4},
+    'subway':        {                              12: 1,  13: 2,  14: 2,  15: 3,  16: 4},
+    'tram':          {                              12: 1,  13: 2,  14: 2,  15: 2,  16: 4},
+    'narrow_gauge':  {                                      13: 2,  14: 2,  15: 2,  16: 4},
+    'funicular':     {                                      13: 2,  14: 6,  15: 2,  16: 4},
 }
 
 # Override color per zoom level (RGB565) - only for features that change color by zoom
@@ -754,16 +755,31 @@ class OSMHandler(osmium.SimpleHandler):
         highway_type = tags.get('highway', '') or tags.get('railway', '')
         ref = tags.get('ref', '')
         old_ref = tags.get('old_ref', '')
+        
+        # 1. On récupère la base de la couche (ex: roads=55, water=30 dans LAYER_PRIORITY)
+        layer_base = LAYER_PRIORITY.get(layer, 55)
+        
+        # 2. On récupère la priorité spécifique de ton fichier JSON (ex: motorway=55)
+        json_priority = get_priority_for_tags(tags, self.config)
 
-        # Force linestrings (roads/railways) to high priority (13) to render above all polygons
-        linestring_priority = 13 * 7  # priority_nibble = 91 // 7 = 13
+        # 3. Calcul de la priorité finale dynamique
+        if tags.get('bridge') in ('yes', 'viaduct', 'bridge'):
+            # Pont : au-dessus de tout (on vise le nibble 14 ou 15)
+            combined_priority = 100 + (json_priority % 10)
+        elif tags.get('tunnel') in ('yes', 'culvert'):
+            # Tunnel : sous le sol et l'eau (on vise le nibble 1 ou 2)
+            combined_priority = 5 + (json_priority % 10)
+        else:
+            # Route normale : hiérarchisée selon le type (on vise le nibble 7 à 13)
+            # On utilise le layer_base (55) et on ajoute une nuance selon le type de route
+            combined_priority = layer_base + (json_priority // 5)
 
         feature = {
             'id': w.id,
             'geom_type': GEOM_LINESTRING,
             'coords': coords,
             'color_rgb565': color_rgb565,
-            'zoom_priority': pack_zoom_priority(min_zoom, linestring_priority),
+            'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
             'width_meters': width_meters,
             'highway_type': highway_type,
             'has_ref': bool(ref),
@@ -796,7 +812,7 @@ class OSMHandler(osmium.SimpleHandler):
             if should_create_label:
                 # Space out labels: only create one every 10 segments
                 self.road_label_counters[ref] += 1
-                if self.road_label_counters[ref] % 50 == 1:
+                if self.road_label_counters[ref] % 100 == 1:
                     # Generate 3 candidate positions (25%, 50%, 75%) for collision avoidance
                     candidates = []
                     for ratio in [0.25, 0.5, 0.75]:
@@ -1377,10 +1393,21 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
                 # Mark roads that need casing (border rendering)
                 # Bit 7 (0x80) = needs_casing flag, bits 0-6 = actual width (0-127)
+                # Casing enabled based on road type, zoom level, and minimum width (≥10px)
                 needs_casing = False
                 hw_type = feature.get('highway_type', '')
-                if hw_type in ('motorway', 'motorway_link', 'trunk', 'trunk_link', 'primary', 'primary_link'):
-                    needs_casing = True
+
+                # Motorway/trunk: casing from z11+, Primary: from z12+, Railway: from z11+
+                if width_pixels >= 10:  # Only apply casing if wide enough (≥10px)
+                    if hw_type in ('motorway', 'motorway_link', 'trunk', 'trunk_link') and zoom >= 11:
+                        needs_casing = True
+                    elif hw_type in ('primary', 'primary_link') and zoom >= 12:
+                        needs_casing = True
+                    elif hw_type in ('secondary', 'secondary_link') and zoom >= 13:
+                        needs_casing = True
+                    # Railway gets casing from z11+ if wide enough
+                    elif hw_type in ('rail', 'subway', 'tram') and zoom >= 11:
+                        needs_casing = True
 
                 # Encode width with casing flag
                 width_byte = min(width_pixels, 127)  # Clamp to 7 bits
