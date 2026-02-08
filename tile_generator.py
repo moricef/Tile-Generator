@@ -931,43 +931,11 @@ class OSMHandler(osmium.SimpleHandler):
                 if len(coords) < 4:
                     continue
 
-                # Filter inner_rings by zoom and size (ESP32-friendly strategy)
-                # Low zoom: suppress all holes (except water) to avoid huge tiles
-                # High zoom: keep structural holes (stadiums, plazas, ponds)
                 inner_rings = []
-                if poly.interiors and min_zoom <= 16:
-                    # Zoom-based filtering strategy for ESP32
-                    # z6-z12: No holes (except major water bodies)
-                    # z13-z14: Keep large holes (≥10px²)
-                    # z15-z16: Keep medium holes (≥5px²)
-                    if min_zoom <= 12 and layer != 'water':
-                        # Low zoom: suppress all non-water holes
-                        pass  # inner_rings stays empty
-                    else:
-                        # High zoom: filter by area threshold
-                        tile_width_deg = 360.0 / (2.0 ** min_zoom)
-                        pixel_deg = tile_width_deg / 256.0
-
-                        # Adaptive threshold based on zoom
-                        if min_zoom >= 15:
-                            min_hole_px = 5   # z15+: keep medium holes
-                        elif min_zoom >= 13:
-                            min_hole_px = 10  # z13-z14: keep large holes only
-                        else:
-                            min_hole_px = 20  # Fallback for water at low zoom
-
-                        min_hole_area = (pixel_deg * min_hole_px) ** 2
-
-                        for interior in poly.interiors:
-                            if len(interior.coords) < 4:
-                                continue
-                            # Water: always keep (islands), others: filter by size
-                            if layer == 'water':
-                                inner_rings.append(list(interior.coords))
-                            else:
-                                hole_poly = Polygon(interior.coords)
-                                if hole_poly.area >= min_hole_area:
-                                    inner_rings.append(list(interior.coords))
+                if poly.interiors:
+                    for interior in poly.interiors:
+                        if len(interior.coords) >= 4:
+                            inner_rings.append(list(interior.coords))
 
                 self.features.append({
                     'geom_type': GEOM_POLYGON,
@@ -1265,13 +1233,32 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             inner_rings = feature.get('inner_rings', [])
             is_polygon = feature['geom_type'] == GEOM_POLYGON
 
-            # Filter inner_rings: keep for water (islands), strip for landcover (pitting)
             feature_layer = feature.get('layer', '')
-            if is_polygon and inner_rings:
+            if is_polygon and inner_rings and SHAPELY_AVAILABLE:
                 total_holes_write += len(inner_rings)
+                
+                # For water, always keep holes (islands)
                 if feature_layer != 'water':
-                    filtered_holes_write += len(inner_rings)
-                    inner_rings = []
+                    # For other layers, filter holes by visible area at the current zoom
+                    pixel_deg = 360.0 / (2**zoom * 256)
+                    
+                    # More permissive for z13+ to avoid "blob" effect on residential areas
+                    min_hole_pixels_sq = K_VISIBILITY * 1.5 if zoom >= 13 else K_VISIBILITY * 10.0
+                    min_hole_area_deg2 = (pixel_deg ** 2) * min_hole_pixels_sq
+
+                    filtered_inner_rings = []
+                    for interior in inner_rings:
+                        try:
+                            hole_poly = Polygon(interior)
+                            if hole_poly.area >= min_hole_area_deg2:
+                                filtered_inner_rings.append(interior)
+                            else:
+                                filtered_holes_write += 1
+                        except Exception:
+                            # Invalid hole geometry, discard
+                            filtered_holes_write += 1
+                    
+                    inner_rings = filtered_inner_rings
 
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
             final_features_data = []
