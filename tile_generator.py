@@ -321,6 +321,10 @@ def get_feature_tiles(coords: List[Tuple[float, float]], zoom: int, is_polygon: 
 
 def get_layer_for_tags(tags: Dict[str, str]) -> Optional[str]:
     """Determine which layer a feature belongs to based on its tags."""
+    # Do not create polygons for abstract features like boundaries or place names
+    if 'place' in tags or tags.get('boundary') == 'administrative':
+        return None
+
     # Explicit rule for all water-related features
     if (tags.get('natural') == 'water' or
         tags.get('natural') == 'bay' or
@@ -783,17 +787,20 @@ class OSMHandler(osmium.SimpleHandler):
         ref = tags.get('ref', '')
         old_ref = tags.get('old_ref', '')
         
-        # Fixed Z-order (nibble) for rendering priority
+        # Fixed Z-order (nibble) for rendering priority (8-15: Structure)
         priority_map = {
-            'motorway': 13,
-            'trunk': 12, 'primary': 12, 'secondary': 12, 'tertiary': 12,
-            'unclassified': 11, 'residential': 11, 'living_street': 11,
+            # Z=13: Major roads & motorways
+            'motorway': 13, 'trunk': 13, 'primary': 13,
+            # Z=11: Secondary and residential roads
+            'secondary': 11, 'tertiary': 11, 'residential': 11, 'unclassified': 11, 'living_street': 11,
+            # Z=9: All links/ramps (must be below main roads)
             'motorway_link': 9, 'trunk_link': 9, 'primary_link': 9, 'secondary_link': 9, 'tertiary_link': 9,
-            'service': 7, 'track': 7, 'path': 7, 'footway': 7, 'cycleway': 7
+            # Z=8: Service, tracks and paths
+            'service': 8, 'track': 8, 'path': 8, 'footway': 8, 'cycleway': 8
         }
-        nibble = priority_map.get(highway_type, 7)  # Default for paths, etc.
-        if tags.get('bridge') in ('yes', 'viaduct'): nibble = 15
-        if tags.get('tunnel') in ('yes', 'culvert'): nibble = 1
+        nibble = priority_map.get(highway_type, 8)  # Default for other minor ways
+        if tags.get('bridge') in ('yes', 'viaduct'): nibble = 15  # Z=15: Bridges (absolute top)
+        if tags.get('tunnel') in ('yes', 'culvert'): nibble = 1   # Z=1: Tunnels (below landuse)
 
         feature = {
             'id': w.id,
@@ -930,9 +937,13 @@ class OSMHandler(osmium.SimpleHandler):
             color = get_color_for_tags(tags, self.config)
             color_rgb565 = hex_to_rgb565(color)
 
-            # Fixed Z-order (nibble) for polygon layers
-            layer_to_nibble = {'water': 5, 'leisure': 3, 'amenities': 3, 'terrain': 2, 'landuse': 2}
-            nibble = layer_to_nibble.get(layer, 2)  # default to landuse layer
+            # Fixed Z-order (nibble) for polygon layers (0-5: Scenery)
+            layer_to_nibble = {
+                'landuse': 2, 'terrain': 2,      # Z=2: Landcover (residential, forest, grass)
+                'leisure': 3, 'amenities': 3,    # Z=3: Parks and amenities
+                'water': 5                      # Z=5: All water bodies
+            }
+            nibble = layer_to_nibble.get(layer, 2)  # Default to landuse layer
 
             # Extract subclass for landcover discrimination (wood/forest vs farmland)
             subclass = tags.get('natural', '') or tags.get('landuse', '') or tags.get('leisure', '')
@@ -1170,10 +1181,13 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 merged_features.extend(poly_list)
 
         features = other_features + merged_features
-        features.sort(key=lambda f: f['zoom_priority'] & 0x0F)
         logger.debug(f"  Tile {tile_x},{tile_y}: Merge: {merge_stats['groups_merged']} groups merged, "
                      f"{merge_stats['holes_removed']}/{merge_stats['holes_total']} holes removed, "
                      f"{merge_stats['sharding_fallbacks']} sharding fallbacks")
+
+    # Final sort by priority nibble to ensure strict rendering order on device.
+    # This is the most critical step for correct Z-ordering.
+    features.sort(key=lambda f: f['zoom_priority'] & 0x0F)
 
     written_features = 0
     filtered_by_size = 0
