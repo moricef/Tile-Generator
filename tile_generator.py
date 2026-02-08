@@ -321,12 +321,17 @@ def get_feature_tiles(coords: List[Tuple[float, float]], zoom: int, is_polygon: 
 
 def get_layer_for_tags(tags: Dict[str, str]) -> Optional[str]:
     """Determine which layer a feature belongs to based on its tags."""
-    # Explicit rule for deprecated but common tag
-    if (tags.get('natural') == 'water' or 
-        'waterway' in tags or 
-        tags.get('water') == 'reservoir' or 
+    # Explicit rule for all water-related features
+    if (tags.get('natural') == 'water' or
+        tags.get('natural') == 'bay' or
+        'waterway' in tags or
+        'water' in tags or
         tags.get('landuse') == 'reservoir'):
         return 'water'
+
+    # Explicit rule for all highways
+    if 'highway' in tags:
+        return 'roads'
 
     for layer_name, feature_keys in LAYER_MAPPING.items():
         for feature_key in feature_keys:
@@ -780,12 +785,13 @@ class OSMHandler(osmium.SimpleHandler):
         
         # Fixed Z-order (nibble) for rendering priority
         priority_map = {
-            'motorway': 13, 'trunk': 12, 'primary': 12, 'secondary': 12,
-            'tertiary': 11, 'unclassified': 11, 'residential': 11, 'living_street': 11,
+            'motorway': 13,
+            'trunk': 12, 'primary': 12, 'secondary': 12, 'tertiary': 12,
+            'unclassified': 11, 'residential': 11, 'living_street': 11,
             'motorway_link': 9, 'trunk_link': 9, 'primary_link': 9, 'secondary_link': 9, 'tertiary_link': 9,
-            'service': 8, 'track': 8
+            'service': 7, 'track': 7, 'path': 7, 'footway': 7, 'cycleway': 7
         }
-        nibble = priority_map.get(highway_type, 10)  # default for other roads/paths
+        nibble = priority_map.get(highway_type, 7)  # Default for paths, etc.
         if tags.get('bridge') in ('yes', 'viaduct'): nibble = 15
         if tags.get('tunnel') in ('yes', 'culvert'): nibble = 1
 
@@ -925,7 +931,7 @@ class OSMHandler(osmium.SimpleHandler):
             color_rgb565 = hex_to_rgb565(color)
 
             # Fixed Z-order (nibble) for polygon layers
-            layer_to_nibble = {'water': 5, 'leisure': 4, 'amenities': 4, 'terrain': 3, 'landuse': 2}
+            layer_to_nibble = {'water': 5, 'leisure': 3, 'amenities': 3, 'terrain': 2, 'landuse': 2}
             nibble = layer_to_nibble.get(layer, 2)  # default to landuse layer
 
             # Extract subclass for landcover discrimination (wood/forest vs farmland)
@@ -1164,6 +1170,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 merged_features.extend(poly_list)
 
         features = other_features + merged_features
+        features.sort(key=lambda f: f['zoom_priority'] & 0x0F)
         logger.debug(f"  Tile {tile_x},{tile_y}: Merge: {merge_stats['groups_merged']} groups merged, "
                      f"{merge_stats['holes_removed']}/{merge_stats['holes_total']} holes removed, "
                      f"{merge_stats['sharding_fallbacks']} sharding fallbacks")
@@ -1183,7 +1190,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
         bg_points = [(0, 0), (4096, 0), (4096, 4096), (0, 4096), (0, 0)]
         f.write(struct.pack('<B', GEOM_POLYGON))       # type
         f.write(struct.pack('<H', hex_to_rgb565(LAND_BG_COLOR)))  # color
-        f.write(struct.pack('<B', pack_zoom_priority(0, 1)))  # lowest priority
+        f.write(struct.pack('<B', pack_zoom_priority(0, 0)))  # lowest priority (Z=0)
         f.write(struct.pack('<B', 1))                   # width
         f.write(struct.pack('<BBBB', 0, 0, 255, 255))  # bbox = full tile
         f.write(struct.pack('<H', 5))                   # 5 points
@@ -1401,23 +1408,9 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                         width_meters = feature.get('width_meters', 0.0)
                         width_pixels = meters_to_pixels(width_meters, zoom) if width_meters > 0 else 1
 
-                # Mark roads that need casing (border rendering)
-                # Bit 7 (0x80) = needs_casing flag, bits 0-6 = actual width (0-127)
-                # Casing enabled based on road type, zoom level, and minimum width (≥10px)
-                needs_casing = False
-                hw_type = feature.get('highway_type', '')
-
-                # Motorway/trunk: casing from z11+, Primary: from z12+, Railway: from z11+
-                if width_pixels >= 10:  # Only apply casing if wide enough (≥10px)
-                    if hw_type in ('motorway', 'motorway_link', 'trunk', 'trunk_link') and zoom >= 11:
-                        needs_casing = True
-                    elif hw_type in ('primary', 'primary_link') and zoom >= 12:
-                        needs_casing = True
-                    elif hw_type in ('secondary', 'secondary_link') and zoom >= 13:
-                        needs_casing = True
-                    # Railway gets casing from z11+ if wide enough
-                    elif hw_type in ('rail', 'subway', 'tram') and zoom >= 11:
-                        needs_casing = True
+                # Mark roads that need casing (border rendering) based on priority nibble
+                priority_nibble = feature['zoom_priority'] & 0x0F
+                needs_casing = priority_nibble in (12, 13)
 
                 # Encode width with casing flag
                 width_byte = min(width_pixels, 127)  # Clamp to 7 bits
