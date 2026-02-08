@@ -202,10 +202,8 @@ LAYER_MAPPING = {
         'natural=bare_rock', 'natural=rock', 'natural=scree', 'natural=stone',
         'natural=fell', 'natural=moor', 'natural=shrubbery', 'landuse=quarry',
         'landuse=grass', 'landuse=orchard', 'landuse=vineyard',
-        'landuse=farmland', 'landuse=farmyard', 'landuse=park', 'leisure=park',
+        'landuse=farmland', 'landuse=farmyard',
         'aeroway=aerodrome', 'aeroway=apron', 'aeroway=helipad', 'aeroway=hangar', 'aeroway=runway', 'aeroway=taxiway',
-        'leisure=nature_reserve', 'leisure=garden',
-        'leisure=recreation_ground', 'landuse=recreation_ground',
         'landuse=residential',
         'landuse=commercial', 'landuse=retail', 'landuse=industrial',
         'landuse=construction', 'landuse=cemetery', 'landuse=allotments',
@@ -265,7 +263,9 @@ LAYER_MAPPING = {
     'leisure': [
         'leisure=pitch', 'leisure=stadium', 'leisure=sports_centre',
         'leisure=sports_hall', 'leisure=track', 'leisure=swimming_pool',
-        'leisure=golf_course', 'leisure=playground'
+        'leisure=golf_course', 'leisure=playground',
+        'landuse=park', 'leisure=park', 'leisure=nature_reserve', 'leisure=garden',
+        'leisure=recreation_ground', 'landuse=recreation_ground'
     ],
     'places': [
         'place=city', 'place=state', 'place=town',
@@ -332,6 +332,10 @@ def get_layer_for_tags(tags: Dict[str, str]) -> Optional[str]:
         'water' in tags or
         tags.get('landuse') == 'reservoir'):
         return 'water'
+
+    # Explicit rule for buildings to ensure they are always on top of scenery
+    if 'building' in tags:
+        return 'buildings'
 
     # Explicit rule for all highways
     if 'highway' in tags:
@@ -934,11 +938,12 @@ class OSMHandler(osmium.SimpleHandler):
                     self.stats['area_exception'] += 1
                     return
 
-            # Fixed Z-order (nibble) for polygon layers (0-5: Scenery)
+            # Fixed Z-order (nibble) for polygon layers (0-5: Scenery & Buildings)
             layer_to_nibble = {
                 'landuse': 2, 'terrain': 2,      # Z=2: Landcover (residential, forest, grass)
-                'leisure': 3, 'amenities': 3,    # Z=3: Parks and amenities
-                'water': 5                       # Z=5: All water bodies
+                'water': 3,                      # Z=3: All water bodies
+                'leisure': 4, 'amenities': 4,    # Z=4: Parks and amenities
+                'buildings': 5                   # Z=5: Buildings
             }
             nibble = layer_to_nibble.get(layer, 2)
 
