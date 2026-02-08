@@ -322,7 +322,7 @@ def get_feature_tiles(coords: List[Tuple[float, float]], zoom: int, is_polygon: 
 def get_layer_for_tags(tags: Dict[str, str]) -> Optional[str]:
     """Determine which layer a feature belongs to based on its tags."""
     # Do not create polygons for abstract features like boundaries or place names
-    if 'place' in tags or tags.get('boundary') == 'administrative':
+    if 'place' in tags or 'boundary' in tags or 'admin_level' in tags:
         return None
 
     # Explicit rule for all water-related features
@@ -632,9 +632,7 @@ class OSMHandler(osmium.SimpleHandler):
                     return
 
                 color_rgb565 = hex_to_rgb565(cfg.get('color', '#000000'))
-                priority = cfg.get('priority', 90)
-                layer_base_priority = LAYER_PRIORITY.get('places', 90)
-                combined_priority = 98  # Force text above roads (priority 14 vs roads 13)
+                nibble = 14  # Force text labels to render near the top
 
                 # Split long names on 2 lines at hyphen or space near middle
                 if len(name) > 12:
@@ -659,7 +657,7 @@ class OSMHandler(osmium.SimpleHandler):
                     'geom_type': GEOM_TEXT,
                     'coords': [(n.location.lon, n.location.lat)],
                     'color_rgb565': color_rgb565,
-                    'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
+                    'zoom_priority': pack_zoom_priority(min_zoom, nibble),
                     'font_size': text_cfg['font_size'],
                     'text': name_bytes,
                     'population': population,
@@ -744,18 +742,13 @@ class OSMHandler(osmium.SimpleHandler):
         is_area_tags = is_closed and (has_area_tag or tags.get('area') == 'yes')
 
         color = get_color_for_tags(tags, self.config)
-        priority = get_priority_for_tags(tags, self.config)
         color_rgb565 = hex_to_rgb565(color)
-        layer_base_priority = LAYER_PRIORITY.get(layer, 50)
-        
-        # Ensure linestrings for waterways are behind areas (polygons)
-        if layer == 'water' and not (is_closed and is_area_tags):
-            combined_priority = layer_base_priority + (priority % 5) # Lower priority for centerlines
-        else:
-            combined_priority = layer_base_priority + (priority % 10)
 
         if is_closed and is_area_tags and 'highway' not in tags:
-            # Extract subclass for landcover discrimination (wood/forest vs farmland)
+            # This logic will be handled by area(), but we might catch some here.
+            # Assign a polygon nibble just in case.
+            nibble = 5 if layer == 'water' else 2
+            
             subclass = tags.get('natural', '') or tags.get('landuse', '') or tags.get('leisure', '')
 
             feature = {
@@ -763,7 +756,7 @@ class OSMHandler(osmium.SimpleHandler):
                 'geom_type': GEOM_POLYGON,
                 'coords': coords,
                 'color_rgb565': color_rgb565,
-                'zoom_priority': pack_zoom_priority(min_zoom, combined_priority),
+                'zoom_priority': pack_zoom_priority(min_zoom, nibble),
                 'width_meters': 0.0,  # Polygons don't use width
                 'subclass': subclass  # Store for merge logic
             }
@@ -791,14 +784,21 @@ class OSMHandler(osmium.SimpleHandler):
         priority_map = {
             # Z=13: Major roads & motorways
             'motorway': 13, 'trunk': 13, 'primary': 13,
-            # Z=11: Secondary and residential roads
-            'secondary': 11, 'tertiary': 11, 'residential': 11, 'unclassified': 11, 'living_street': 11,
+            # Z=12: Secondary roads
+            'secondary': 12, 'tertiary': 12,
+            # Z=11: Residential and minor roads
+            'residential': 11, 'unclassified': 11, 'living_street': 11,
             # Z=9: All links/ramps (must be below main roads)
             'motorway_link': 9, 'trunk_link': 9, 'primary_link': 9, 'secondary_link': 9, 'tertiary_link': 9,
             # Z=8: Service, tracks and paths
             'service': 8, 'track': 8, 'path': 8, 'footway': 8, 'cycleway': 8
         }
-        nibble = priority_map.get(highway_type, 8)  # Default for other minor ways
+        
+        if layer == 'water':
+            nibble = 5
+        else:
+            nibble = priority_map.get(highway_type, 8)  # Default for other minor ways
+
         if tags.get('bridge') in ('yes', 'viaduct'): nibble = 15  # Z=15: Bridges (absolute top)
         if tags.get('tunnel') in ('yes', 'culvert'): nibble = 1   # Z=1: Tunnels (below landuse)
 
@@ -934,16 +934,20 @@ class OSMHandler(osmium.SimpleHandler):
                     self.stats['area_exception'] += 1
                     return
 
-            color = get_color_for_tags(tags, self.config)
-            color_rgb565 = hex_to_rgb565(color)
-
             # Fixed Z-order (nibble) for polygon layers (0-5: Scenery)
             layer_to_nibble = {
                 'landuse': 2, 'terrain': 2,      # Z=2: Landcover (residential, forest, grass)
                 'leisure': 3, 'amenities': 3,    # Z=3: Parks and amenities
-                'water': 5                      # Z=5: All water bodies
+                'water': 5                       # Z=5: All water bodies
             }
-            nibble = layer_to_nibble.get(layer, 2)  # Default to landuse layer
+            nibble = layer_to_nibble.get(layer, 2)
+
+            color = get_color_for_tags(tags, self.config)
+            color_rgb565 = hex_to_rgb565(color)
+            
+            # Force water color to ensure consistency, overriding JSON
+            if layer == 'water':
+                color_rgb565 = hex_to_rgb565("#aad3df")
 
             # Extract subclass for landcover discrimination (wood/forest vs farmland)
             subclass = tags.get('natural', '') or tags.get('landuse', '') or tags.get('leisure', '')
