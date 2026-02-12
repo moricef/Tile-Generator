@@ -120,7 +120,7 @@ LINE_WIDTH_PER_ZOOM = {
     'pedestrian':    {                                                    13: 2,  14: 3,  15: 5,  16: 6,  17: 12, 18: 13, 19: 17},
     'living_street': {                                                    13: 2,  14: 3,  15: 5,  16: 6,  17: 12, 18: 13, 19: 17},
     'unclassified':  {                                            12: 1,  13: 3,  14: 3,  15: 5,  16: 6,  17: 12, 18: 13, 19: 17},
-    'service':       {                                                    13: 1,  14: 1,  15: 1,  16: 2,  17: 7,  18: 9,  19: 11},
+    'service':       {                                                    13: 1,  14: 1,  15: 1,  16: 3,  17: 6,  18: 8,  19: 10},
     'track':         {                                                    13: 1,  14: 1,  15: 2,  16: 2,  17: 3,  18: 4,  19: 5},
     'footway':       {                                                    13: 1,  14: 1,  15: 1,  16: 1,  17: 2,  18: 2,  19: 2},
     'cycleway':      {                                                    13: 1,  14: 1,  15: 1,  16: 1,  17: 2,  18: 2,  19: 2},
@@ -792,7 +792,7 @@ class OSMHandler(osmium.SimpleHandler):
             return
 
         # Store line type for zoom-based width lookup
-        highway_type = tags.get('highway', '') or tags.get('railway', '')
+        highway_type = tags.get('highway', '') or tags.get('railway', '') or tags.get('aeroway', '')
         ref = tags.get('ref', '')
         old_ref = tags.get('old_ref', '')
         

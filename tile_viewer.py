@@ -320,7 +320,13 @@ class NAVViewer:
 
         # Pass 2: Render all features normally (including road cores)
         # Low priority rendered first = below, high priority rendered last = above
+        # DEBUG: Log rendering order for roads/railways to verify priority
+        debug_count = 0
         for feature in features:
+            if feature.geom_type == GEOM_LINESTRING and feature.priority >= 8 and debug_count < 30:
+                color = rgb565_to_rgb888(feature.color_rgb565)
+                print(f"[RENDER] priority={feature.priority}, color=#{color[0]:02x}{color[1]:02x}{color[2]:02x}, width={feature.width}")
+                debug_count += 1
             self._render_feature(surface, feature)
 
         if self.show_tile_grid:
