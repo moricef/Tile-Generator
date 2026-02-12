@@ -374,10 +374,7 @@ class NAVViewer:
             for i in range(1, len(points) - 1):
                 x, y = points[i]
                 pygame.draw.circle(surface, color, (x, y), radius)
-        # Always draw at endpoints for proper line caps
-        if len(points) >= 2:
-            pygame.draw.circle(surface, color, points[0], radius)
-            pygame.draw.circle(surface, color, points[-1], radius)
+        # Endpoint circles removed - runways should have flat ends, not rounded
 
     def _render_road_casing(self, surface: pygame.Surface, feature: NavFeature):
         """Render road casing (border) for two-pass rendering - Pass 1 only."""
