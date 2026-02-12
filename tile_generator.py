@@ -120,7 +120,7 @@ LINE_WIDTH_PER_ZOOM = {
     'pedestrian':    {                                                    13: 2,  14: 3,  15: 5,  16: 6,  17: 12, 18: 13, 19: 17},
     'living_street': {                                                    13: 2,  14: 3,  15: 5,  16: 6,  17: 12, 18: 13, 19: 17},
     'unclassified':  {                                            12: 1,  13: 3,  14: 3,  15: 5,  16: 6,  17: 12, 18: 13, 19: 17},
-    'service':       {                                                    13: 1,  14: 1,  15: 1,  16: 3,  17: 6,  18: 8,  19: 10},
+    'service':       {                                                    13: 1,  14: 1,  15: 2,  16: 4,  17: 6,  18: 8,  19: 10},
     'track':         {                                                    13: 1,  14: 1,  15: 2,  16: 2,  17: 3,  18: 4,  19: 5},
     'footway':       {                                                    13: 1,  14: 1,  15: 1,  16: 1,  17: 2,  18: 2,  19: 2},
     'cycleway':      {                                                    13: 1,  14: 1,  15: 1,  16: 1,  17: 2,  18: 2,  19: 2},
@@ -178,6 +178,7 @@ def meters_to_pixels(width_meters: float, zoom: int, lat: float = 45.0) -> int:
 
 # Layer rendering priority (lower = rendered first = behind)
 LAYER_PRIORITY = {
+    'aeroways': 5,
     'landuse': 10,
     'terrain': 20,
     'water': 30,
@@ -206,6 +207,9 @@ LAYER_MAPPING = {
     'islands': [
         'place=island', 'place=islet'
     ],
+    'aeroways': [
+        'aeroway=aerodrome', 'aeroway=apron', 'aeroway=helipad', 'aeroway=hangar'
+    ],
     'landuse': [
         'natural=beach', 'natural=sand', 'natural=wood',
         'landuse=forest', 'natural=forest', 'natural=scrub',
@@ -214,7 +218,6 @@ LAYER_MAPPING = {
         'natural=fell', 'natural=moor', 'natural=shrubbery', 'landuse=quarry',
         'landuse=grass', 'landuse=orchard', 'landuse=vineyard',
         'landuse=farmland', 'landuse=farmyard',
-        'aeroway=aerodrome', 'aeroway=apron', 'aeroway=helipad', 'aeroway=hangar', 'aeroway=runway', 'aeroway=taxiway',
         'landuse=residential',
         'landuse=commercial', 'landuse=retail', 'landuse=industrial',
         'landuse=construction', 'landuse=cemetery', 'landuse=allotments',
@@ -940,6 +943,9 @@ class OSMHandler(osmium.SimpleHandler):
         if tags.get('natural') == 'water' or tags.get('waterway') == 'riverbank':
             print(f"[DEBUG AREA] Water area id={a.id}, tags={tags}")
 
+        if tags.get('natural') == 'grassland':
+            print(f"[GRASSLAND] Area id={a.id}, tags={tags}")
+
         # Skip boundary relations
         if tags.get('boundary') == 'administrative':
             self.stats['area_boundary'] += 1
@@ -982,6 +988,7 @@ class OSMHandler(osmium.SimpleHandler):
 
             # Fixed Z-order (nibble) for polygon layers (0-5: Scenery & Buildings)
             layer_to_nibble = {
+                'aeroways': 1,                   # Z=1: Airport base (aerodrome, apron, hangars)
                 'landuse': 2, 'terrain': 2,      # Z=2: Landcover (residential, forest, grass)
                 'water': 3,                      # Z=3: All water bodies
                 'leisure': 4, 'amenities': 4,    # Z=4: Parks and amenities
