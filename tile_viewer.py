@@ -368,7 +368,7 @@ class NAVViewer:
 
         # Draw filled circles at joints only (not every point) for smooth connections
         # Only draw circles at significant direction changes to avoid visual artifacts
-        radius = max(1, (width - 2) // 2)  # Thinner circles for less visual bulk
+        radius = max(1, width // 3)  # Very thin circles, about 1/3 of line width
         if len(points) >= 3:
             # Draw circles only at joints (skip first and last to avoid endpoint artifacts)
             for i in range(1, len(points) - 1):
