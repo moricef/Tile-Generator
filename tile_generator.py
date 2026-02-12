@@ -129,7 +129,7 @@ LINE_WIDTH_PER_ZOOM = {
     # Railway - based on OpenStreetMap Carto standard
     'rail':          {              8: 2,  9: 2,  10: 2,  11: 2,  12: 2,  13: 3,  14: 3,  15: 3,  16: 4},
     'subway':        {                                            12: 1,  13: 2,  14: 2,  15: 3,  16: 4},
-    'tram':          {                                            12: 1,  13: 2,  14: 2,  15: 3,  16: 4},
+    'tram':          {                                            12: 1,  13: 1,  14: 2,  15: 2,  16: 3},
     'narrow_gauge':  {                                                    13: 2,  14: 2,  15: 3,  16: 4},
     'funicular':     {                                                    13: 2,  14: 2,  15: 3,  16: 4},
     # Aeroway - typical runway ~45m, taxiway ~23m, helipad ~15m (scaled for visibility)
@@ -208,7 +208,7 @@ LAYER_MAPPING = {
         'place=island', 'place=islet'
     ],
     'aeroways': [
-        'aeroway=aerodrome', 'aeroway=apron', 'aeroway=helipad', 'aeroway=hangar'
+        'aeroway=aerodrome'
     ],
     'landuse': [
         'natural=beach', 'natural=sand', 'natural=wood',
@@ -221,7 +221,7 @@ LAYER_MAPPING = {
         'landuse=residential',
         'landuse=commercial', 'landuse=retail', 'landuse=industrial',
         'landuse=construction', 'landuse=cemetery', 'landuse=allotments',
-        'amenity=parking', 'leisure=common', 'landuse=village_green',
+        'leisure=common', 'landuse=village_green',
         'landuse=quarry', 'landuse=military', 'landuse=landfill', 'landuse=brownfield',
         'landuse=basin', 'landuse=railway', 'landuse=education',
         'landuse=garages', 'landuse=flowerbed'
@@ -253,12 +253,13 @@ LAYER_MAPPING = {
         'amenity=school', 'amenity=university',
         'amenity=place_of_worship',
         'amenity=grave_yard', 'amenity=marketplace',
-        'amenity=parking_space'
+        'amenity=parking_space',
+        'amenity=parking'
     ],
     'infrastructure': [
         'bridge=yes', 'man_made=bridge',
         'aeroway=runway', 'aeroway=taxiway', 'aeroway=apron',
-        'aeroway=aerodrome', 'aeroway=hangar', 'aeroway=helipad',
+        'aeroway=hangar', 'aeroway=helipad',
         'aeroway=parking_position',
         'tunnel=yes', 'tunnel=culvert',
         'man_made=embankment', 'man_made=pier',
@@ -992,7 +993,8 @@ class OSMHandler(osmium.SimpleHandler):
                 'landuse': 2, 'terrain': 2,      # Z=2: Landcover (residential, forest, grass)
                 'water': 3,                      # Z=3: All water bodies
                 'leisure': 4, 'amenities': 4,    # Z=4: Parks and amenities
-                'buildings': 5                   # Z=5: Buildings
+                'buildings': 5,                   # Z=5: Buildings
+                'infrastructure': 6
             }
             nibble = layer_to_nibble.get(layer, 2)
 
@@ -1368,14 +1370,14 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
             final_features_data = []
 
-            # Clip geometry
-            if clip_box:
+            # Clip geometry (only polygons - linestrings preserved for continuity)
+            if clip_box and is_polygon:
                 try:
                     from shapely.geometry import Polygon, MultiPolygon, LineString, MultiLineString, GeometryCollection
-                    if is_polygon and inner_rings:
+                    if inner_rings:
                         geom = Polygon(orig_coords, inner_rings)
                     else:
-                        geom = Polygon(orig_coords) if is_polygon else LineString(orig_coords)
+                        geom = Polygon(orig_coords)
                     if not geom.is_valid:
                         geom = geom.buffer(0)
 
@@ -1409,14 +1411,14 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                 for p in polys:
                                     if not p.is_empty and p.exterior and len(p.exterior.coords) >= 4:
                                         # Simplify polygon AFTER clipping
-                                        # Simplify: landuse, terrain (forests, parks, etc.)
-                                        # NO simplification: water, buildings, infrastructure (preserve precision)
-                                        if feature_layer in ('landuse', 'terrain'):
+                                        # Simplify: landuse, terrain (forests, parks, etc.) only at low zooms
+                                        # At high zooms (z>=14): NO simplification for any layer (preserve detail)
+                                        if feature_layer in ('landuse', 'terrain') and zoom < 14:
                                             simplified_poly = p.simplify(tolerance, preserve_topology=True)
                                         else:
                                             if feature_layer == 'water' and len(p.exterior.coords) > 20:
                                                 print(f"[NO_SIMP] Water polygon: {len(p.exterior.coords)} points NOT simplified")
-                                            simplified_poly = p  # No simplification for water/buildings
+                                            simplified_poly = p  # No simplification for water/buildings/high-zoom
                                         if simplified_poly.is_empty or not simplified_poly.exterior:
                                             continue
                                         rings = [list(simplified_poly.exterior.coords)]
@@ -1426,9 +1428,9 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                         final_features_data.append(rings)
                         else:
                             if isinstance(part, LineString) and len(part.coords) >= 2:
-                                # Simplify AFTER clipping (but NOT for water or roads)
-                                if feature_layer in ('water', 'roads'):
-                                    simplified = part  # No simplification for water/roads (preserve curves/roundabouts)
+                                # Simplify AFTER clipping (but NOT for water, roads, or infrastructure)
+                                if feature_layer in ('water', 'roads', 'infrastructure'):
+                                    simplified = part  # No simplification for water/roads/infrastructure (preserve curves/runways)
                                 else:
                                     simplified = part.simplify(tolerance, preserve_topology=True)
                                 if len(simplified.coords) >= 2:
@@ -1436,8 +1438,8 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                             elif isinstance(part, MultiLineString):
                                 for l in part.geoms:
                                     if len(l.coords) >= 2:
-                                        if feature_layer in ('water', 'roads'):
-                                            simplified = l  # No simplification for water/roads
+                                        if feature_layer in ('water', 'roads', 'infrastructure'):
+                                            simplified = l  # No simplification for water/roads/infrastructure
                                         else:
                                             simplified = l.simplify(tolerance, preserve_topology=True)
                                         if len(simplified.coords) >= 2:
