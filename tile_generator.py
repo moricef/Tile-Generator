@@ -1576,13 +1576,19 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
     # Second pass: extract all features (including multipolygon relations)
     handler = OSMHandler(config, zoom_range)
     handler.boundary_ways = scanner.boundary_ways
-    logger.info("Pass 2: Processing OSM data (including Multipolygons)...")
 
     area_manager = osmium.area.AreaManager()
+
+    # AreaManager requires TWO passes:
+    logger.info("Pass 2a: Scanning multipolygon relations...")
+    osmium.apply(input_pbf, area_manager.first_pass_handler())
+
+    logger.info("Pass 2b: Building areas and extracting features...")
     idx = osmium.index.create_map('flex_mem')
     nlw = osmium.NodeLocationsForWays(idx)
     nlw.apply_nodes_to_ways = True
-    osmium.apply(input_pbf, nlw, area_manager, handler)
+    # Chain handlers: nlw -> handler (nodes/ways) -> area_manager.second_pass (areas)
+    osmium.apply(input_pbf, nlw, handler, area_manager.second_pass_handler(handler))
     print()
 
     elapsed = time.time() - start_time
