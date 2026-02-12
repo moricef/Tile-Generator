@@ -798,6 +798,9 @@ class OSMHandler(osmium.SimpleHandler):
         
         # Fixed Z-order (nibble) for rendering priority (8-15: Structure)
         priority_map = {
+            # Z=14: Railways (above all roads for level crossings priority)
+            'rail': 14, 'subway': 14, 'tram': 14, 'light_rail': 14,
+            'narrow_gauge': 14, 'funicular': 14, 'monorail': 14,
             # Z=13: Major roads & motorways
             'motorway': 13, 'trunk': 13, 'primary': 13,
             # Z=12: Secondary roads
@@ -814,6 +817,10 @@ class OSMHandler(osmium.SimpleHandler):
             nibble = 5
         else:
             nibble = priority_map.get(highway_type, 8)  # Default for other minor ways
+
+        # Log railways to verify nibble assignment
+        if highway_type in ('rail', 'subway', 'tram', 'light_rail', 'narrow_gauge', 'funicular', 'monorail'):
+            print(f"[RAILWAY] way={w.id}, type={highway_type}, nibble={nibble}")
 
         # Bridges: shift up to ensure above ALL normal roads (max normal road is 13)
         # Major bridges (roads/links): nibble+3 ensures above normal motorway (13)
