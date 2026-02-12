@@ -329,9 +329,16 @@ class NAVViewer:
                 color = rgb565_to_rgb888(feature.color_rgb565)
                 print(f"[RENDER LINE] priority={feature.priority}, color=#{color[0]:02x}{color[1]:02x}{color[2]:02x}, width={feature.width}")
                 debug_line_count += 1
-            elif feature.geom_type == GEOM_POLYGON and feature.priority <= 5 and debug_poly_count < 30:
+            elif feature.geom_type == GEOM_POLYGON and feature.priority <= 5 and debug_poly_count < 100:
                 color = rgb565_to_rgb888(feature.color_rgb565)
-                print(f"[RENDER POLY] priority={feature.priority}, color=#{color[0]:02x}{color[1]:02x}{color[2]:02x}, pts={len(feature.coords)}")
+                color_name = ""
+                # Identify aerodrome (grey) vs grassland (green)
+                if 210 <= color[0] <= 230 and 210 <= color[1] <= 230 and 220 <= color[2] <= 240:
+                    color_name = " [AERODROME?]"
+                elif 195 <= color[0] <= 210 and 225 <= color[1] <= 240 and 170 <= color[2] <= 185:
+                    color_name = " [GRASSLAND!]"
+                print(f"[RENDER POLY] priority={feature.priority}, tile={feature.tile_x}/{feature.tile_y}, "
+                      f"color=#{color[0]:02x}{color[1]:02x}{color[2]:02x}{color_name}, pts={len(feature.coords)}")
                 debug_poly_count += 1
             self._render_feature(surface, feature)
 
