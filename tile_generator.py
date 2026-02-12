@@ -843,6 +843,11 @@ class OSMHandler(osmium.SimpleHandler):
         if tags.get('tunnel') in ('yes', 'culvert'):
             nibble = max(nibble - 11, 1)  # Shift down by 11, minimum 1
 
+        # Densify curves for smooth rendering (add intermediate points)
+        # Roads/runways/railways need smooth curves to avoid triangular artifacts
+        if highway_type and len(coords) >= 2:
+            coords = densify_linestring(coords, max_segment_degrees=0.0001)
+
         feature = {
             'id': w.id,
             'geom_type': GEOM_LINESTRING,
@@ -1049,6 +1054,22 @@ class OSMHandler(osmium.SimpleHandler):
             # Debug: log first 10 errors
             if self.stats['area_exception'] <= 10:
                 logger.warning(f"Area extraction failed: {e} | tags: {tags}")
+
+
+def densify_linestring(coords: List[Tuple[float, float]], max_segment_degrees: float) -> List[Tuple[float, float]]:
+    """Add intermediate points to linestring for smoother curves."""
+    if len(coords) <= 1 or not SHAPELY_AVAILABLE:
+        return coords
+
+    try:
+        from shapely.geometry import LineString
+        from shapely.ops import segmentize
+        line = LineString(coords)
+        # Segmentize adds points so no segment is longer than max_segment_degrees
+        densified = segmentize(line, max_segment_degrees)
+        return list(densified.coords)
+    except Exception:
+        return coords
 
 
 def simplify_coords(coords: List[Tuple[float, float]], tolerance: float) -> List[Tuple[float, float]]:
@@ -1370,14 +1391,14 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
             final_features_data = []
 
-            # Clip geometry (only polygons - linestrings preserved for continuity)
-            if clip_box and is_polygon:
+            # Clip geometry (with coordinate clamping for long linestrings)
+            if clip_box:
                 try:
                     from shapely.geometry import Polygon, MultiPolygon, LineString, MultiLineString, GeometryCollection
-                    if inner_rings:
+                    if is_polygon and inner_rings:
                         geom = Polygon(orig_coords, inner_rings)
                     else:
-                        geom = Polygon(orig_coords)
+                        geom = Polygon(orig_coords) if is_polygon else LineString(orig_coords)
                     if not geom.is_valid:
                         geom = geom.buffer(0)
 
@@ -1566,10 +1587,13 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 f.write(struct.pack('<H', total_points))
                 f.write(b'\x00')
 
-                # Points for all rings
+                # Points for all rings (clamp to int16 range for long runways)
                 for ring in projected_rings:
                     for px, py in ring:
-                        f.write(struct.pack('<hh', px, py))
+                        # Clamp coordinates to fit in signed 16-bit integer range
+                        px_clamped = max(-32768, min(32767, px))
+                        py_clamped = max(-32768, min(32767, py))
+                        f.write(struct.pack('<hh', px_clamped, py_clamped))
 
                 if is_polygon:
                     # Write ring ends (using uint16 to support > 255 rings in complex merged areas)

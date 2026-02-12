@@ -20,6 +20,7 @@ from typing import Dict, List, Tuple, Optional, Set
 
 try:
     import pygame
+    from pygame import gfxdraw
     PYGAME_AVAILABLE = True
 except ImportError:
     PYGAME_AVAILABLE = False
@@ -348,6 +349,21 @@ class NAVViewer:
         
         return int(fx * TILE_SIZE), int(fy * TILE_SIZE)
 
+    def _draw_smooth_line(self, surface: pygame.Surface, color: Tuple[int, int, int],
+                          points: List[Tuple[int, int]], width: int):
+        """Draw line with circles at joints for smooth curves without triangular artifacts."""
+        if len(points) < 2:
+            return
+
+        # Draw line segments
+        if width > 1:
+            pygame.draw.lines(surface, color, False, points, width)
+
+        # Draw filled circles at each joint for smooth connections
+        radius = max(1, width // 2)
+        for x, y in points:
+            pygame.draw.circle(surface, color, (x, y), radius)
+
     def _render_road_casing(self, surface: pygame.Surface, feature: NavFeature):
         """Render road casing (border) for two-pass rendering - Pass 1 only."""
         if not feature.coords or len(feature.coords) < 2:
@@ -361,9 +377,9 @@ class NAVViewer:
         road_color = rgb565_to_rgb888(feature.color_rgb565)
         casing_color = darken_color(road_color, amount=0.3)  # 30% darker than road color
 
-        # Draw casing: wider than the road core
+        # Draw casing: wider than the road core with smooth joins
         casing_width = feature.width + 2
-        pygame.draw.lines(surface, casing_color, False, pts, casing_width)
+        self._draw_smooth_line(surface, casing_color, pts, casing_width)
 
     def _render_feature(self, surface: pygame.Surface, feature: NavFeature):
         if not feature.coords: return
@@ -394,8 +410,8 @@ class NAVViewer:
         elif feature.geom_type == GEOM_LINESTRING:
             pts = [self._tile_coord_to_screen(feature.tile_x, feature.tile_y, x, y) for x, y in feature.coords]
             if len(pts) >= 2:
-                # Draw road core (casing already drawn in pass 1 for roads with needs_casing flag)
-                pygame.draw.lines(surface, color, False, pts, max(1, feature.width))
+                # Draw road core with smooth joins (casing already drawn in pass 1 for roads with needs_casing flag)
+                self._draw_smooth_line(surface, color, pts, max(1, feature.width))
 
         elif feature.geom_type == GEOM_POLYGON:
             rings = feature.get_rings()
