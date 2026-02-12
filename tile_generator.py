@@ -34,6 +34,7 @@ try:
     import osmium
     from osmium import osm
     import osmium.geom
+    import osmium.area
 except ImportError:
     print("Error: osmium not found. Install with: pip install osmium")
     sys.exit(1)
@@ -108,17 +109,17 @@ LINE_WIDTH_PER_ZOOM = {
     # Casing needs ≥10px to be visible (2px border each side)
     'motorway':      {8: 2,  9: 2,  10: 3,  11: 5,  12: 7,  13: 10, 14: 12, 15: 14, 16: 16},
     'motorway_link': {8: 2,  9: 2,  10: 3,  11: 3,  12: 6,  13: 9,  14: 11, 15: 9,  16: 12},
-    'trunk':         {8: 3,  9: 4,  10: 6,  11: 4,  12: 9,  13: 10, 14: 12, 15: 14, 16: 16},
+    'trunk':         {8: 2,  9: 2,  10: 3,  11: 4,  12: 9,  13: 10, 14: 12, 15: 12, 16: 16},
     'trunk_link':    {8: 2,  9: 2,  10: 3,  11: 3,  12: 7,  13: 9,  14: 11, 15: 8,  16: 15},
-    'primary':       {8: 2,  9: 2,  10: 3,  11: 3,  12: 5,  13: 6,  14: 8,  15: 10, 16: 14},
-    'primary_link':  {8: 1,  9: 1,  10: 2,  11: 2,  12: 4,  13: 6,  14: 8,  15: 8, 16: 12},
-    'secondary':     {8: 1,  9: 1,  10: 2,  11: 2,  12: 5,  13: 7,  14: 8,  15: 13, 16: 16},
-    'secondary_link':{8: 1,  9: 1,  10: 1,  11: 2,  12: 3,  13: 4,  14: 6,  15: 8,  16: 10},
-    'tertiary':      {                              12: 2,  13: 3,  14: 6,  15: 5,  16: 10},
-    'tertiary_link': {                              12: 1,  13: 3,  14: 4,  15: 5,  16: 6},
-    'residential':   {                              12: 2,  13: 3,  14: 4,  15: 4,  16: 6},
-    'living_street': {                                      13: 2,  14: 3,  15: 4,  16: 4},
-    'unclassified':  {                              12: 2,  13: 3,  14: 5,  15: 3,  16: 9},
+    'primary':       {8: 2,  9: 2,  10: 2,  11: 2,  12: 3,  13: 4,  14: 6,  15: 9,  16: 14},
+    'primary_link':  {8: 1,  9: 1,  10: 2,  11: 2,  12: 4,  13: 6,  14: 8,  15: 8,  16: 12},
+    'secondary':     {       9: 1,  10: 2,  11: 2,  12: 5,  13: 7,  14: 8,  15: 8, 16: 16},
+    'secondary_link':{       9: 1,  10: 1,  11: 2,  12: 3,  13: 4,  14: 6,  15: 6,  16: 10},
+    'tertiary':      {                              12: 2,  13: 3,  14: 6,  15: 4,  16: 10},
+    'tertiary_link': {                              12: 1,  13: 3,  14: 4,  15: 4,  16: 6},
+    'residential':   {                              12: 2,  13: 3,  14: 4,  15: 3,  16: 6},
+    'living_street': {                                      13: 2,  14: 3,  15: 3,  16: 4},
+    'unclassified':  {                              12: 2,  13: 3,  14: 5,  15: 2,  16: 9},
     'service':       {                                              14: 2,  15: 3,  16: 4},
     'track':         {                                              14: 1,  15: 2,  16: 2},
     # Railway (increased for visible casing at z11+)
@@ -321,10 +322,7 @@ def get_feature_tiles(coords: List[Tuple[float, float]], zoom: int, is_polygon: 
 
 def get_layer_for_tags(tags: Dict[str, str]) -> Optional[str]:
     """Determine which layer a feature belongs to based on its tags."""
-    # Do not create polygons for abstract features like boundaries or place names
-    if 'place' in tags or 'boundary' in tags or 'admin_level' in tags:
-        return None
-
+    
     # Explicit rule for all water-related features
     if (tags.get('natural') == 'water' or
         tags.get('natural') == 'bay' or
@@ -332,6 +330,11 @@ def get_layer_for_tags(tags: Dict[str, str]) -> Optional[str]:
         'water' in tags or
         tags.get('landuse') == 'reservoir'):
         return 'water'
+    
+    # Do not create polygons for abstract features like boundaries or place names
+    if 'place' in tags or 'boundary' in tags or 'admin_level' in tags:
+        return None
+    
 
     # Explicit rule for buildings to ensure they are always on top of scenery
     if 'building' in tags:
@@ -751,7 +754,7 @@ class OSMHandler(osmium.SimpleHandler):
         if is_closed and is_area_tags and 'highway' not in tags:
             # This logic will be handled by area(), but we might catch some here.
             # Assign a polygon nibble just in case.
-            nibble = 5 if layer == 'water' else 2
+            nibble = 3 if layer == 'water' else 2
             
             subclass = tags.get('natural', '') or tags.get('landuse', '') or tags.get('leisure', '')
 
@@ -897,7 +900,15 @@ class OSMHandler(osmium.SimpleHandler):
         self.stats['areas_processed'] += 1
         self._log_progress()
 
+        # DEBUG: Check if area() is called
+        if self.stats['areas_processed'] <= 5:
+            print(f"[DEBUG] area() called! id={a.id}, area_count={self.stats['areas_processed']}")
+
         tags = self._tags_to_dict(a.tags)
+
+        # DEBUG: Trace water areas
+        if tags.get('natural') == 'water' or tags.get('waterway') == 'riverbank':
+            print(f"[DEBUG AREA] Water area id={a.id}, tags={tags}")
 
         # Skip boundary relations
         if tags.get('boundary') == 'administrative':
@@ -907,6 +918,7 @@ class OSMHandler(osmium.SimpleHandler):
         # Check if feature is in config and has a layer mapping
         if not self._is_feature_in_config(tags):
             self.stats['area_no_config'] += 1
+            print(f"[DEBUG REJECT] Area id={a.id} rejected: not in config, tags={tags}")
             return
 
         layer = get_layer_for_tags(tags)
@@ -976,7 +988,7 @@ class OSMHandler(osmium.SimpleHandler):
                         if len(interior.coords) >= 4:
                             inner_rings.append(list(interior.coords))
 
-                self.features.append({
+                feature_data = {
                     'geom_type': GEOM_POLYGON,
                     'coords': coords,
                     'color_rgb565': color_rgb565,
@@ -985,7 +997,13 @@ class OSMHandler(osmium.SimpleHandler):
                     'inner_rings': inner_rings,
                     'subclass': subclass,  # Store for merge logic
                     'layer': layer  # Store layer name for inner_rings handling
-                })
+                }
+
+                # DEBUG: Trace large water polygons
+                if layer == 'water' and len(coords) > 20:
+                    print(f"[EXTRACT] Water polygon: pts={len(coords)}, holes={len(inner_rings)}, subclass={subclass}, rgb565=0x{color_rgb565:04x}")
+
+                self.features.append(feature_data)
                 self.stats['features_extracted'] += 1
         except Exception as e:
             self.stats['area_exception'] += 1
@@ -1083,6 +1101,9 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     else:
                         sp = ShapelyPolygon(feat['coords'])
                     if sp.area < min_area_deg2:
+                        # DEBUG: Trace large water polygons being filtered
+                        if feat.get('layer') == 'water' and len(feat['coords']) > 20:
+                            print(f"[FILTER_AREA z{zoom}] Water polygon FILTERED: pts={len(feat['coords'])}, area={sp.area:.9f} < min={min_area_deg2:.9f}")
                         filtered_by_area += 1
                         continue  # Skip small polygons
 
@@ -1277,6 +1298,10 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             is_polygon = feature['geom_type'] == GEOM_POLYGON
 
             feature_layer = feature.get('layer', '')
+
+            # DEBUG: Check layer for large polygons
+            if is_polygon and len(orig_coords) > 100:
+                print(f"[WRITE] Large polygon: pts={len(orig_coords)}, layer='{feature_layer}', rgb565=0x{feature.get('color_rgb565', 0):04x}")
             if is_polygon and inner_rings and SHAPELY_AVAILABLE:
                 total_holes_write += len(inner_rings)
                 
@@ -1316,16 +1341,29 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                         geom = Polygon(orig_coords) if is_polygon else LineString(orig_coords)
                     if not geom.is_valid:
                         geom = geom.buffer(0)
-                    
+
+                    # DEBUG: Trace large water polygons before clipping
+                    if feature_layer == 'water' and len(orig_coords) > 100:
+                        lons = [lon for lon, lat in orig_coords]
+                        lats = [lat for lon, lat in orig_coords]
+                        print(f"[CLIP_IN z{zoom}] Water {tile_x}/{tile_y}: pts={len(orig_coords)}, "
+                              f"lon={min(lons):.5f} to {max(lons):.5f}, "
+                              f"lat={min(lats):.5f} to {max(lats):.5f}")
+
                     clipped = geom.intersection(clip_box)
                     if clipped.is_empty:
                         continue
-                        
+
                     parts = []
                     if isinstance(clipped, GeometryCollection):
                         parts = list(clipped.geoms)
                     else:
                         parts = [clipped]
+
+                    # DEBUG: Trace clipping results for large water polygons
+                    if feature_layer == 'water' and len(orig_coords) > 100:
+                        print(f"[CLIP_OUT z{zoom}] Water {tile_x}/{tile_y}: {len(orig_coords)} pts -> "
+                              f"{len(parts)} parts, types={[type(p).__name__ for p in parts]}")
                         
                     for part in parts:
                         if is_polygon:
@@ -1333,8 +1371,13 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                 polys = [part] if isinstance(part, Polygon) else list(part.geoms)
                                 for p in polys:
                                     if not p.is_empty and p.exterior and len(p.exterior.coords) >= 4:
-                                        # Simplify polygon AFTER clipping
-                                        simplified_poly = p.simplify(tolerance, preserve_topology=True)
+                                        # Simplify polygon AFTER clipping (but NOT for water)
+                                        if feature_layer == 'water':
+                                            if len(p.exterior.coords) > 20:
+                                                print(f"[NO_SIMP] Water polygon: {len(p.exterior.coords)} points NOT simplified")
+                                            simplified_poly = p  # No simplification for water
+                                        else:
+                                            simplified_poly = p.simplify(tolerance, preserve_topology=True)
                                         if simplified_poly.is_empty or not simplified_poly.exterior:
                                             continue
                                         rings = [list(simplified_poly.exterior.coords)]
@@ -1344,14 +1387,20 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                         final_features_data.append(rings)
                         else:
                             if isinstance(part, LineString) and len(part.coords) >= 2:
-                                # Simplify AFTER clipping with preserve_topology
-                                simplified = part.simplify(tolerance, preserve_topology=True)
+                                # Simplify AFTER clipping (but NOT for water)
+                                if feature_layer == 'water':
+                                    simplified = part  # No simplification for water
+                                else:
+                                    simplified = part.simplify(tolerance, preserve_topology=True)
                                 if len(simplified.coords) >= 2:
                                     final_features_data.append([list(simplified.coords)])
                             elif isinstance(part, MultiLineString):
                                 for l in part.geoms:
                                     if len(l.coords) >= 2:
-                                        simplified = l.simplify(tolerance, preserve_topology=True)
+                                        if feature_layer == 'water':
+                                            simplified = l  # No simplification for water
+                                        else:
+                                            simplified = l.simplify(tolerance, preserve_topology=True)
                                         if len(simplified.coords) >= 2:
                                             final_features_data.append([list(simplified.coords)])
                 except Exception as e:
@@ -1396,25 +1445,49 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
                 if is_polygon:
                     pixel_area = (f_max_x - f_min_x) * (f_max_y - f_min_y) / (16 * 16)
-                    if zoom <= 7:
-                        min_area = K_VISIBILITY * 8
-                    elif zoom == 8:
-                        min_area = K_VISIBILITY * 6  # z8 : très permissif (12 pixels²)
-                    elif zoom == 9:
-                        min_area = K_VISIBILITY * 8  # z9 : garde le bon niveau actuel
-                    elif zoom <= 11:
-                        min_area = K_VISIBILITY * 8
-                    elif zoom == 12:
-                        min_area = K_VISIBILITY * 5
-                    elif zoom == 13:
-                        min_area = K_VISIBILITY * 2
-                    elif zoom == 14:
-                        min_area = K_VISIBILITY * 0.5
-                    else:  # z15-16
-                        min_area = K_VISIBILITY * 0.1  # 0.2 px² - capture everything
-                    if pixel_area < min_area:
-                        filtered_by_size += 1
-                        continue
+
+                    # DEBUG: Track water polygon projection
+                    if feature_layer == 'water' and total_points > 20:
+                        # Get lon/lat bounds from original coords
+                        first_ring = feature_rings[0] if feature_rings else []
+                        if first_ring:
+                            lons = [lon for lon, lat in first_ring]
+                            lats = [lat for lon, lat in first_ring]
+                            lon_range = max(lons) - min(lons)
+                            lat_range = max(lats) - min(lats)
+                            # Get projected bounds
+                            first_proj = projected_rings[0] if projected_rings else []
+                            if first_proj:
+                                pxs = [px for px, py in first_proj]
+                                pys = [py for px, py in first_proj]
+                                px_range = max(pxs) - min(pxs)
+                                py_range = max(pys) - min(pys)
+                                print(f"[PROJ z{zoom}] Water {tile_x}/{tile_y}: pts={total_points}, "
+                                      f"lon_range={lon_range:.6f}°, lat_range={lat_range:.6f}°, "
+                                      f"px_range={px_range}, py_range={py_range}, "
+                                      f"pixel_area={pixel_area:.1f}px²")
+
+                    # Do NOT filter water by pixel area - keep all river segments
+                    if feature_layer != 'water':
+                        if zoom <= 7:
+                            min_area = K_VISIBILITY * 8
+                        elif zoom == 8:
+                            min_area = K_VISIBILITY * 6  # z8 : très permissif (12 pixels²)
+                        elif zoom == 9:
+                            min_area = K_VISIBILITY * 8  # z9 : garde le bon niveau actuel
+                        elif zoom <= 11:
+                            min_area = K_VISIBILITY * 8
+                        elif zoom == 12:
+                            min_area = K_VISIBILITY * 5
+                        elif zoom == 13:
+                            min_area = K_VISIBILITY * 2
+                        elif zoom == 14:
+                            min_area = K_VISIBILITY * 0.5
+                        else:  # z15-16
+                            min_area = K_VISIBILITY * 0.1  # 0.2 px² - capture everything
+                        if pixel_area < min_area:
+                            filtered_by_size += 1
+                            continue
 
                 # Hard limit: skip features exceeding uint16 capacity
                 # Impossible to render on ESP32 and would corrupt binary format
@@ -1500,11 +1573,16 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
     scanner.apply_file(input_pbf)
     logger.info(f"  Boundary ways found: {len(scanner.boundary_ways):,}")
 
-    # Second pass: extract all features
+    # Second pass: extract all features (including multipolygon relations)
     handler = OSMHandler(config, zoom_range)
     handler.boundary_ways = scanner.boundary_ways
-    logger.info("Pass 2: Processing OSM data...")
-    handler.apply_file(input_pbf, locations=True, idx='flex_mem')
+    logger.info("Pass 2: Processing OSM data (including Multipolygons)...")
+
+    area_manager = osmium.area.AreaManager()
+    idx = osmium.index.create_map('flex_mem')
+    nlw = osmium.NodeLocationsForWays(idx)
+    nlw.apply_nodes_to_ways = True
+    osmium.apply(input_pbf, nlw, area_manager, handler)
     print()
 
     elapsed = time.time() - start_time
@@ -1637,6 +1715,7 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                     'width_pixels': feature.get('width_pixels', 0),
                     'highway_type': hw_type,
                     'inner_rings': feature.get('inner_rings', []),
+                    'layer': feature.get('layer', ''),  # Preserve layer for water detection
                 }
 
             # Text labels: collect for collision detection
