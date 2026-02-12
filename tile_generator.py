@@ -132,9 +132,10 @@ LINE_WIDTH_PER_ZOOM = {
     'tram':          {                                            12: 1,  13: 2,  14: 2,  15: 3,  16: 4},
     'narrow_gauge':  {                                                    13: 2,  14: 2,  15: 3,  16: 4},
     'funicular':     {                                                    13: 2,  14: 2,  15: 3,  16: 4},
-    # Aeroway - typical runway ~45m, taxiway ~23m (scaled for visibility)
+    # Aeroway - typical runway ~45m, taxiway ~23m, helipad ~15m (scaled for visibility)
     'runway':        {                              10: 3,  11: 4,  12: 6,  13: 8,  14: 11, 15: 14, 16: 18, 17: 24, 18: 30},
     'taxiway':       {                              10: 2,  11: 2,  12: 3,  13: 4,  14: 5,  15: 7,  16: 9,  17: 12, 18: 15},
+    'helipad':       {                                            12: 2,  13: 3,  14: 4,  15: 5,  16: 6,  17: 8,  18: 10},
 }
 
 # Override color per zoom level (RGB565) - only for features that change color by zoom
