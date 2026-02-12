@@ -844,8 +844,9 @@ class OSMHandler(osmium.SimpleHandler):
             nibble = max(nibble - 11, 1)  # Shift down by 11, minimum 1
 
         # Densify curves for smooth rendering (add intermediate points)
-        # Roads/runways/railways need smooth curves to avoid triangular artifacts
-        if highway_type and len(coords) >= 2:
+        # Only for roads and railways - NOT aeroways (runways/taxiways should stay straight)
+        is_aeroway = tags.get('aeroway', '') != ''
+        if highway_type and not is_aeroway and len(coords) >= 2:
             coords = densify_linestring(coords, max_segment_degrees=0.0001)
 
         feature = {
