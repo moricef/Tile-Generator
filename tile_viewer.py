@@ -375,10 +375,10 @@ class NAVViewer:
                 x, y = points[i]
                 pygame.draw.circle(surface, color, (x, y), radius)
 
-        # Draw square caps at endpoints for flat, right-angle ends (not beveled)
+        # Draw square caps at endpoints: perpendicular line segments
         half_width = width / 2.0
 
-        # First endpoint
+        # First endpoint - draw perpendicular line
         if len(points) >= 2:
             x1, y1 = points[0]
             x2, y2 = points[1]
@@ -387,15 +387,12 @@ class NAVViewer:
             if length > 0:
                 # Perpendicular vector
                 px, py = -dy / length * half_width, dx / length * half_width
-                cap_points = [
-                    (x1 - px, y1 - py),
-                    (x1 + px, y1 + py),
-                    (x1 + px + dx/length, y1 + py + dy/length),
-                    (x1 - px + dx/length, y1 - py + dy/length)
-                ]
-                pygame.draw.polygon(surface, color, cap_points)
+                pygame.draw.line(surface, color,
+                               (int(x1 - px), int(y1 - py)),
+                               (int(x1 + px), int(y1 + py)),
+                               max(1, width // 2))
 
-        # Last endpoint
+        # Last endpoint - draw perpendicular line
         if len(points) >= 2:
             x1, y1 = points[-2]
             x2, y2 = points[-1]
@@ -404,13 +401,10 @@ class NAVViewer:
             if length > 0:
                 # Perpendicular vector
                 px, py = -dy / length * half_width, dx / length * half_width
-                cap_points = [
-                    (x2 - px, y2 - py),
-                    (x2 + px, y2 + py),
-                    (x2 + px - dx/length, y2 + py - dy/length),
-                    (x2 - px - dx/length, y2 - py - dy/length)
-                ]
-                pygame.draw.polygon(surface, color, cap_points)
+                pygame.draw.line(surface, color,
+                               (int(x2 - px), int(y2 - py)),
+                               (int(x2 + px), int(y2 + py)),
+                               max(1, width // 2))
 
     def _render_road_casing(self, surface: pygame.Surface, feature: NavFeature):
         """Render road casing (border) for two-pass rendering - Pass 1 only."""
