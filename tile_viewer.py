@@ -374,7 +374,43 @@ class NAVViewer:
             for i in range(1, len(points) - 1):
                 x, y = points[i]
                 pygame.draw.circle(surface, color, (x, y), radius)
-        # Endpoint circles removed - runways should have flat ends, not rounded
+
+        # Draw square caps at endpoints for flat, right-angle ends (not beveled)
+        half_width = width / 2.0
+
+        # First endpoint
+        if len(points) >= 2:
+            x1, y1 = points[0]
+            x2, y2 = points[1]
+            dx, dy = x2 - x1, y2 - y1
+            length = (dx*dx + dy*dy) ** 0.5
+            if length > 0:
+                # Perpendicular vector
+                px, py = -dy / length * half_width, dx / length * half_width
+                cap_points = [
+                    (x1 - px, y1 - py),
+                    (x1 + px, y1 + py),
+                    (x1 + px + dx/length, y1 + py + dy/length),
+                    (x1 - px + dx/length, y1 - py + dy/length)
+                ]
+                pygame.draw.polygon(surface, color, cap_points)
+
+        # Last endpoint
+        if len(points) >= 2:
+            x1, y1 = points[-2]
+            x2, y2 = points[-1]
+            dx, dy = x2 - x1, y2 - y1
+            length = (dx*dx + dy*dy) ** 0.5
+            if length > 0:
+                # Perpendicular vector
+                px, py = -dy / length * half_width, dx / length * half_width
+                cap_points = [
+                    (x2 - px, y2 - py),
+                    (x2 + px, y2 + py),
+                    (x2 + px - dx/length, y2 + py - dy/length),
+                    (x2 - px - dx/length, y2 - py - dy/length)
+                ]
+                pygame.draw.polygon(surface, color, cap_points)
 
     def _render_road_casing(self, surface: pygame.Surface, feature: NavFeature):
         """Render road casing (border) for two-pass rendering - Pass 1 only."""
