@@ -998,7 +998,7 @@ class OSMHandler(osmium.SimpleHandler):
                 'landuse': 2, 'terrain': 2,      # Z=2: Landcover (residential, forest, grass)
                 'water': 3,                      # Z=3: All water bodies
                 'leisure': 4, 'amenities': 4,    # Z=4: Parks and amenities
-                'buildings': 5,                   # Z=5: Buildings
+                'buildings': 7,                   # Z=7: Buildings (above infrastructure)
                 'infrastructure': 6
             }
             nibble = layer_to_nibble.get(layer, 2)
