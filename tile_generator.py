@@ -105,30 +105,36 @@ WIDTH_TAGS = {'highway', 'railway', 'waterway'}
 # Fixed width in pixels per feature type and zoom level (OSM Carto style)
 # Format: type_value -> {zoom: pixels}
 LINE_WIDTH_PER_ZOOM = {
-    # Highway (widths increased for visible casing at z11+)
-    # Casing needs ≥10px to be visible (2px border each side)
-    'motorway':      {8: 2,  9: 2,  10: 3,  11: 5,  12: 7,  13: 10, 14: 12, 15: 14, 16: 16},
-    'motorway_link': {8: 2,  9: 2,  10: 3,  11: 3,  12: 6,  13: 9,  14: 11, 15: 12, 16: 12},
-    'trunk':         {8: 2,  9: 2,  10: 3,  11: 4,  12: 6,  13: 9,  14: 11, 15: 12, 16: 16},
-    'trunk_link':    {8: 2,  9: 2,  10: 3,  11: 3,  12: 5,  13: 8,  14: 10, 15: 10, 16: 15},
-    'primary':       {8: 2,  9: 2,  10: 2,  11: 2,  12: 4,  13: 4,  14: 6,  15: 9,  16: 14},
-    'primary_link':  {8: 1,  9: 1,  10: 2,  11: 2,  12: 3,  13: 6,  14: 8,  15: 7,  16: 12},
-    'secondary':     {       9: 1,  10: 2,  11: 2,  12: 3,  13: 7,  14: 8,  15: 8,  16: 16},
-    'secondary_link':{       9: 1,  10: 1,  11: 2,  12: 2,  13: 4,  14: 6,  15: 6,  16: 10},
-    'tertiary':      {                              12: 2,  13: 3,  14: 4,  15: 7,  16: 6},
-    'tertiary_link': {                              12: 1,  13: 3,  14: 4,  15: 4,  16: 6},
-    'residential':   {                              12: 1,  13: 1,  14: 2,  15: 4,  16: 6},
-    'pedestrian':    {                                      13: 2,  14: 3,  15: 4,  16: 6},
-    'living_street': {                                      13: 2,  14: 3,  15: 2,  16: 4},
-    'unclassified':  {                                      13: 1,  14: 1,  15: 2,  16: 2},
-    'service':       {                                              14: 1,  15: 1,  16: 2},
-    'track':         {                                              14: 1,  15: 2,  16: 3},
-    # Railway (increased for visible casing at z11+)
-    'rail':          {8: 2, 9: 2,  10: 2,   11:2,   12: 2,  13: 3,  14: 3,  15: 3,  16: 4},
-    'subway':        {                              12: 1,  13: 2,  14: 2,  15: 3,  16: 4},
-    'tram':          {                              12: 1,  13: 2,  14: 2,  15: 3,  16: 4},
-    'narrow_gauge':  {                                      13: 2,  14: 2,  15: 3,  16: 4},
-    'funicular':     {                                      13: 2,  14: 2,  15: 3,  16: 4},
+    # Highway - based on OpenStreetMap Carto standard
+    'motorway':      {6: 1,  7: 1,  8: 1,  9: 1,  10: 2,  11: 2,  12: 4,  13: 6,  14: 6,  15: 10, 16: 10, 17: 18, 18: 21, 19: 27},
+    'motorway_link': {                            10: 1,  11: 1,  12: 2,  13: 4,  14: 4,  15: 8,  16: 8,  17: 12, 18: 13, 19: 16},
+    'trunk':         {6: 1,  7: 1,  8: 1,  9: 1,  10: 2,  11: 2,  12: 4,  13: 6,  14: 6,  15: 10, 16: 10, 17: 18, 18: 21, 19: 27},
+    'trunk_link':    {                            10: 1,  11: 1,  12: 2,  13: 4,  14: 4,  15: 8,  16: 8,  17: 12, 18: 13, 19: 16},
+    'primary':       {              8: 1,  9: 1,  10: 2,  11: 2,  12: 4,  13: 5,  14: 5,  15: 10, 16: 10, 17: 18, 18: 21, 19: 27},
+    'primary_link':  {                            10: 1,  11: 1,  12: 2,  13: 4,  14: 4,  15: 8,  16: 8,  17: 12, 18: 13, 19: 16},
+    'secondary':     {              8: 1,  9: 1,  10: 1,  11: 1,  12: 4,  13: 5,  14: 5,  15: 9,  16: 10, 17: 18, 18: 21, 19: 27},
+    'secondary_link':{                            10: 1,  11: 1,  12: 2,  13: 4,  14: 4,  15: 7,  16: 7,  17: 12, 18: 13, 19: 16},
+    'tertiary':      {                            10: 1,  11: 1,  12: 3,  13: 4,  14: 5,  15: 9,  16: 10, 17: 18, 18: 21, 19: 27},
+    'tertiary_link': {                                            12: 2,  13: 3,  14: 3,  15: 7,  16: 7,  17: 12, 18: 13, 19: 16},
+    'residential':   {                                            12: 1,  13: 3,  14: 3,  15: 5,  16: 6,  17: 12, 18: 13, 19: 17},
+    'pedestrian':    {                                                    13: 2,  14: 3,  15: 5,  16: 6,  17: 12, 18: 13, 19: 17},
+    'living_street': {                                                    13: 2,  14: 3,  15: 5,  16: 6,  17: 12, 18: 13, 19: 17},
+    'unclassified':  {                                            12: 1,  13: 3,  14: 3,  15: 5,  16: 6,  17: 12, 18: 13, 19: 17},
+    'service':       {                                                    13: 1,  14: 1,  15: 1,  16: 2,  17: 7,  18: 9,  19: 11},
+    'track':         {                                                    13: 1,  14: 1,  15: 2,  16: 2,  17: 3,  18: 4,  19: 5},
+    'footway':       {                                                    13: 1,  14: 1,  15: 1,  16: 1,  17: 2,  18: 2,  19: 2},
+    'cycleway':      {                                                    13: 1,  14: 1,  15: 1,  16: 1,  17: 2,  18: 2,  19: 2},
+    'path':          {                                                    13: 1,  14: 1,  15: 1,  16: 1,  17: 2,  18: 2,  19: 2},
+    'bridleway':     {                                                    13: 1,  14: 1,  15: 1,  16: 1},
+    # Railway - based on OpenStreetMap Carto standard
+    'rail':          {              8: 2,  9: 2,  10: 2,  11: 2,  12: 2,  13: 3,  14: 3,  15: 3,  16: 4},
+    'subway':        {                                            12: 1,  13: 2,  14: 2,  15: 3,  16: 4},
+    'tram':          {                                            12: 1,  13: 2,  14: 2,  15: 3,  16: 4},
+    'narrow_gauge':  {                                                    13: 2,  14: 2,  15: 3,  16: 4},
+    'funicular':     {                                                    13: 2,  14: 2,  15: 3,  16: 4},
+    # Aeroway - typical runway ~45m, taxiway ~23m (scaled for visibility)
+    'runway':        {                              10: 3,  11: 4,  12: 6,  13: 8,  14: 11, 15: 14, 16: 18, 17: 24, 18: 30},
+    'taxiway':       {                              10: 2,  11: 2,  12: 3,  13: 4,  14: 5,  15: 7,  16: 9,  17: 12, 18: 15},
 }
 
 # Override color per zoom level (RGB565) - only for features that change color by zoom
@@ -138,6 +144,8 @@ LINE_COLOR_PER_ZOOM = {
     'residential':   {12: '#cccccc'},  # grey at z12, white (from JSON) at z13+
     'unclassified':  {12: '#cccccc'},
     'living_street': {12: '#cccccc'},
+    'track':         {14: '#996600', 15: '#ffffff', 16: '#ffffff'},  # brown at z14, white at z15+
+    'service':       {16: '#cccccc'},  # white at z15, grey at z16+
 }
 
 # Cache for zoom level parameters
@@ -456,7 +464,7 @@ def get_simplify_tolerance(zoom: int) -> float:
     """Calculate simplification tolerance based on zoom level."""
     tile_width_degrees = 360.0 / (2.0 ** zoom)
     pixel_size_degrees = tile_width_degrees / 256.0
-    return pixel_size_degrees * 0.5  # Keep more detail for smoother curves
+    return pixel_size_degrees * 0.25  # Reduced from 0.5 to preserve roundabouts and curves
 
 
 class BoundaryScanner(osmium.SimpleHandler):
@@ -795,20 +803,33 @@ class OSMHandler(osmium.SimpleHandler):
             # Z=12: Secondary roads
             'secondary': 12, 'tertiary': 12,
             # Z=11: Residential and minor roads
-            'residential': 11, 'unclassified': 11, 'living_street': 11,
-            # Z=9: All links/ramps (must be below main roads)
-            'motorway_link': 9, 'trunk_link': 9, 'primary_link': 9, 'secondary_link': 9, 'tertiary_link': 9,
+            'residential': 11, 'unclassified': 11, 'living_street': 11, 'pedestrian': 11,
+            # Z=9-10: Links/ramps differentiated by hierarchy (below main roads but above service)
+            'motorway_link': 11, 'trunk_link': 10, 'primary_link': 10, 'secondary_link': 9, 'tertiary_link': 9,
             # Z=8: Service, tracks and paths
             'service': 8, 'track': 8, 'path': 8, 'footway': 8, 'cycleway': 8
         }
-        
+
         if layer == 'water':
             nibble = 5
         else:
             nibble = priority_map.get(highway_type, 8)  # Default for other minor ways
 
-        if tags.get('bridge') in ('yes', 'viaduct'): nibble = 15  # Z=15: Bridges (absolute top)
-        if tags.get('tunnel') in ('yes', 'culvert'): nibble = 1   # Z=1: Tunnels (below landuse)
+        # Bridges: shift up to ensure above ALL normal roads (max normal road is 13)
+        # Major bridges (roads/links): nibble+3 ensures above normal motorway (13)
+        # Minor bridges (track/path): nibble+2 sufficient for hierarchy
+        original_nibble = nibble
+        if tags.get('bridge') in ('yes', 'viaduct'):
+            if highway_type in ('track', 'path', 'footway', 'cycleway', 'bridleway'):
+                nibble = min(nibble + 2, 15)  # Minor bridges: +2
+            else:
+                nibble = min(nibble + 3, 15)  # Major bridges: +3 to be above motorway(13)
+            print(f"[BRIDGE] way={w.id}, ref={ref}, highway={highway_type}, nibble {original_nibble}→{nibble}")
+
+        # Tunnels: shift down to ensure below ground level while preserving hierarchy
+        # motorway tunnel: max(13-11,1)=2, secondary tunnel: max(12-11,1)=1, etc.
+        if tags.get('tunnel') in ('yes', 'culvert'):
+            nibble = max(nibble - 11, 1)  # Shift down by 11, minimum 1
 
         feature = {
             'id': w.id,
@@ -1372,13 +1393,15 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                 polys = [part] if isinstance(part, Polygon) else list(part.geoms)
                                 for p in polys:
                                     if not p.is_empty and p.exterior and len(p.exterior.coords) >= 4:
-                                        # Simplify polygon AFTER clipping (but NOT for water)
-                                        if feature_layer == 'water':
-                                            if len(p.exterior.coords) > 20:
-                                                print(f"[NO_SIMP] Water polygon: {len(p.exterior.coords)} points NOT simplified")
-                                            simplified_poly = p  # No simplification for water
-                                        else:
+                                        # Simplify polygon AFTER clipping
+                                        # Simplify: landuse, terrain (forests, parks, etc.)
+                                        # NO simplification: water, buildings, infrastructure (preserve precision)
+                                        if feature_layer in ('landuse', 'terrain'):
                                             simplified_poly = p.simplify(tolerance, preserve_topology=True)
+                                        else:
+                                            if feature_layer == 'water' and len(p.exterior.coords) > 20:
+                                                print(f"[NO_SIMP] Water polygon: {len(p.exterior.coords)} points NOT simplified")
+                                            simplified_poly = p  # No simplification for water/buildings
                                         if simplified_poly.is_empty or not simplified_poly.exterior:
                                             continue
                                         rings = [list(simplified_poly.exterior.coords)]
@@ -1388,9 +1411,9 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                         final_features_data.append(rings)
                         else:
                             if isinstance(part, LineString) and len(part.coords) >= 2:
-                                # Simplify AFTER clipping (but NOT for water)
-                                if feature_layer == 'water':
-                                    simplified = part  # No simplification for water
+                                # Simplify AFTER clipping (but NOT for water or roads)
+                                if feature_layer in ('water', 'roads'):
+                                    simplified = part  # No simplification for water/roads (preserve curves/roundabouts)
                                 else:
                                     simplified = part.simplify(tolerance, preserve_topology=True)
                                 if len(simplified.coords) >= 2:
@@ -1398,8 +1421,8 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                             elif isinstance(part, MultiLineString):
                                 for l in part.geoms:
                                     if len(l.coords) >= 2:
-                                        if feature_layer == 'water':
-                                            simplified = l  # No simplification for water
+                                        if feature_layer in ('water', 'roads'):
+                                            simplified = l  # No simplification for water/roads
                                         else:
                                             simplified = l.simplify(tolerance, preserve_topology=True)
                                         if len(simplified.coords) >= 2:
