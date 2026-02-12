@@ -358,53 +358,15 @@ class NAVViewer:
 
     def _draw_smooth_line(self, surface: pygame.Surface, color: Tuple[int, int, int],
                           points: List[Tuple[int, int]], width: int):
-        """Draw line with circles at joints for smooth curves without triangular artifacts."""
+        """Draw line with simple pygame rendering."""
         if len(points) < 2:
             return
 
-        # Draw line segments
+        # Simple line drawing without circles or custom caps to avoid artifacts
         if width > 1:
             pygame.draw.lines(surface, color, False, points, width)
-
-        # Draw filled circles at joints only (not every point) for smooth connections
-        # Only draw circles at significant direction changes to avoid visual artifacts
-        radius = max(1, width // 3)  # Very thin circles, about 1/3 of line width
-        if len(points) >= 3:
-            # Draw circles only at joints (skip first and last to avoid endpoint artifacts)
-            for i in range(1, len(points) - 1):
-                x, y = points[i]
-                pygame.draw.circle(surface, color, (x, y), radius)
-
-        # Draw square caps at endpoints: perpendicular line segments
-        half_width = width / 2.0
-
-        # First endpoint - draw perpendicular line
-        if len(points) >= 2:
-            x1, y1 = points[0]
-            x2, y2 = points[1]
-            dx, dy = x2 - x1, y2 - y1
-            length = (dx*dx + dy*dy) ** 0.5
-            if length > 0:
-                # Perpendicular vector
-                px, py = -dy / length * half_width, dx / length * half_width
-                pygame.draw.line(surface, color,
-                               (int(x1 - px), int(y1 - py)),
-                               (int(x1 + px), int(y1 + py)),
-                               max(1, width // 2))
-
-        # Last endpoint - draw perpendicular line
-        if len(points) >= 2:
-            x1, y1 = points[-2]
-            x2, y2 = points[-1]
-            dx, dy = x2 - x1, y2 - y1
-            length = (dx*dx + dy*dy) ** 0.5
-            if length > 0:
-                # Perpendicular vector
-                px, py = -dy / length * half_width, dx / length * half_width
-                pygame.draw.line(surface, color,
-                               (int(x2 - px), int(y2 - py)),
-                               (int(x2 + px), int(y2 + py)),
-                               max(1, width // 2))
+        else:
+            pygame.draw.lines(surface, color, False, points, 1)
 
     def _render_road_casing(self, surface: pygame.Surface, feature: NavFeature):
         """Render road casing (border) for two-pass rendering - Pass 1 only."""
