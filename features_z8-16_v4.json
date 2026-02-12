@@ -490,96 +490,101 @@
     "color": "#bbbbbb",
     "priority": 48
   },
-
-  "highway=motorway": {
+"highway=motorway": {
     "zoom": 6,
     "color": "#e990a0",
-    "priority": 50
+    "priority": 60
   },
   "highway=trunk": {
     "zoom": 6,
     "color": "#f9b29c",
-    "priority": 51
+    "priority": 59
   },
   "highway=primary": {
     "zoom": 7,
     "color": "#fcd6a4",
-    "priority": 52
+    "priority": 58
   },
   "highway=secondary": {
     "zoom": 9,
     "color": "#f7fabf",
-    "priority": 53
+    "priority": 57
   },
   "highway=tertiary": {
     "zoom": 12,
     "color": "#ffffff",
-    "priority": 54
-  },
-  "highway=construction": {
-    "zoom": 13,
-    "color": "#aaaaaa",
-    "priority": 55
-  },
-  "highway=living_street": {
-    "zoom": 13,
-    "color": "#ededed",
-    "priority": 55
-  },
-  "highway=motorway_link": {
-    "zoom": 10,
-    "color": "#e990a0",
-    "priority": 55
-  },
-  "highway=platform": {
-    "zoom": 13,
-    "color": "#bbbbbb",
-    "priority": 55
-  },
-  "highway=primary_link": {
-    "zoom": 11,
-    "color": "#fcd6a4",
-    "priority": 55
-  },
-  "highway=residential": {
-    "zoom": 12,
-    "color": "#ffffff",
-    "priority": 55
-  },
-  "highway=secondary_link": {
-    "zoom": 12,
-    "color": "#f7f496",
-    "priority": 55
-  },
-  "highway=tertiary_link": {
-    "zoom": 12,
-    "color": "#ffffff",
-    "priority": 55
-  },
-  "highway=trunk_link": {
-    "zoom": 10,
-    "color": "#f9b29c",
-    "priority": 55
+    "priority": 56
   },
   "highway=unclassified": {
     "zoom": 12,
     "color": "#ffffff",
     "priority": 55
   },
-  "highway=service": {
+  "highway=residential": {
+    "zoom": 12,
+    "color": "#ffffff",
+    "priority": 54
+  },
+  "highway=living_street": {
+    "zoom": 13,
+    "color": "#ededed",
+    "priority": 53
+  },
+  "highway=pedestrian": {
+    "zoom": 13,
+    "color": "#dedee8",
+    "priority": 56
+  },
+  
+  "highway=motorway_link": {
+    "zoom": 10,
+    "color": "#e990a0",
+    "priority": 50
+  },
+  "highway=trunk_link": {
+    "zoom": 10,
+    "color": "#f9b29c",
+    "priority": 49
+  },
+  "highway=primary_link": {
+    "zoom": 11,
+    "color": "#fcd6a4",
+    "priority": 48
+  },
+  "highway=secondary_link": {
+    "zoom": 12,
+    "color": "#f7f496",
+    "priority": 47
+  },
+  "highway=tertiary_link": {
+    "zoom": 12,
+    "color": "#ffffff",
+    "priority": 46
+  },
+   "highway=service": {
     "zoom": 15,
     "color": "#ffffff",
-    "priority": 56
+    "priority": 40
   },
   "highway=track": {
     "zoom": 14,
     "color": "#996600",
-    "priority": 57
+    "priority": 38
   },
+  "highway=construction": {
+    "zoom": 13,
+    "color": "#aaaaaa",
+    "priority": 30
+  },
+  "highway=platform": {
+    "zoom": 13,
+    "color": "#bbbbbb",
+    "priority": 20
+  },  
   "tunnel=yes": {
     "zoom": 13,
     "color": "#aaaaaa",
-    "priority": 60
+    "priority": 10
   },
   "aeroway=apron": {
     "zoom": 12,
@@ -610,13 +615,13 @@
     "zoom": 12,
     "color": "#bbbbcc",
     "priority": 68,
-    "width": 2
+    "width": 5
   },
   "aeroway=taxiway": {
     "zoom": 12,
     "color": "#bbbbcc",
     "priority": 67,
-    "width": 1
+    "width": 5
   },
   "man_made=embankment": {
     "zoom": 12,

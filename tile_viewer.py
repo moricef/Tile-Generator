@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 # UI Constants
 TILE_SIZE = 256
 VIEWPORT_SIZE = 768
-TOOLBAR_WIDTH = 200
+TOOLBAR_WIDTH = 350  # Increased for better stats/legend visibility
 STATUSBAR_HEIGHT = 60
 WINDOW_WIDTH = VIEWPORT_SIZE + TOOLBAR_WIDTH
 WINDOW_HEIGHT = VIEWPORT_SIZE + STATUSBAR_HEIGHT
@@ -390,6 +390,16 @@ class NAVViewer:
             rings = feature.get_rings()
             if not rings: return
 
+            # DEBUG: Print info for blue-ish polygons (water)
+            if 150 <= color[2] <= 235 and 160 <= color[1] <= 220 and 150 <= color[0] <= 180:
+                first_ring = rings[0] if rings else []
+                print(f"DEBUG POLYGON water: tile={feature.tile_x}/{feature.tile_y}, color={color}, "
+                      f"rgb565=0x{feature.color_rgb565:04x}, rings={len(rings)}, "
+                      f"pts_first_ring={len(first_ring)}, "
+                      f"min_zoom={feature.min_zoom}, priority={feature.priority}")
+                if first_ring and len(first_ring) >= 3:
+                    print(f"  RAW coords: first={first_ring[0]}, second={first_ring[1]}, last={first_ring[-1]}")
+
             # Only draw exterior ring (first ring)
             # Inner rings (holes) are NOT drawn - they stay transparent
             # This allows features below to show through (e.g., islands in rivers)
@@ -399,6 +409,16 @@ class NAVViewer:
 
                 pts = [self._tile_coord_to_screen(feature.tile_x, feature.tile_y, x, y) for x, y in ring]
                 if len(pts) >= 3:
+                    # DEBUG: Print when drawing water polygon
+                    if 150 <= color[2] <= 235 and 160 <= color[1] <= 220 and 150 <= color[0] <= 180:
+                        if len(pts) >= 80:  # Large polygons - show full extent
+                            xs = [p[0] for p in pts]
+                            ys = [p[1] for p in pts]
+                            print(f"  -> SCREEN coords ring {i}: first={pts[0]}, second={pts[1]}, last={pts[-1]}")
+                            print(f"     ALL {len(pts)} points: X=[{min(xs)}, {max(xs)}] ({max(xs)-min(xs)} px), Y=[{min(ys)}, {max(ys)}] ({max(ys)-min(ys)} px)")
+                        else:
+                            print(f"  -> SCREEN coords ring {i}: first={pts[0]}, second={pts[1]}, last={pts[-1]}")
+
                     if self.fill_polygons:
                         pygame.draw.polygon(surface, color, pts, 0)  # 0 = filled
                     else:
@@ -427,7 +447,9 @@ class NAVViewer:
         tl_x, tl_y = center_x - 1.5, center_y - 1.5
         fx, fy = tl_x + (pixel_x / TILE_SIZE), tl_y + (pixel_y / TILE_SIZE)
 
-        for feature in reversed(self.cached_features):
+        # Test features in priority order (highest first) for correct hit-testing
+        sorted_features = sorted(self.cached_features, key=lambda f: f.priority, reverse=True)
+        for feature in sorted_features:
             if self._point_in_feature(fx, fy, feature):
                 bx1, by1, bx2, by2 = feature.bbox
                 color_hex = f"#{rgb565_to_rgb888(feature.color_rgb565)[0]:02x}{rgb565_to_rgb888(feature.color_rgb565)[1]:02x}{rgb565_to_rgb888(feature.color_rgb565)[2]:02x}"
