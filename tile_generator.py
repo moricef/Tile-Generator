@@ -1003,6 +1003,11 @@ class OSMHandler(osmium.SimpleHandler):
             }
             nibble = layer_to_nibble.get(layer, 2)
 
+            # Special case: grassland gets nibble=3 to render above other landuse
+            # This prevents grey features at nibble=2 from covering grassland
+            if tags.get('natural') == 'grassland':
+                nibble = 3
+
             color = get_color_for_tags(tags, self.config)
             color_rgb565 = hex_to_rgb565(color)
             
