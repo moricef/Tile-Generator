@@ -359,10 +359,18 @@ class NAVViewer:
         if width > 1:
             pygame.draw.lines(surface, color, False, points, width)
 
-        # Draw filled circles at each joint for smooth connections
-        radius = max(1, width // 2)
-        for x, y in points:
-            pygame.draw.circle(surface, color, (x, y), radius)
+        # Draw filled circles at joints only (not every point) for smooth connections
+        # Only draw circles at significant direction changes to avoid visual artifacts
+        radius = max(1, (width - 1) // 2)  # Slightly smaller than line width
+        if len(points) >= 3:
+            # Draw circles only at joints (skip first and last to avoid endpoint artifacts)
+            for i in range(1, len(points) - 1):
+                x, y = points[i]
+                pygame.draw.circle(surface, color, (x, y), radius)
+        # Always draw at endpoints for proper line caps
+        if len(points) >= 2:
+            pygame.draw.circle(surface, color, points[0], radius)
+            pygame.draw.circle(surface, color, points[-1], radius)
 
     def _render_road_casing(self, surface: pygame.Surface, feature: NavFeature):
         """Render road casing (border) for two-pass rendering - Pass 1 only."""

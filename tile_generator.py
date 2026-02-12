@@ -1114,16 +1114,23 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
     t_min_merc = lat_to_merc(tile_min_lat)
     merc_range = t_max_merc - t_min_merc
 
-    # Clipping box with 10% margin to avoid artifacts and ensure overlap
-    margin = 0.10
-    lon_margin = (tile_max_lon - tile_min_lon) * margin
-    lat_margin = (tile_max_lat - tile_min_lat) * margin
-    
+    # Clipping box with margins: 10% for polygons, 100% for linestrings (long runways)
+    poly_margin = 0.10  # Small margin for polygons to avoid artifacts
+    line_margin = 1.0   # 100% = 1 full tile margin for runways spanning 8-12 tiles
+
+    poly_lon_margin = (tile_max_lon - tile_min_lon) * poly_margin
+    poly_lat_margin = (tile_max_lat - tile_min_lat) * poly_margin
+    line_lon_margin = (tile_max_lon - tile_min_lon) * line_margin
+    line_lat_margin = (tile_max_lat - tile_min_lat) * line_margin
+
     clip_box = None
+    clip_box_line = None
     if SHAPELY_AVAILABLE:
         from shapely.geometry import box, Polygon, MultiPolygon, LineString, MultiLineString, GeometryCollection
-        clip_box = box(tile_min_lon - lon_margin, tile_min_lat - lat_margin, 
-                       tile_max_lon + lon_margin, tile_max_lat + lat_margin)
+        clip_box = box(tile_min_lon - poly_lon_margin, tile_min_lat - poly_lat_margin,
+                       tile_max_lon + poly_lon_margin, tile_max_lat + poly_lat_margin)
+        clip_box_line = box(tile_min_lon - line_lon_margin, tile_min_lat - line_lat_margin,
+                            tile_max_lon + line_lon_margin, tile_max_lat + line_lat_margin)
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
@@ -1391,8 +1398,9 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
             final_features_data = []
 
-            # Clip geometry (with coordinate clamping for long linestrings)
-            if clip_box:
+            # Clip geometry (polygons with small margin, linestrings with large margin)
+            active_clip_box = clip_box_line if (not is_polygon and clip_box_line) else clip_box
+            if active_clip_box:
                 try:
                     from shapely.geometry import Polygon, MultiPolygon, LineString, MultiLineString, GeometryCollection
                     if is_polygon and inner_rings:
@@ -1410,7 +1418,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                               f"lon={min(lons):.5f} to {max(lons):.5f}, "
                               f"lat={min(lats):.5f} to {max(lats):.5f}")
 
-                    clipped = geom.intersection(clip_box)
+                    clipped = geom.intersection(active_clip_box)
                     if clipped.is_empty:
                         continue
 
