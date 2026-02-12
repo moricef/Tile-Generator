@@ -320,13 +320,18 @@ class NAVViewer:
 
         # Pass 2: Render all features normally (including road cores)
         # Low priority rendered first = below, high priority rendered last = above
-        # DEBUG: Log rendering order for roads/railways to verify priority
-        debug_count = 0
+        # DEBUG: Log rendering order for roads/railways/polygons to verify priority
+        debug_line_count = 0
+        debug_poly_count = 0
         for feature in features:
-            if feature.geom_type == GEOM_LINESTRING and feature.priority >= 8 and debug_count < 30:
+            if feature.geom_type == GEOM_LINESTRING and feature.priority >= 8 and debug_line_count < 30:
                 color = rgb565_to_rgb888(feature.color_rgb565)
-                print(f"[RENDER] priority={feature.priority}, color=#{color[0]:02x}{color[1]:02x}{color[2]:02x}, width={feature.width}")
-                debug_count += 1
+                print(f"[RENDER LINE] priority={feature.priority}, color=#{color[0]:02x}{color[1]:02x}{color[2]:02x}, width={feature.width}")
+                debug_line_count += 1
+            elif feature.geom_type == GEOM_POLYGON and feature.priority <= 5 and debug_poly_count < 30:
+                color = rgb565_to_rgb888(feature.color_rgb565)
+                print(f"[RENDER POLY] priority={feature.priority}, color=#{color[0]:02x}{color[1]:02x}{color[2]:02x}, pts={len(feature.coords)}")
+                debug_poly_count += 1
             self._render_feature(surface, feature)
 
         if self.show_tile_grid:
@@ -394,7 +399,24 @@ class NAVViewer:
 
         elif feature.geom_type == GEOM_POLYGON:
             rings = feature.get_rings()
-            if not rings: return
+            if not rings:
+                print(f"[POLYGON EMPTY] No rings for priority={feature.priority}, color=#{color[0]:02x}{color[1]:02x}{color[2]:02x}")
+                return
+
+            # DEBUG: Print info for green-ish polygons (grassland #cdebb0 = RGB 205,235,176)
+            if 195 <= color[0] <= 210 and 225 <= color[1] <= 240 and 170 <= color[2] <= 185:
+                first_ring = rings[0] if rings else []
+                print(f"[DEBUG GRASSLAND] tile={feature.tile_x}/{feature.tile_y}, color={color}, "
+                      f"rgb565=0x{feature.color_rgb565:04x}, rings={len(rings)}, "
+                      f"pts_first_ring={len(first_ring)}, "
+                      f"min_zoom={feature.min_zoom}, priority={feature.priority}")
+                if first_ring and len(first_ring) >= 3:
+                    # Convert to screen coords to check visibility
+                    screen_pts = [self._tile_coord_to_screen(feature.tile_x, feature.tile_y, x, y) for x, y in first_ring]
+                    xs = [p[0] for p in screen_pts]
+                    ys = [p[1] for p in screen_pts]
+                    print(f"  SCREEN: X=[{min(xs)}, {max(xs)}], Y=[{min(ys)}, {max(ys)}], "
+                          f"viewport=[0, {VIEWPORT_SIZE}]")
 
             # DEBUG: Print info for blue-ish polygons (water)
             if 150 <= color[2] <= 235 and 160 <= color[1] <= 220 and 150 <= color[0] <= 180:
@@ -414,7 +436,23 @@ class NAVViewer:
                     continue  # Skip holes when filling (keep transparent)
 
                 pts = [self._tile_coord_to_screen(feature.tile_x, feature.tile_y, x, y) for x, y in ring]
+
+                # DEBUG grassland rendering
+                if 195 <= color[0] <= 210 and 225 <= color[1] <= 240 and 170 <= color[2] <= 185:
+                    xs = [p[0] for p in pts] if pts else []
+                    ys = [p[1] for p in pts] if pts else []
+                    print(f"  [RENDER ATTEMPT] ring {i}, raw_pts={len(ring)}, screen_pts={len(pts)}, tile={feature.tile_x}/{feature.tile_y}")
+                    if len(pts) >= 3:
+                        print(f"    COORDS: X=[{min(xs)}, {max(xs)}], Y=[{min(ys)}, {max(ys)}], viewport=[0, {VIEWPORT_SIZE}]")
+                    else:
+                        print(f"    SKIPPED: not enough screen points!")
+
                 if len(pts) >= 3:
+                    # DEBUG grassland drawing
+                    if 195 <= color[0] <= 210 and 225 <= color[1] <= 240 and 170 <= color[2] <= 185:
+                        mode = "FILLED" if self.fill_polygons else "OUTLINE"
+                        print(f"    DRAWING {mode}: color={color}")
+
                     # DEBUG: Print when drawing water polygon
                     if 150 <= color[2] <= 235 and 160 <= color[1] <= 220 and 150 <= color[0] <= 180:
                         if len(pts) >= 80:  # Large polygons - show full extent
