@@ -1854,8 +1854,8 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
         if text_candidates:
             tile_width_deg = 360.0 / (2.0 ** zoom)
             pixel_deg = tile_width_deg / 256.0
-            char_w = pixel_deg * 8  # half-width per char in degrees (doubled for actual render size)
-            label_h = pixel_deg * 12  # half-height in degrees (increased for actual render size)
+            char_w = pixel_deg * 7  # half-width per char in degrees (1.75x for actual render size)
+            label_h = pixel_deg * 11  # half-height in degrees (1.375x for actual render size)
 
             # Separate place names from road labels
             place_names = [f for f in text_candidates if 'coords_candidates' not in f]
