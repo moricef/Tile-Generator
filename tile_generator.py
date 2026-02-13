@@ -134,7 +134,7 @@ LINE_WIDTH_PER_ZOOM = {
     'funicular':     {                                                    13: 2,  14: 2,  15: 3,  16: 4},
     # Aeroway - typical runway ~45m, taxiway ~23m, helipad ~15m (scaled for visibility)
     'runway':        {                              10: 3,  11: 4,  12: 6,  13: 8,  14: 11, 15: 14, 16: 18, 17: 24, 18: 30},
-    'taxiway':       {                              10: 2,  11: 2,  12: 3,  13: 4,  14: 5,  15: 4,  16: 5,  17: 12, 18: 15},
+    'taxiway':       {                              10: 2,  11: 2,  12: 3,  13: 4,  14: 5,  15: 5,  16: 7,  17: 12, 18: 15},
     'helipad':       {                                            12: 2,  13: 3,  14: 4,  15: 5,  16: 6,  17: 8,  18: 10},
 }
 
@@ -1467,8 +1467,14 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                 if feature_layer in ('water', 'roads'):
                                     simplified = part  # No simplification for water/roads
                                 elif feature_layer == 'infrastructure':
-                                    # Infrastructure: simplify to remove colinear points from clipping
-                                    simplified = part.simplify(3.0, preserve_topology=True)
+                                    # Zoom élevé (13+) : Simplification microscopique (0.25 pixel)
+                                    # Cela supprime le "bruit" (ondulations) des lignes droites
+                                    # tout en gardant les courbes des taxiways parfaites.
+                                    if zoom >= 13:
+                                        simplified = part.simplify(0.25, preserve_topology=True)
+                                    else:
+                                        # Zoom faible : Simplification standard
+                                        simplified = part.simplify(tolerance, preserve_topology=True)
                                 else:
                                     simplified = part.simplify(tolerance, preserve_topology=True)
                                 if len(simplified.coords) >= 2:
@@ -1479,8 +1485,11 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                         if feature_layer in ('water', 'roads'):
                                             simplified = l  # No simplification for water/roads
                                         elif feature_layer == 'infrastructure':
-                                            # Infrastructure: simplify to remove colinear points from clipping
-                                            simplified = l.simplify(3.0, preserve_topology=True)
+                                            # Zoom élevé (13+) : Simplification microscopique (0.25 pixel)
+                                            if zoom >= 13:
+                                                simplified = l.simplify(0.25, preserve_topology=True)
+                                            else:
+                                                simplified = l.simplify(tolerance, preserve_topology=True)
                                         else:
                                             simplified = l.simplify(tolerance, preserve_topology=True)
                                         if len(simplified.coords) >= 2:

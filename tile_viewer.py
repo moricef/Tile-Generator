@@ -358,15 +358,55 @@ class NAVViewer:
 
     def _draw_smooth_line(self, surface: pygame.Surface, color: Tuple[int, int, int],
                           points: List[Tuple[int, int]], width: int):
-        """Draw line with simple pygame rendering."""
+        """
+        Dessine une ligne épaisse sous forme de polygones pour :
+        1. Des bords lisses (Anti-Aliasing).
+        2. Des bouts parfaitement CARRÉS (pas biseautés).
+        3. Des jointures PROPRES (cercles internes).
+        """
         if len(points) < 2:
             return
 
-        # Simple line drawing without circles or custom caps to avoid artifacts
-        if width > 1:
-            pygame.draw.lines(surface, color, False, points, width)
-        else:
-            pygame.draw.lines(surface, color, False, points, 1)
+        # Demi-largeur pour les calculs de vecteurs
+        half_w = width / 2.0
+
+        for i in range(len(points) - 1):
+            p1 = points[i]
+            p2 = points[i + 1]
+
+            dx = p2[0] - p1[0]
+            dy = p2[1] - p1[1]
+            dist = math.hypot(dx, dy)
+
+            if dist == 0:
+                continue
+
+            # Vecteur unitaire normal (perpendiculaire)
+            nx = -dy / dist
+            ny = dx / dist
+
+            # Calcul des 4 coins du rectangle orienté (Le segment de piste)
+            # P1_top, P1_bottom, P2_bottom, P2_top
+            poly_pts = [
+                (p1[0] + nx * half_w, p1[1] + ny * half_w),
+                (p1[0] - nx * half_w, p1[1] - ny * half_w),
+                (p2[0] - nx * half_w, p2[1] - ny * half_w),
+                (p2[0] + nx * half_w, p2[1] + ny * half_w)
+            ]
+
+            # 1. Dessiner le rectangle plein (Corps de la piste)
+            pygame.gfxdraw.filled_polygon(surface, poly_pts, color)
+
+            # 2. Dessiner le contour Anti-Aliasing (Bords lisses)
+            pygame.gfxdraw.aapolygon(surface, poly_pts, color)
+
+            # 3. Dessiner un cercle UNIQUEMENT à la jonction P2 (sauf si c'est la fin)
+            # Cela bouche le trou entre ce segment et le suivant
+            if i < len(points) - 2:
+                # On utilise +1 sur le rayon pour bien couvrir la soudure des polygones AA
+                radius = int(half_w) + 1
+                pygame.gfxdraw.filled_circle(surface, int(p2[0]), int(p2[1]), radius, color)
+                pygame.gfxdraw.aacircle(surface, int(p2[0]), int(p2[1]), radius, color)
 
     def _render_road_casing(self, surface: pygame.Surface, feature: NavFeature):
         """Render road casing (border) for two-pass rendering - Pass 1 only."""
