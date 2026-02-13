@@ -319,12 +319,14 @@ class NAVViewer:
             if feature.geom_type == GEOM_LINESTRING and feature.needs_casing:
                 self._render_road_casing(surface, feature)
 
-        # Pass 2: Render all features normally (including road cores)
+        # Pass 2: Render all non-text features normally (including road cores)
         # Low priority rendered first = below, high priority rendered last = above
         # DEBUG: Log rendering order for roads/railways/polygons to verify priority
         debug_line_count = 0
         debug_poly_count = 0
         for feature in features:
+            if feature.geom_type == GEOM_TEXT:
+                continue  # Skip text, render in pass 3
             if feature.geom_type == GEOM_LINESTRING and feature.priority >= 8 and debug_line_count < 30:
                 color = rgb565_to_rgb888(feature.color_rgb565)
                 print(f"[RENDER LINE] priority={feature.priority}, color=#{color[0]:02x}{color[1]:02x}{color[2]:02x}, width={feature.width}")
@@ -342,6 +344,11 @@ class NAVViewer:
                 debug_poly_count += 1
             self._render_feature(surface, feature)
 
+        # Pass 3: Render all text features on top of everything
+        for feature in features:
+            if feature.geom_type == GEOM_TEXT:
+                self._render_feature(surface, feature)
+
         if self.show_tile_grid:
             self._draw_tile_grid(surface)
 
@@ -358,32 +365,18 @@ class NAVViewer:
 
     def _draw_smooth_line(self, surface: pygame.Surface, color: Tuple[int, int, int],
                           points: List[Tuple[int, int]], width: int):
-        """
-        Smart vector drawing:
-        - < 2px: Simple line.
-        - 2-4px: Rectangles only (eliminates "pearl necklace" on small roads).
-        - > 4px: Rectangles + Round joints (for large runways/highways).
-        """
+        """Draw line using oriented rectangles for square ends, no AA, no joints."""
         if len(points) < 2:
             return
 
-        # Case 1: Very thin lines -> Simple line (cleaner than rectangles)
+        # Very thin lines: use simple line
         if width <= 1:
             pygame.draw.lines(surface, color, False, points, 1)
             return
 
         half_w = width / 2.0
 
-        # Case 2 & 3: Joint management
-        # Only draw "rotule" (circles) if road is wide (>= 5px).
-        # On small roads (2, 3, 4px), circles create "sausage/pearl" effect.
-        draw_joints = width >= 5
-
-        # Circle radius (if drawn)
-        radius = int(half_w)
-        # Small safety margin only for very large runways (>10px)
-        if width > 10: radius += 1
-
+        # Draw each segment as an oriented rectangle
         for i in range(len(points) - 1):
             p1 = points[i]
             p2 = points[i + 1]
@@ -392,12 +385,14 @@ class NAVViewer:
             dy = p2[1] - p1[1]
             dist = math.hypot(dx, dy)
 
-            if dist == 0: continue
+            if dist == 0:
+                continue
 
+            # Perpendicular unit vector
             nx = -dy / dist
             ny = dx / dist
 
-            # Calculate 4 corners of rectangle (road segment)
+            # Rectangle corners
             poly_pts = [
                 (p1[0] + nx * half_w, p1[1] + ny * half_w),
                 (p1[0] - nx * half_w, p1[1] - ny * half_w),
@@ -405,14 +400,8 @@ class NAVViewer:
                 (p2[0] + nx * half_w, p2[1] + ny * half_w)
             ]
 
-            # 1. Line body (Oriented rectangle)
+            # Draw filled polygon only (no AA, no joints)
             pygame.gfxdraw.filled_polygon(surface, poly_pts, color)
-
-            # 2. Joints (Only for large roads)
-            # Skip last point to keep square ends
-            if draw_joints and i < len(points) - 2:
-                cx, cy = int(p2[0]), int(p2[1])
-                pygame.gfxdraw.filled_circle(surface, cx, cy, radius, color)
 
     def _render_road_casing(self, surface: pygame.Surface, feature: NavFeature):
         """Render road casing (border) for two-pass rendering - Pass 1 only."""
