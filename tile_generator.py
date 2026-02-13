@@ -1467,13 +1467,13 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                 if feature_layer in ('water', 'roads'):
                                     simplified = part  # No simplification for water/roads
                                 elif feature_layer == 'infrastructure':
-                                    # Zoom élevé (13+) : Simplification microscopique (0.25 pixel)
-                                    # Cela supprime le "bruit" (ondulations) des lignes droites
-                                    # tout en gardant les courbes des taxiways parfaites.
+                                    # High zoom (13+): Microscopic simplification (0.25 pixel)
+                                    # Removes GPS noise/waviness on straight lines while
+                                    # preserving actual curves on taxiways
                                     if zoom >= 13:
                                         simplified = part.simplify(0.25, preserve_topology=True)
                                     else:
-                                        # Zoom faible : Simplification standard
+                                        # Low zoom: Standard simplification
                                         simplified = part.simplify(tolerance, preserve_topology=True)
                                 else:
                                     simplified = part.simplify(tolerance, preserve_topology=True)
@@ -1485,7 +1485,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                         if feature_layer in ('water', 'roads'):
                                             simplified = l  # No simplification for water/roads
                                         elif feature_layer == 'infrastructure':
-                                            # Zoom élevé (13+) : Simplification microscopique (0.25 pixel)
+                                            # High zoom (13+): Microscopic simplification (0.25 pixel)
                                             if zoom >= 13:
                                                 simplified = l.simplify(0.25, preserve_topology=True)
                                             else:

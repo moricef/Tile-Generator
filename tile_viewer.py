@@ -359,24 +359,24 @@ class NAVViewer:
     def _draw_smooth_line(self, surface: pygame.Surface, color: Tuple[int, int, int],
                           points: List[Tuple[int, int]], width: int):
         """
-        Dessin vectoriel optimisé :
-        - Pistes larges : Rectangles + AA + Joints ronds (avec marge de sécu).
-        - Routes fines : Rectangles + AA + Joints ronds (sans dépassement).
+        Optimized vector drawing with hybrid rendering:
+        - Wide runways: Rectangles + AA + Round joints (with safety margin)
+        - Thin roads: Rectangles + AA + Round joints (strict fit, no bulges)
         """
         if len(points) < 2:
             return
 
         half_w = width / 2.0
 
-        # CORRECTION : Calcul du rayon adaptatif
-        # Si la route est fine (< 6px), le rayon doit être strict pour ne pas faire de "boules".
-        # Si la route est large (piste), on ajoute 1px pour bien sceller les polygones.
+        # Adaptive radius calculation
+        # Thin roads (<6px): strict radius to prevent bulges
+        # Wide runways (>=6px): add 1px to seal polygon gaps
         if width < 6:
-            radius = int(half_w)      # Rayon strict -> Pas de débordement
-            # Astuce : sur les largeurs impaires (ex: 5), int(2.5)=2, diam=4.
-            # C'est un peu plus petit que la ligne, donc invisible (caché dedans), c'est parfait.
+            radius = int(half_w)      # Strict radius - no overflow
+            # For odd widths (e.g. 5px): int(2.5)=2, diameter=4
+            # Slightly smaller than line, hidden inside, perfect
         else:
-            radius = int(half_w) + 1  # Rayon étendu -> Bouche les trous des pistes
+            radius = int(half_w) + 1  # Extended radius - seals gaps
 
         for i in range(len(points) - 1):
             p1 = points[i]
@@ -391,7 +391,7 @@ class NAVViewer:
             nx = -dy / dist
             ny = dx / dist
 
-            # 4 coins du rectangle
+            # 4 corners of oriented rectangle
             poly_pts = [
                 (p1[0] + nx * half_w, p1[1] + ny * half_w),
                 (p1[0] - nx * half_w, p1[1] - ny * half_w),
@@ -399,24 +399,22 @@ class NAVViewer:
                 (p2[0] + nx * half_w, p2[1] + ny * half_w)
             ]
 
-            # 1. Corps de la ligne (Solide)
+            # 1. Solid fill (prevents color artifacts and holes)
             pygame.draw.polygon(surface, color, poly_pts)
 
-            # 2. Bords lisses (AA)
+            # 2. Anti-aliased edges (smooth appearance)
             try:
                 pygame.gfxdraw.aapolygon(surface, poly_pts, color)
             except: pass
 
-            # 3. Jointures
-            # On ne dessine pas aux extrémités pour garder les bouts carrés
+            # 3. Joint circles (not at endpoints to keep square ends)
             if i < len(points) - 2:
-                # On ne dessine le cercle que si la ligne est assez épaisse (>2px)
-                # Sinon ça fait du bruit pour rien
+                # Only draw circles for lines thick enough (>2px)
                 if width > 2:
                     cx, cy = int(p2[0]), int(p2[1])
-                    # Cercle de remplissage
+                    # Solid fill circle
                     pygame.draw.circle(surface, color, (cx, cy), radius)
-                    # Cercle de lissage (seulement si assez gros)
+                    # AA circle (only if large enough)
                     if radius > 1:
                         try:
                             pygame.gfxdraw.aacircle(surface, cx, cy, radius, color)
