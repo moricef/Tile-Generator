@@ -359,24 +359,30 @@ class NAVViewer:
     def _draw_smooth_line(self, surface: pygame.Surface, color: Tuple[int, int, int],
                           points: List[Tuple[int, int]], width: int):
         """
-        Optimized vector drawing with hybrid rendering:
-        - Wide runways: Rectangles + AA + Round joints (with safety margin)
-        - Thin roads: Rectangles + AA + Round joints (strict fit, no bulges)
+        Smart vector drawing:
+        - < 2px: Simple line.
+        - 2-4px: Rectangles only (eliminates "pearl necklace" on small roads).
+        - > 4px: Rectangles + Round joints (for large runways/highways).
         """
         if len(points) < 2:
             return
 
+        # Case 1: Very thin lines -> Simple line (cleaner than rectangles)
+        if width <= 1:
+            pygame.draw.lines(surface, color, False, points, 1)
+            return
+
         half_w = width / 2.0
 
-        # Adaptive radius calculation
-        # Thin roads (<6px): strict radius to prevent bulges
-        # Wide runways (>=6px): add 1px to seal polygon gaps
-        if width < 6:
-            radius = int(half_w)      # Strict radius - no overflow
-            # For odd widths (e.g. 5px): int(2.5)=2, diameter=4
-            # Slightly smaller than line, hidden inside, perfect
-        else:
-            radius = int(half_w) + 1  # Extended radius - seals gaps
+        # Case 2 & 3: Joint management
+        # Only draw "rotule" (circles) if road is wide (>= 5px).
+        # On small roads (2, 3, 4px), circles create "sausage/pearl" effect.
+        draw_joints = width >= 5
+
+        # Circle radius (if drawn)
+        radius = int(half_w)
+        # Small safety margin only for very large runways (>10px)
+        if width > 10: radius += 1
 
         for i in range(len(points) - 1):
             p1 = points[i]
@@ -391,7 +397,7 @@ class NAVViewer:
             nx = -dy / dist
             ny = dx / dist
 
-            # 4 corners of oriented rectangle
+            # Calculate 4 corners of rectangle (road segment)
             poly_pts = [
                 (p1[0] + nx * half_w, p1[1] + ny * half_w),
                 (p1[0] - nx * half_w, p1[1] - ny * half_w),
@@ -399,26 +405,16 @@ class NAVViewer:
                 (p2[0] + nx * half_w, p2[1] + ny * half_w)
             ]
 
-            # 1. Solid fill (prevents color artifacts and holes)
-            pygame.draw.polygon(surface, color, poly_pts)
+            # 1. Line body (Oriented rectangle)
+            pygame.gfxdraw.filled_polygon(surface, poly_pts, color)
+            pygame.gfxdraw.aapolygon(surface, poly_pts, color)
 
-            # 2. Anti-aliased edges (smooth appearance)
-            try:
-                pygame.gfxdraw.aapolygon(surface, poly_pts, color)
-            except: pass
-
-            # 3. Joint circles (not at endpoints to keep square ends)
-            if i < len(points) - 2:
-                # Only draw circles for lines thick enough (>2px)
-                if width > 2:
-                    cx, cy = int(p2[0]), int(p2[1])
-                    # Solid fill circle
-                    pygame.draw.circle(surface, color, (cx, cy), radius)
-                    # AA circle (only if large enough)
-                    if radius > 1:
-                        try:
-                            pygame.gfxdraw.aacircle(surface, cx, cy, radius, color)
-                        except: pass
+            # 2. Joints (Only for large roads)
+            # Skip last point to keep square ends
+            if draw_joints and i < len(points) - 2:
+                cx, cy = int(p2[0]), int(p2[1])
+                pygame.gfxdraw.filled_circle(surface, cx, cy, radius, color)
+                pygame.gfxdraw.aacircle(surface, cx, cy, radius, color)
 
     def _render_road_casing(self, surface: pygame.Surface, feature: NavFeature):
         """Render road casing (border) for two-pass rendering - Pass 1 only."""
