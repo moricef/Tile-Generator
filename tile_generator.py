@@ -134,7 +134,7 @@ LINE_WIDTH_PER_ZOOM = {
     'funicular':     {                                                    13: 2,  14: 2,  15: 3,  16: 4},
     # Aeroway - typical runway ~45m, taxiway ~23m, helipad ~15m (scaled for visibility)
     'runway':        {                              10: 3,  11: 4,  12: 6,  13: 8,  14: 11, 15: 14, 16: 18, 17: 24, 18: 30},
-    'taxiway':       {                              10: 2,  11: 2,  12: 3,  13: 4,  14: 5,  15: 7,  16: 9,  17: 12, 18: 15},
+    'taxiway':       {                              10: 2,  11: 2,  12: 3,  13: 4,  14: 5,  15: 4,  16: 5,  17: 12, 18: 15},
     'helipad':       {                                            12: 2,  13: 3,  14: 4,  15: 5,  16: 6,  17: 8,  18: 10},
 }
 
@@ -1468,7 +1468,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                     simplified = part  # No simplification for water/roads
                                 elif feature_layer == 'infrastructure':
                                     # Infrastructure: simplify to remove colinear points from clipping
-                                    simplified = part.simplify(1.0, preserve_topology=True)
+                                    simplified = part.simplify(3.0, preserve_topology=True)
                                 else:
                                     simplified = part.simplify(tolerance, preserve_topology=True)
                                 if len(simplified.coords) >= 2:
@@ -1480,7 +1480,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                             simplified = l  # No simplification for water/roads
                                         elif feature_layer == 'infrastructure':
                                             # Infrastructure: simplify to remove colinear points from clipping
-                                            simplified = l.simplify(1.0, preserve_topology=True)
+                                            simplified = l.simplify(3.0, preserve_topology=True)
                                         else:
                                             simplified = l.simplify(tolerance, preserve_topology=True)
                                         if len(simplified.coords) >= 2:
