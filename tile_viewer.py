@@ -359,16 +359,24 @@ class NAVViewer:
     def _draw_smooth_line(self, surface: pygame.Surface, color: Tuple[int, int, int],
                           points: List[Tuple[int, int]], width: int):
         """
-        Version Hybride Robuste :
-        - Remplissage via pygame.draw (solide, pas de trous)
-        - Anti-aliasing via gfxdraw (bords lisses)
+        Dessin vectoriel optimisé :
+        - Pistes larges : Rectangles + AA + Joints ronds (avec marge de sécu).
+        - Routes fines : Rectangles + AA + Joints ronds (sans dépassement).
         """
         if len(points) < 2:
             return
 
         half_w = width / 2.0
-        # On augmente légèrement le rayon des cercles pour être sûr de bien boucher les coins
-        radius = int(half_w) + 1 if width > 2 else int(half_w)
+
+        # CORRECTION : Calcul du rayon adaptatif
+        # Si la route est fine (< 6px), le rayon doit être strict pour ne pas faire de "boules".
+        # Si la route est large (piste), on ajoute 1px pour bien sceller les polygones.
+        if width < 6:
+            radius = int(half_w)      # Rayon strict -> Pas de débordement
+            # Astuce : sur les largeurs impaires (ex: 5), int(2.5)=2, diam=4.
+            # C'est un peu plus petit que la ligne, donc invisible (caché dedans), c'est parfait.
+        else:
+            radius = int(half_w) + 1  # Rayon étendu -> Bouche les trous des pistes
 
         for i in range(len(points) - 1):
             p1 = points[i]
@@ -383,7 +391,7 @@ class NAVViewer:
             nx = -dy / dist
             ny = dx / dist
 
-            # Les 4 coins du segment
+            # 4 coins du rectangle
             poly_pts = [
                 (p1[0] + nx * half_w, p1[1] + ny * half_w),
                 (p1[0] - nx * half_w, p1[1] - ny * half_w),
@@ -391,26 +399,28 @@ class NAVViewer:
                 (p2[0] + nx * half_w, p2[1] + ny * half_w)
             ]
 
-            # 1. REMPLISSAGE SOLIDE (Standard Pygame)
-            # C'est ça qui bouche les trous blancs. pygame.draw est 100% fiable sur la couleur.
+            # 1. Corps de la ligne (Solide)
             pygame.draw.polygon(surface, color, poly_pts)
 
-            # 2. ANTI-ALIASING (Contour lissé)
-            # On dessine le contour lissé par-dessus pour enlever l'effet escalier
+            # 2. Bords lisses (AA)
             try:
                 pygame.gfxdraw.aapolygon(surface, poly_pts, color)
-            except: pass # Sécurité si gfxdraw plante
+            except: pass
 
-            # 3. JOINTURES (Cercles)
-            # Uniquement aux angles internes (pas début ni fin)
+            # 3. Jointures
+            # On ne dessine pas aux extrémités pour garder les bouts carrés
             if i < len(points) - 2:
-                cx, cy = int(p2[0]), int(p2[1])
-                # Cercle solide (Standard) pour boucher le trou
-                pygame.draw.circle(surface, color, (cx, cy), radius)
-                # Cercle lissé (AA) pour le bord propre
-                try:
-                    pygame.gfxdraw.aacircle(surface, cx, cy, radius, color)
-                except: pass
+                # On ne dessine le cercle que si la ligne est assez épaisse (>2px)
+                # Sinon ça fait du bruit pour rien
+                if width > 2:
+                    cx, cy = int(p2[0]), int(p2[1])
+                    # Cercle de remplissage
+                    pygame.draw.circle(surface, color, (cx, cy), radius)
+                    # Cercle de lissage (seulement si assez gros)
+                    if radius > 1:
+                        try:
+                            pygame.gfxdraw.aacircle(surface, cx, cy, radius, color)
+                        except: pass
 
     def _render_road_casing(self, surface: pygame.Surface, feature: NavFeature):
         """Render road casing (border) for two-pass rendering - Pass 1 only."""
