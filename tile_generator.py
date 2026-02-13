@@ -112,7 +112,7 @@ LINE_WIDTH_PER_ZOOM = {
     'trunk_link':    {                            10: 1,  11: 2,  12: 2,  13: 4,  14: 4,  15: 8,  16: 8,  17: 12, 18: 13, 19: 16},
     'primary':       {              8: 1,  9: 1,  10: 2,  11: 2,  12: 4,  13: 5,  14: 6,  15: 10, 16: 10, 17: 18, 18: 21, 19: 27},
     'primary_link':  {                            10: 1,  11: 1,  12: 2,  13: 4,  14: 4,  15: 8,  16: 8,  17: 12, 18: 13, 19: 16},
-    'secondary':     {                            10: 1,  11: 1,  12: 4,  13: 5,  14: 5,  15: 9,  16: 10, 17: 18, 18: 21, 19: 27},
+    'secondary':     {                            10: 1,  11: 1,  12: 3,  13: 5,  14: 5,  15: 9,  16: 10, 17: 18, 18: 21, 19: 27},
     'secondary_link':{                            10: 1,  11: 1,  12: 2,  13: 4,  14: 4,  15: 7,  16: 7,  17: 12, 18: 13, 19: 16},
     'tertiary':      {                            10: 1,  11: 1,  12: 2,  13: 3,  14: 5,  15: 9,  16: 10, 17: 18, 18: 21, 19: 27},
     'tertiary_link': {                                            12: 2,  13: 2,  14: 3,  15: 7,  16: 7,  17: 12, 18: 13, 19: 16},
@@ -127,7 +127,7 @@ LINE_WIDTH_PER_ZOOM = {
     'path':          {                                                    13: 1,  14: 1,  15: 1,  16: 1,  17: 2,  18: 2,  19: 2},
     'bridleway':     {                                                    13: 1,  14: 1,  15: 1,  16: 1},
     # Railway - based on OpenStreetMap Carto standard
-    'rail':          {                     9: 1,  10: 1,  11: 2,  12: 2,  13: 3,  14: 3,  15: 3,  16: 4},
+    'rail':          {                     9: 1,  10: 1,  11: 2,  12: 2,  13: 3,  14: 3,  15: 3,  16: 4,  17: 4,  18: 6,  19: 8},
     'subway':        {                                            12: 1,  13: 2,  14: 2,  15: 3,  16: 4},
     'tram':          {                                                                    15: 2,  16: 3},
     'narrow_gauge':  {                                                    13: 2,  14: 2,  15: 3,  16: 4},
@@ -142,7 +142,7 @@ LINE_WIDTH_PER_ZOOM = {
 # Format: type_value -> {zoom: '#hexcolor'}
 # If a zoom is not listed, the default JSON color is used
 LINE_COLOR_PER_ZOOM = {
-    'residential':   {12: '#cccccc'},
+    'residential':   {13: '#cccccc'},
     'unclassified':  {12: '#cccccc'},
     'living_street': {12: '#cccccc'},
     'track':         {15: '#ffffff', 16: '#ffffff'},
@@ -1854,8 +1854,8 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
         if text_candidates:
             tile_width_deg = 360.0 / (2.0 ** zoom)
             pixel_deg = tile_width_deg / 256.0
-            char_w = pixel_deg * 4  # half-width per char in degrees
-            label_h = pixel_deg * 8  # half-height in degrees
+            char_w = pixel_deg * 8  # half-width per char in degrees (doubled for actual render size)
+            label_h = pixel_deg * 12  # half-height in degrees (increased for actual render size)
 
             # Separate place names from road labels
             place_names = [f for f in text_candidates if 'coords_candidates' not in f]
@@ -1876,12 +1876,20 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                 lon, lat = pf['coords'][0]
                 box = (lon - half_w, lat - half_h, lon + half_w, lat + half_h)
 
+                # DEBUG: Log specific cities
+                city_name = pf['text'].decode('utf-8', errors='ignore') if isinstance(pf['text'], bytes) else pf['text']
+                debug_cities = ['toulouse', 'balma', 'colomiers']
+                if zoom == 10 and any(c in city_name.lower() for c in debug_cities):
+                    print(f"\n[DEBUG z{zoom}] {city_name}: box={box}, text_len={text_len}, half_w={half_w:.6f}")
+
                 # Check for visual overlap with already placed labels
                 overlap = False
                 for pb in placed_boxes:
                     if (box[0] < pb[2] and box[2] > pb[0] and
                         box[1] < pb[3] and box[3] > pb[1]):
                         overlap = True
+                        if zoom == 10 and any(c in city_name.lower() for c in debug_cities):
+                            print(f"[DEBUG z{zoom}] {city_name}: OVERLAP with existing box {pb}")
                         break
 
                 if not overlap:
