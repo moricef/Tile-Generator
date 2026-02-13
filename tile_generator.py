@@ -1463,9 +1463,12 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                         final_features_data.append(rings)
                         else:
                             if isinstance(part, LineString) and len(part.coords) >= 2:
-                                # Simplify AFTER clipping (but NOT for water, roads, or infrastructure)
-                                if feature_layer in ('water', 'roads', 'infrastructure'):
-                                    simplified = part  # No simplification for water/roads/infrastructure (preserve curves/runways)
+                                # Simplify AFTER clipping
+                                if feature_layer in ('water', 'roads'):
+                                    simplified = part  # No simplification for water/roads
+                                elif feature_layer == 'infrastructure':
+                                    # Infrastructure: simplify to remove colinear points from clipping
+                                    simplified = part.simplify(1.0, preserve_topology=True)
                                 else:
                                     simplified = part.simplify(tolerance, preserve_topology=True)
                                 if len(simplified.coords) >= 2:
@@ -1473,8 +1476,11 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                             elif isinstance(part, MultiLineString):
                                 for l in part.geoms:
                                     if len(l.coords) >= 2:
-                                        if feature_layer in ('water', 'roads', 'infrastructure'):
-                                            simplified = l  # No simplification for water/roads/infrastructure
+                                        if feature_layer in ('water', 'roads'):
+                                            simplified = l  # No simplification for water/roads
+                                        elif feature_layer == 'infrastructure':
+                                            # Infrastructure: simplify to remove colinear points from clipping
+                                            simplified = l.simplify(1.0, preserve_topology=True)
                                         else:
                                             simplified = l.simplify(tolerance, preserve_topology=True)
                                         if len(simplified.coords) >= 2:
