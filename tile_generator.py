@@ -83,11 +83,11 @@ TEXT_FEATURES = {
     },
     'place=town': {
         'font_size': 1,
-        'zoom_rules': [(35000, 8), (0, 9)],
+        'zoom_rules': [(50000, 8), (15000, 9), (5000, 10), (0, 11)],
     },
     'place=village': {
         'font_size': 0,
-        'zoom_rules': [(1000, 10), (500, 11), (0, 12)],
+        'zoom_rules': [(2000, 11), (500, 12), (0, 13)],
     },
     'place=suburb': {
         'font_size': 0,
@@ -106,47 +106,48 @@ WIDTH_TAGS = {'highway', 'railway', 'waterway'}
 # Format: type_value -> {zoom: pixels}
 LINE_WIDTH_PER_ZOOM = {
     # Highway - based on OpenStreetMap Carto standard
-    'motorway':      {6: 1,  7: 1,  8: 1,  9: 1,  10: 2,  11: 2,  12: 4,  13: 6,  14: 6,  15: 10, 16: 10, 17: 18, 18: 21, 19: 27},
-    'motorway_link': {                            10: 1,  11: 1,  12: 2,  13: 4,  14: 4,  15: 8,  16: 8,  17: 12, 18: 13, 19: 16},
-    'trunk':         {6: 1,  7: 1,  8: 1,  9: 1,  10: 2,  11: 2,  12: 4,  13: 6,  14: 6,  15: 10, 16: 10, 17: 18, 18: 21, 19: 27},
-    'trunk_link':    {                            10: 1,  11: 1,  12: 2,  13: 4,  14: 4,  15: 8,  16: 8,  17: 12, 18: 13, 19: 16},
-    'primary':       {              8: 1,  9: 1,  10: 2,  11: 2,  12: 4,  13: 5,  14: 5,  15: 10, 16: 10, 17: 18, 18: 21, 19: 27},
+    'motorway':      {6: 1,  7: 1,  8: 2,  9: 2,  10: 2,  11: 3,  12: 5,  13: 6,  14: 6,  15: 10, 16: 10, 17: 18, 18: 21, 19: 27},
+    'motorway_link': {                            10: 1,  11: 2,  12: 2,  13: 4,  14: 4,  15: 8,  16: 8,  17: 12, 18: 13, 19: 16},
+    'trunk':         {6: 1,  7: 1,  8: 2,  9: 2,  10: 2,  11: 2,  12: 4,  13: 6,  14: 6,  15: 10, 16: 10, 17: 18, 18: 21, 19: 27},
+    'trunk_link':    {                            10: 1,  11: 2,  12: 2,  13: 4,  14: 4,  15: 8,  16: 8,  17: 12, 18: 13, 19: 16},
+    'primary':       {              8: 1,  9: 1,  10: 2,  11: 2,  12: 4,  13: 5,  14: 6,  15: 10, 16: 10, 17: 18, 18: 21, 19: 27},
     'primary_link':  {                            10: 1,  11: 1,  12: 2,  13: 4,  14: 4,  15: 8,  16: 8,  17: 12, 18: 13, 19: 16},
-    'secondary':     {              8: 1,  9: 1,  10: 1,  11: 1,  12: 4,  13: 5,  14: 5,  15: 9,  16: 10, 17: 18, 18: 21, 19: 27},
+    'secondary':     {                            10: 1,  11: 1,  12: 4,  13: 5,  14: 5,  15: 9,  16: 10, 17: 18, 18: 21, 19: 27},
     'secondary_link':{                            10: 1,  11: 1,  12: 2,  13: 4,  14: 4,  15: 7,  16: 7,  17: 12, 18: 13, 19: 16},
-    'tertiary':      {                            10: 1,  11: 1,  12: 3,  13: 4,  14: 5,  15: 9,  16: 10, 17: 18, 18: 21, 19: 27},
-    'tertiary_link': {                                            12: 2,  13: 3,  14: 3,  15: 7,  16: 7,  17: 12, 18: 13, 19: 16},
-    'residential':   {                                            12: 1,  13: 3,  14: 3,  15: 5,  16: 6,  17: 12, 18: 13, 19: 17},
-    'pedestrian':    {                                                    13: 2,  14: 3,  15: 5,  16: 6,  17: 12, 18: 13, 19: 17},
-    'living_street': {                                                    13: 2,  14: 3,  15: 5,  16: 6,  17: 12, 18: 13, 19: 17},
-    'unclassified':  {                                            12: 1,  13: 3,  14: 3,  15: 5,  16: 6,  17: 12, 18: 13, 19: 17},
+    'tertiary':      {                            10: 1,  11: 1,  12: 2,  13: 3,  14: 5,  15: 9,  16: 10, 17: 18, 18: 21, 19: 27},
+    'tertiary_link': {                                            12: 2,  13: 2,  14: 3,  15: 7,  16: 7,  17: 12, 18: 13, 19: 16},
+    'residential':   {                                                    13: 2,  14: 3,  15: 4,  16: 5,  17: 12, 18: 13, 19: 17},
+    'pedestrian':    {                                                    13: 2,  14: 3,  15: 4,  16: 5,  17: 12, 18: 13, 19: 17},
+    'living_street': {                                                    13: 2,  14: 3,  15: 4,  16: 5,  17: 12, 18: 13, 19: 17},
+    'unclassified':  {                                            12: 1,  13: 3,  14: 3,  15: 4,  16: 5,  17: 12, 18: 13, 19: 17},
     'service':       {                                                    13: 1,  14: 1,  15: 2,  16: 4,  17: 6,  18: 8,  19: 10},
-    'track':         {                                                    13: 1,  14: 1,  15: 2,  16: 2,  17: 3,  18: 4,  19: 5},
+    'track':         {                                                    15: 2,  16: 2,  17: 3,  18: 4,  19: 5},
     'footway':       {                                                    13: 1,  14: 1,  15: 1,  16: 1,  17: 2,  18: 2,  19: 2},
     'cycleway':      {                                                    13: 1,  14: 1,  15: 1,  16: 1,  17: 2,  18: 2,  19: 2},
     'path':          {                                                    13: 1,  14: 1,  15: 1,  16: 1,  17: 2,  18: 2,  19: 2},
     'bridleway':     {                                                    13: 1,  14: 1,  15: 1,  16: 1},
     # Railway - based on OpenStreetMap Carto standard
-    'rail':          {              8: 2,  9: 2,  10: 2,  11: 2,  12: 2,  13: 3,  14: 3,  15: 3,  16: 4},
+    'rail':          {                     9: 1,  10: 1,  11: 2,  12: 2,  13: 3,  14: 3,  15: 3,  16: 4},
     'subway':        {                                            12: 1,  13: 2,  14: 2,  15: 3,  16: 4},
-    'tram':          {                                            12: 1,  13: 1,  14: 2,  15: 2,  16: 3},
+    'tram':          {                                                                    15: 2,  16: 3},
     'narrow_gauge':  {                                                    13: 2,  14: 2,  15: 3,  16: 4},
     'funicular':     {                                                    13: 2,  14: 2,  15: 3,  16: 4},
     # Aeroway - typical runway ~45m, taxiway ~23m, helipad ~15m (scaled for visibility)
-    'runway':        {                              10: 3,  11: 4,  12: 6,  13: 8,  14: 11, 15: 14, 16: 18, 17: 24, 18: 30},
-    'taxiway':       {                              10: 2,  11: 2,  12: 3,  13: 4,  14: 5,  15: 5,  16: 7,  17: 12, 18: 15},
-    'helipad':       {                                            12: 2,  13: 3,  14: 4,  15: 5,  16: 6,  17: 8,  18: 10},
+    'runway':        {                                              12: 3,  13: 5,  14: 8,  15: 12, 16: 16, 17: 22, 18: 28},
+    'taxiway':       {                                              12: 1,  13: 2,  14: 3,  15: 4,  16: 6,  17: 10, 18: 13},
+    'helipad':       {                                              12: 2,  13: 3,  14: 4,  15: 4,  16: 6,  17: 8,  18: 10},
 }
 
 # Override color per zoom level (RGB565) - only for features that change color by zoom
 # Format: type_value -> {zoom: '#hexcolor'}
 # If a zoom is not listed, the default JSON color is used
 LINE_COLOR_PER_ZOOM = {
-    'residential':   {12: '#cccccc'},  # grey at z12, white (from JSON) at z13+
+    'residential':   {12: '#cccccc'},
     'unclassified':  {12: '#cccccc'},
     'living_street': {12: '#cccccc'},
-    'track':         {14: '#996600', 15: '#ffffff', 16: '#ffffff'},  # brown at z14, white at z15+
-    'service':       {16: '#cccccc'},  # white at z15, grey at z16+
+    'track':         {15: '#ffffff', 16: '#ffffff'},
+    'service':       {16: '#cccccc'},
+    'secondary':     {10: '#bababa', 11: '#bababa'},
 }
 
 # Cache for zoom level parameters
@@ -653,7 +654,16 @@ class OSMHandler(osmium.SimpleHandler):
                     return
 
                 color_rgb565 = hex_to_rgb565(cfg.get('color', '#000000'))
-                nibble = 14  # Force text labels to render near the top
+
+                # Priority based on population - higher population = on top
+                if population >= 500000:
+                    nibble = 15  # Major cities (Paris, Lyon, Marseille, Toulouse...)
+                elif population >= 100000:
+                    nibble = 14  # Large cities
+                elif population >= 15000:
+                    nibble = 13  # Towns (Cugnaux, Muret...)
+                else:
+                    nibble = 12  # Small towns and villages
 
                 # Split long names on 2 lines at hyphen or space near middle
                 if len(name) > 12:
@@ -970,11 +980,18 @@ class OSMHandler(osmium.SimpleHandler):
             return
 
         # Force water layer identity for correct hole processing (islands)
-        if (tags.get('natural') == 'water' or 
+        if (tags.get('natural') == 'water' or
             tags.get('natural') == 'bay' or
-            tags.get('waterway') == 'riverbank' or 
+            tags.get('waterway') == 'riverbank' or
             tags.get('landuse') == 'reservoir'):
             layer = 'water'
+
+        # Force buildings layer for any polygon with building tag
+        # This ensures hangars (aeroway=hangar + building=yes/hangar) render
+        # as buildings (#d9d0c9 beige) not as aeroway infrastructure (#dadae0 grey)
+        # Per OSM wiki: hangars have both aeroway=hangar and building=* tags
+        if 'building' in tags:
+            layer = 'buildings'
 
         # Removed the 'highway in tags' filter that was causing issues
 
@@ -995,12 +1012,13 @@ class OSMHandler(osmium.SimpleHandler):
 
             # Fixed Z-order (nibble) for polygon layers (0-5: Scenery & Buildings)
             layer_to_nibble = {
-                'aeroways': 1,                   # Z=1: Airport base (aerodrome, apron, hangars)
+                'aeroways': 1,                   # Z=1: Airport base
                 'landuse': 2, 'terrain': 2,      # Z=2: Landcover (residential, forest, grass)
                 'water': 3,                      # Z=3: All water bodies
                 'leisure': 4, 'amenities': 4,    # Z=4: Parks and amenities
-                'buildings': 7,                   # Z=7: Buildings (above infrastructure)
-                'infrastructure': 6
+                'infrastructure': 6,
+                'buildings': 7                   # Z=7: Buildings (above infrastructure)
+                
             }
             nibble = layer_to_nibble.get(layer, 2)
 

@@ -428,8 +428,8 @@ class NAVViewer:
             px, py = feature.coords[0]
             sx, sy = self._tile_coord_to_screen(feature.tile_x, feature.tile_y, px, py)
             if 0 <= sx < VIEWPORT_SIZE and 0 <= sy < VIEWPORT_SIZE and feature.text:
-                font_sizes = {0: 13, 1: 15, 2: 18}
-                size = font_sizes.get(feature.font_size, 13)
+                font_sizes = {0: 15, 1: 17, 2: 20}
+                size = font_sizes.get(feature.font_size, 15)
                 text_font = pygame.font.SysFont(None, size)
                 lines = feature.text.split('\n')
                 line_height = text_font.get_linesize()
