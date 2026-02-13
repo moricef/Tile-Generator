@@ -1849,58 +1849,80 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
             if prepared_count % 25000 == 0:
                 print(f"\r  Zoom {zoom:2d}: Preparing features... {prepared_count:,} / {total_to_process:,}", end='', flush=True)
 
-        # Phase 1b: Text label collision detection - keep only highest population when too close
+        # Phase 1b: Text label collision detection
+        # PRIORITY: Place names (fixed) > Road labels (moveable)
         if text_candidates:
             tile_width_deg = 360.0 / (2.0 ** zoom)
             pixel_deg = tile_width_deg / 256.0
+            char_w = pixel_deg * 4  # half-width per char in degrees
+            label_h = pixel_deg * 8  # half-height in degrees
 
-            # Define proximity threshold (distance within which we keep only highest population)
-            # Scale with zoom: larger radius at low zoom, smaller at high zoom
+            # Separate place names from road labels
+            place_names = [f for f in text_candidates if 'coords_candidates' not in f]
+            road_labels = [f for f in text_candidates if 'coords_candidates' in f]
+
+            # Proximity threshold for place names
             proximity_threshold = pixel_deg * (30 if zoom <= 8 else 20 if zoom <= 10 else 15)
 
-            # Sort by population ONLY - highest population wins
-            text_candidates.sort(key=lambda f: -f.get('population', 0))
-
-            # Filter by proximity: keep only highest population within threshold
-            filtered_candidates = []
-            for candidate in text_candidates:
+            # STEP 1: Place names - filter by proximity and population
+            place_names.sort(key=lambda f: -f.get('population', 0))
+            filtered_places = []
+            for candidate in place_names:
                 lon, lat = candidate['coords'][0]
-
-                # Check if too close to already selected candidate
                 too_close = False
-                for selected in filtered_candidates:
+                for selected in filtered_places:
                     sel_lon, sel_lat = selected['coords'][0]
                     dist = math.sqrt((lon - sel_lon)**2 + (lat - sel_lat)**2)
                     if dist < proximity_threshold:
                         too_close = True
                         break
-
                 if not too_close:
-                    filtered_candidates.append(candidate)
+                    filtered_places.append(candidate)
 
-            # Now place labels with collision detection based on actual label size
-            char_w = pixel_deg * 4  # half-width per char in degrees
-            label_h = pixel_deg * 8  # half-height in degrees
+            # Place all place names first (they have fixed positions)
+            placed_boxes = []
+            places_placed = 0
+            places_dropped = len(place_names) - len(filtered_places)
 
-            placed_boxes = []  # list of (min_lon, min_lat, max_lon, max_lat)
-            labels_placed = 0
-            labels_dropped_proximity = len(text_candidates) - len(filtered_candidates)
-            labels_dropped_overlap = 0
+            for pf in filtered_places:
+                text_len = len(pf['text'])
+                half_w = char_w * text_len / 2
+                half_h = label_h
+                lon, lat = pf['coords'][0]
+                box = (lon - half_w, lat - half_h, lon + half_w, lat + half_h)
 
-            for tf in filtered_candidates:
-                text_len = len(tf['text'])
+                # Place names are ALWAYS placed (priority over roads)
+                placed_boxes.append(box)
+                places_placed += 1
+
+                # Distribute to tiles
+                tiles = get_feature_tiles(pf['coords'], zoom, False)
+                expanded = set()
+                for (tx, ty) in tiles:
+                    for dx in range(-1, 2):
+                        for dy in range(-1, 2):
+                            expanded.add((tx + dx, ty + dy))
+                for tile in expanded:
+                    tile_features[tile].append(pf)
+
+            # STEP 2: Road labels - try candidate positions, avoid place names
+            roads_placed = 0
+            roads_dropped = 0
+
+            for rf in road_labels:
+                text_len = len(rf['text'])
                 half_w = char_w * text_len / 2
                 half_h = label_h
 
-                # Road labels: try 3 candidate positions
-                candidates_to_try = tf.get('coords_candidates', [tf['coords'][0]])
+                # Try 3 candidate positions along the road
+                candidates_to_try = rf.get('coords_candidates', [rf['coords'][0]])
                 placed = False
 
                 for candidate_pos in candidates_to_try:
                     lon, lat = candidate_pos
                     box = (lon - half_w, lat - half_h, lon + half_w, lat + half_h)
 
-                    # Check overlap with placed label boxes
+                    # Check overlap with ALL placed labels (places + roads)
                     overlap = False
                     for pb in placed_boxes:
                         if (box[0] < pb[2] and box[2] > pb[0] and
@@ -1910,28 +1932,27 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
 
                     if not overlap:
                         # Found position without collision
-                        tf['coords'] = [(lon, lat)]
+                        rf['coords'] = [(lon, lat)]
                         placed_boxes.append(box)
-                        labels_placed += 1
+                        roads_placed += 1
                         placed = True
+
+                        # Distribute to tiles
+                        tiles = get_feature_tiles(rf['coords'], zoom, False)
+                        expanded = set()
+                        for (tx, ty) in tiles:
+                            for dx in range(-1, 2):
+                                for dy in range(-1, 2):
+                                    expanded.add((tx + dx, ty + dy))
+                        for tile in expanded:
+                            tile_features[tile].append(rf)
                         break
 
                 if not placed:
-                    labels_dropped_overlap += 1
-                    continue
+                    roads_dropped += 1
 
-                # Distribute to tiles (including neighbors)
-                tiles = get_feature_tiles(tf['coords'], zoom, False)
-                expanded = set()
-                for (tx, ty) in tiles:
-                    for dx in range(-1, 2):
-                        for dy in range(-1, 2):
-                            expanded.add((tx + dx, ty + dy))
-                for tile in expanded:
-                    tile_features[tile].append(tf)
-
-            if labels_dropped_proximity > 0 or labels_dropped_overlap > 0:
-                print(f"\r  Zoom {zoom:2d}: Labels: {labels_placed} placed, {labels_dropped_proximity} filtered (proximity), {labels_dropped_overlap} dropped (overlap)")
+            if places_dropped > 0 or roads_dropped > 0:
+                print(f"\r  Zoom {zoom:2d}: Labels: {places_placed} places, {roads_placed} roads, {places_dropped} places dropped, {roads_dropped} roads dropped")
 
         # Phase 2: Calculate tile grid from global bbox and write all tiles
         min_tx = lon_to_tile_x(min_lon, zoom)
