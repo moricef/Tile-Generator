@@ -407,14 +407,12 @@ class NAVViewer:
 
             # 1. Line body (Oriented rectangle)
             pygame.gfxdraw.filled_polygon(surface, poly_pts, color)
-            pygame.gfxdraw.aapolygon(surface, poly_pts, color)
 
             # 2. Joints (Only for large roads)
             # Skip last point to keep square ends
             if draw_joints and i < len(points) - 2:
                 cx, cy = int(p2[0]), int(p2[1])
                 pygame.gfxdraw.filled_circle(surface, cx, cy, radius, color)
-                pygame.gfxdraw.aacircle(surface, cx, cy, radius, color)
 
     def _render_road_casing(self, surface: pygame.Surface, feature: NavFeature):
         """Render road casing (border) for two-pass rendering - Pass 1 only."""
