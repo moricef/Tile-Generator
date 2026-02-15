@@ -1311,6 +1311,21 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                      f"{merge_stats['holes_removed']}/{merge_stats['holes_total']} holes removed, "
                      f"{merge_stats['sharding_fallbacks']} sharding fallbacks")
 
+    # DEBUG: Check features entering the tile
+    if tile_y == 11966 and tile_x in [16509, 16510, 16511]:
+        print(f"[DEBUG ENTER] Tile {tile_x},{tile_y}: Start writing. Features count={len(features)}")
+        if features:
+             print(f"[DEBUG ENTER] Feature 0 keys: {list(features[0].keys())}")
+             print(f"[DEBUG ENTER] Feature 0 content: {features[0]}")
+        
+        lardenne_count = sum(1 for f in features if f.get('name') == 'Avenue de Lardenne')
+        print(f"  [DEBUG ENTER] 'Avenue de Lardenne' count: {lardenne_count}")
+        # Print one instance
+        for f in features:
+            if f.get('name') == 'Avenue de Lardenne':
+                 print(f"  [DEBUG ENTER] Found Avenue de Lardenne: {f}")
+                 break
+
     # Final sort by priority nibble to ensure strict rendering order on device.
     # This is the most critical step for correct Z-ordering.
     features.sort(key=lambda f: f['zoom_priority'] & 0x0F)
@@ -1343,7 +1358,13 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
         for feature in features:
             if written_features >= 65534:
+                logger.warning(f"  Tile {tile_x},{tile_y} z{zoom}: HIT FEATURE LIMIT (65534)! Truncating rest of tile.")
                 break
+            # DEBUG: Trace Avenue de Lardenne at start of loop
+            if feature.get('name') == 'Avenue de Lardenne' and tile_y == 11966 and tile_x in [16509, 16510, 16511]:
+                 print(f"[DEBUG START] Tile {tile_x},{tile_y}: Processing Avenue de Lardenne. Pts={len(feature['coords'])}, Geom={feature['geom_type']}, Layer={feature.get('layer', 'N/A')}")
+                 print(f"  [DEBUG START] SHAPELY_AVAILABLE={SHAPELY_AVAILABLE}")
+
             # Handle text features separately
             if feature['geom_type'] == GEOM_TEXT:
                 lon, lat = feature['coords'][0]
@@ -1432,103 +1453,98 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             if active_clip_box:
                 try:
                     from shapely.geometry import Polygon, MultiPolygon, LineString, MultiLineString, GeometryCollection
-                    if is_polygon and inner_rings:
-                        geom = Polygon(orig_coords, inner_rings)
+                    
+                    # 1. Create the appropriate Shapely geometry
+                    if is_polygon:
+                        if inner_rings:
+                            geom = Polygon(orig_coords, inner_rings)
+                        else:
+                            geom = Polygon(orig_coords)
+                        # Only repair Polygons (buffer(0) fixes self-intersections)
+                        if not geom.is_valid:
+                            geom = geom.buffer(0)
                     else:
-                        geom = Polygon(orig_coords) if is_polygon else LineString(orig_coords)
-                    if not geom.is_valid:
-                        geom = geom.buffer(0)
+                        # For roads/lines, NEVER use buffer(0) as it destroys the geometry
+                        if len(orig_coords) < 2:
+                            continue
+                        geom = LineString(orig_coords)
 
-                    # DEBUG: Trace large water polygons before clipping
-                    if feature_layer == 'water' and len(orig_coords) > 100:
-                        lons = [lon for lon, lat in orig_coords]
-                        lats = [lat for lon, lat in orig_coords]
-                        print(f"[CLIP_IN z{zoom}] Water {tile_x}/{tile_y}: pts={len(orig_coords)}, "
-                              f"lon={min(lons):.5f} to {max(lons):.5f}, "
-                              f"lat={min(lats):.5f} to {max(lats):.5f}")
+                    if geom is None or geom.is_empty:
+                        continue
 
+                    # 2. Perform clipping (intersection with the tile bounding box)
                     clipped = geom.intersection(active_clip_box)
                     if clipped.is_empty:
                         continue
 
+                    # 3. Extract parts from the result (handles MultiLineStrings and GeometryCollections)
                     parts = []
                     if isinstance(clipped, GeometryCollection):
                         parts = list(clipped.geoms)
                     else:
                         parts = [clipped]
 
-                    # DEBUG: Trace clipping results for large water polygons
-                    if feature_layer == 'water' and len(orig_coords) > 100:
-                        print(f"[CLIP_OUT z{zoom}] Water {tile_x}/{tile_y}: {len(orig_coords)} pts -> "
-                              f"{len(parts)} parts, types={[type(p).__name__ for p in parts]}")
-                        
                     for part in parts:
                         if is_polygon:
+                            # Process Polygon results
                             if isinstance(part, (Polygon, MultiPolygon)):
                                 polys = [part] if isinstance(part, Polygon) else list(part.geoms)
                                 for p in polys:
                                     if not p.is_empty and p.exterior and len(p.exterior.coords) >= 4:
-                                        # Simplify polygon AFTER clipping
-                                        # Simplify: landuse, terrain (forests, parks, etc.) only at low zooms
-                                        # At high zooms (z>=14): NO simplification for any layer (preserve detail)
+                                        # Simplify polygons depending on zoom level
                                         if feature_layer in ('landuse', 'terrain') and zoom < 14:
                                             simplified_poly = p.simplify(tolerance, preserve_topology=True)
                                         else:
-                                            if feature_layer == 'water' and len(p.exterior.coords) > 20:
-                                                print(f"[NO_SIMP] Water polygon: {len(p.exterior.coords)} points NOT simplified")
-                                            simplified_poly = p  # No simplification for water/buildings/high-zoom
+                                            simplified_poly = p
+                                            
                                         if simplified_poly.is_empty or not simplified_poly.exterior:
                                             continue
+                                            
                                         rings = [list(simplified_poly.exterior.coords)]
                                         for interior in simplified_poly.interiors:
                                             if len(interior.coords) >= 4:
                                                 rings.append(list(interior.coords))
                                         final_features_data.append(rings)
                         else:
-                            if isinstance(part, LineString) and len(part.coords) >= 2:
-                                # Simplify AFTER clipping
+                            # Process LineString results (Roads, Rivers, etc.)
+                            lines = []
+                            if isinstance(part, LineString):
+                                lines = [part]
+                            elif isinstance(part, MultiLineString):
+                                lines = list(part.geoms)
+                            
+                            for l in lines:
+                                if len(l.coords) < 2:
+                                    continue
+                                
+                                # FIX: Removed hardcoded 0.25 (which meant 27km in degrees)
+                                # We keep full detail for roads and water, or use tile-relative tolerance
                                 if feature_layer in ('water', 'roads'):
-                                    simplified = part  # No simplification for water/roads
+                                    simplified = l
                                 elif feature_layer == 'infrastructure':
-                                    # High zoom (13+): Microscopic simplification (0.25 pixel)
-                                    # Removes GPS noise/waviness on straight lines while
-                                    # preserving actual curves on taxiways
-                                    if zoom >= 13:
-                                        simplified = part.simplify(0.25, preserve_topology=True)
-                                    else:
-                                        # Low zoom: Standard simplification
-                                        simplified = part.simplify(tolerance, preserve_topology=True)
+                                    # Use a microscopic tolerance for noise removal at high zooms
+                                    pixel_deg = 360.0 / (2**zoom * 256)
+                                    simplified = l.simplify(pixel_deg * 0.1, preserve_topology=True)
                                 else:
-                                    simplified = part.simplify(tolerance, preserve_topology=True)
+                                    simplified = l.simplify(tolerance, preserve_topology=True)
+                                    
                                 if len(simplified.coords) >= 2:
                                     final_features_data.append([list(simplified.coords)])
-                            elif isinstance(part, MultiLineString):
-                                for l in part.geoms:
-                                    if len(l.coords) >= 2:
-                                        if feature_layer in ('water', 'roads'):
-                                            simplified = l  # No simplification for water/roads
-                                        elif feature_layer == 'infrastructure':
-                                            # High zoom (13+): Microscopic simplification (0.25 pixel)
-                                            if zoom >= 13:
-                                                simplified = l.simplify(0.25, preserve_topology=True)
-                                            else:
-                                                simplified = l.simplify(tolerance, preserve_topology=True)
-                                        else:
-                                            simplified = l.simplify(tolerance, preserve_topology=True)
-                                        if len(simplified.coords) >= 2:
-                                            final_features_data.append([list(simplified.coords)])
+                                    
                 except Exception as e:
-                    # Clipping failed, use unclipped geometry as fallback
-                    if is_polygon and inner_rings:
-                        final_features_data = [[orig_coords] + inner_rings]
+                    # Fallback: if clipping fails, use original coordinates to avoid data loss
+                    if is_polygon:
+                        final_features_data.append([orig_coords] + inner_rings)
                     else:
-                        final_features_data = [[orig_coords]]
+                        final_features_data.append([orig_coords])
             else:
+                # No clipping active: use the original geometry
                 if is_polygon and inner_rings:
                     final_features_data = [[orig_coords] + inner_rings]
                 else:
                     final_features_data = [[orig_coords]]
 
+            # Project and write the features
             for feature_rings in final_features_data:
                 # Project all rings for this feature part
                 projected_rings = []
@@ -1606,6 +1622,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 # Hard limit: skip features exceeding uint16 capacity
                 # Impossible to render on ESP32 and would corrupt binary format
                 if total_points > 65535:
+                    logger.warning(f"  Tile {tile_x},{tile_y} z{zoom}: SKIPPING feature with {total_points} points (limit 65535). Type={feature.get('geom_type')}")
                     continue
 
                 width_pixels = feature.get('width_pixels', 0)
@@ -1725,19 +1742,18 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
     logger.info(f"    - Zoom filtered: {handler.stats['area_zoom_filtered']:,}")
     logger.info(f"    - Exceptions: {handler.stats['area_exception']:,}")
 
-    logger.info("Calculating bounding box from polygons only (useful area)...")
+    logger.info("Calculating bounding box from ALL features...")
     min_lon, max_lon = 180.0, -180.0
     min_lat, max_lat = 90.0, -90.0
-    polygon_count = 0
+    feature_count = 0
     for feature in handler.features:
-        if feature['geom_type'] == GEOM_POLYGON:
-            polygon_count += 1
-            for lon, lat in feature['coords']:
-                min_lon = min(min_lon, lon)
-                max_lon = max(max_lon, lon)
-                min_lat = min(min_lat, lat)
-                max_lat = max(max_lat, lat)
-    logger.info(f"  BBox from {polygon_count:,} polygons")
+        feature_count += 1
+        for lon, lat in feature['coords']:
+            min_lon = min(min_lon, lon)
+            max_lon = max(max_lon, lon)
+            min_lat = min(min_lat, lat)
+            max_lat = max(max_lat, lat)
+    logger.info(f"  BBox from {feature_count:,} features")
     logger.info(f"  BBox: lon=[{min_lon:.4f}, {max_lon:.4f}], lat=[{min_lat:.4f}, {max_lat:.4f}]")
 
     logger.info("Generating NAV tile files...")
@@ -1847,6 +1863,15 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
             else:
                 is_polygon = zoom_feature['geom_type'] == GEOM_POLYGON
                 tiles = get_feature_tiles(zoom_feature['coords'], zoom, is_polygon)
+                
+                # DEBUG: Trace assignment
+                if feature.get('name') == 'Avenue de Lardenne':
+                     relevant_tiles = [t for t in tiles if t[1] == 11966 and t[0] in [16509, 16510, 16511]]
+                     if relevant_tiles:
+                         print(f"[DEBUG ASSIGN z{zoom}] Avenue de Lardenne assigned to target tiles: {relevant_tiles}")
+                     else:
+                         pass # Reduce noise
+
                 for tile in tiles:
                     tile_features[tile].append(zoom_feature)
             
