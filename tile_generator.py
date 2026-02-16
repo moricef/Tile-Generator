@@ -717,6 +717,7 @@ class OSMHandler(osmium.SimpleHandler):
                         'zoom_priority': bnd['zoom_priority'],
                         'width_meters': 0.0,
                         'width_pixels': bnd.get('width_pixels', 1),
+                        'name': w.tags.get('name', ''),
                     })
                     self.stats['boundary_ways_extracted'] += 1
 
@@ -789,7 +790,8 @@ class OSMHandler(osmium.SimpleHandler):
                 'color_rgb565': color_rgb565,
                 'zoom_priority': pack_zoom_priority(min_zoom, nibble),
                 'width_meters': 0.0,  # Polygons don't use width
-                'subclass': subclass  # Store for merge logic
+                'subclass': subclass,  # Store for merge logic
+                'name': tags.get('name', ''),
             }
             self.features.append(feature)
             self.stats['features_extracted'] += 1
@@ -810,7 +812,8 @@ class OSMHandler(osmium.SimpleHandler):
         highway_type = tags.get('highway', '') or tags.get('railway', '') or tags.get('aeroway', '')
         ref = tags.get('ref', '')
         old_ref = tags.get('old_ref', '')
-        
+        name = tags.get('name', '')
+
         # Fixed Z-order (nibble) for rendering priority (8-15: Structure)
         priority_map = {
             # Z=14: Railways (above all roads for level crossings priority)
@@ -870,6 +873,7 @@ class OSMHandler(osmium.SimpleHandler):
             'has_ref': bool(ref),
             'ref': ref,
             'old_ref': old_ref,
+            'name': name,
         }
         self.features.append(feature)
         self.stats['features_extracted'] += 1
@@ -1064,7 +1068,8 @@ class OSMHandler(osmium.SimpleHandler):
                     'width_meters': 0.0,
                     'inner_rings': inner_rings,
                     'subclass': subclass,  # Store for merge logic
-                    'layer': layer  # Store layer name for inner_rings handling
+                    'layer': layer,  # Store layer name for inner_rings handling
+                    'name': tags.get('name', ''),
                 }
 
                 # DEBUG: Trace large water polygons
