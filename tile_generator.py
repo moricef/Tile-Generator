@@ -1558,6 +1558,9 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                                     
                                 if len(simplified.coords) >= 2:
                                     final_features_data.append([list(simplified.coords)])
+                                    # DEBUG: Confirm road added to final_features_data
+                                    if is_debug_road and is_debug_tile:
+                                        print(f"[DEBUG ADDED] Tile {tile_x},{tile_y}: {feature.get('name')} (id={feature.get('id')}) ADDED to final_features_data, pts={len(simplified.coords)}")
                                     
                 except Exception as e:
                     # Fallback: if clipping fails, use original coordinates to avoid data loss
@@ -1571,6 +1574,10 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     final_features_data = [[orig_coords] + inner_rings]
                 else:
                     final_features_data = [[orig_coords]]
+
+            # DEBUG: Check if roads made it to final_features_data
+            if is_debug_road and is_debug_tile and len(final_features_data) > 0:
+                print(f"[DEBUG FINAL] Tile {tile_x},{tile_y}: {feature.get('name')} (id={feature.get('id')}) has {len(final_features_data)} feature parts to write")
 
             # Project and write the features
             for feature_rings in final_features_data:
