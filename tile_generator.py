@@ -1588,16 +1588,27 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 f_max_x, f_max_y = 0, 0
                 is_visible = False
 
+                # DEBUG: Check if this is a target road for coordinate logging
+                debug_roads_proj = ['Boulevard Silvio Trentin', 'Boulevard Pierre et Marie Curie', 'Avenue de Lardenne']
+                debug_tiles_proj = [(11962, [16513, 16514, 16515]), (11966, [16509, 16510, 16511])]
+                is_debug_road_proj = any(road.lower() in feature.get('name', '').lower() for road in debug_roads_proj)
+                is_debug_tile_proj = any(tile_y == debug_y and tile_x in debug_xs for debug_y, debug_xs in debug_tiles_proj)
+
                 for ring in feature_rings:
                     projected_ring = []
                     for lon, lat in ring:
                         px = int((lon - tile_min_lon) / (tile_max_lon - tile_min_lon) * 4096)
                         m_y = lat_to_merc(lat)
                         py = int((t_max_merc - m_y) / merc_range * 4096)
-                        
+
+                        # DEBUG: Log projected coordinates for target roads
+                        if is_debug_road_proj and is_debug_tile_proj and len(projected_ring) == 0:  # First point only
+                            in_range = -8192 < px < 12288 and -8192 < py < 12288
+                            print(f"[DEBUG PROJ] Tile {tile_x},{tile_y}: {feature.get('name')} (id={feature.get('id')}), first_point: lon={lon:.6f}, lat={lat:.6f} → px={px}, py={py}, in_range={in_range}")
+
                         if -8192 < px < 12288 and -8192 < py < 12288:
                             is_visible = True
-                        
+
                         projected_ring.append((px, py))
                         
                         c_px, c_py = max(0, min(4096, px)), max(0, min(4096, py))
