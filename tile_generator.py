@@ -1695,7 +1695,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
                 # DEBUG: Confirm writing to file
                 if is_debug_road_proj and is_debug_tile_proj:
-                    print(f"[DEBUG WRITE] Tile {tile_x},{tile_y}: WRITING {feature.get('name')} (id={feature.get('id')}) to file, total_points={total_points}, projected_rings={len(projected_rings)}")
+                    print(f"[DEBUG WRITE] Tile {tile_x},{tile_y}: WRITING {feature.get('name')} (id={feature.get('id')}) to file, total_points={total_points}, projected_rings={len(projected_rings)}, color={feature['color_rgb565']}, width={width_pixels}, hw_type={feature.get('highway_type', 'N/A')}")
 
                 # Feature Header
                 f.write(struct.pack('<B', feature['geom_type']))
