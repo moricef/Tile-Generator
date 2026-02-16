@@ -1867,6 +1867,8 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                     'highway_type': hw_type,
                     'inner_rings': feature.get('inner_rings', []),
                     'layer': feature.get('layer', ''),  # Preserve layer for water detection
+                    'name': feature.get('name', ''),  # Preserve name for debugging
+                    'id': feature.get('id', 0),  # Preserve OSM ID for debugging
                 }
 
             # Text labels: collect for collision detection
