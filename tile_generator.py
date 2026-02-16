@@ -1312,19 +1312,24 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                      f"{merge_stats['sharding_fallbacks']} sharding fallbacks")
 
     # DEBUG: Check features entering the tile
-    if tile_y == 11966 and tile_x in [16509, 16510, 16511]:
-        print(f"[DEBUG ENTER] Tile {tile_x},{tile_y}: Start writing. Features count={len(features)}")
-        if features:
-             print(f"[DEBUG ENTER] Feature 0 keys: {list(features[0].keys())}")
-             print(f"[DEBUG ENTER] Feature 0 content: {features[0]}")
-        
-        lardenne_count = sum(1 for f in features if f.get('name') == 'Avenue de Lardenne')
-        print(f"  [DEBUG ENTER] 'Avenue de Lardenne' count: {lardenne_count}")
-        # Print one instance
-        for f in features:
-            if f.get('name') == 'Avenue de Lardenne':
-                 print(f"  [DEBUG ENTER] Found Avenue de Lardenne: {f}")
-                 break
+    debug_tiles = [(11962, [16513, 16514, 16515]), (11966, [16509, 16510, 16511])]
+    debug_roads = ['Boulevard Silvio Trentin', 'Boulevard Pierre et Marie Curie', 'Avenue de Lardenne']
+
+    for debug_y, debug_xs in debug_tiles:
+        if tile_y == debug_y and tile_x in debug_xs:
+            print(f"[DEBUG ENTER] Tile {tile_x},{tile_y}: Start writing. Features count={len(features)}")
+            if features:
+                 print(f"[DEBUG ENTER] Feature 0 keys: {list(features[0].keys())}")
+
+            for road_name in debug_roads:
+                road_count = sum(1 for f in features if road_name.lower() in f.get('name', '').lower())
+                if road_count > 0:
+                    print(f"  [DEBUG ENTER] '{road_name}' count: {road_count}")
+                    # Print one instance
+                    for f in features:
+                        if road_name.lower() in f.get('name', '').lower():
+                             print(f"  [DEBUG ENTER] Found {road_name}: id={f.get('id')}, coords_len={len(f.get('coords', []))}")
+                             break
 
     # Final sort by priority nibble to ensure strict rendering order on device.
     # This is the most critical step for correct Z-ordering.
@@ -1360,10 +1365,17 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             if written_features >= 65534:
                 logger.warning(f"  Tile {tile_x},{tile_y} z{zoom}: HIT FEATURE LIMIT (65534)! Truncating rest of tile.")
                 break
-            # DEBUG: Trace Avenue de Lardenne at start of loop
-            if feature.get('name') == 'Avenue de Lardenne' and tile_y == 11966 and tile_x in [16509, 16510, 16511]:
-                 print(f"[DEBUG START] Tile {tile_x},{tile_y}: Processing Avenue de Lardenne. Pts={len(feature['coords'])}, Geom={feature['geom_type']}, Layer={feature.get('layer', 'N/A')}")
-                 print(f"  [DEBUG START] SHAPELY_AVAILABLE={SHAPELY_AVAILABLE}")
+            # DEBUG: Trace specific roads at start of loop
+            debug_tiles_check = [(11962, [16513, 16514, 16515]), (11966, [16509, 16510, 16511])]
+            debug_roads_check = ['Boulevard Silvio Trentin', 'Boulevard Pierre et Marie Curie', 'Avenue de Lardenne']
+
+            for debug_y, debug_xs in debug_tiles_check:
+                if tile_y == debug_y and tile_x in debug_xs:
+                    for road_name in debug_roads_check:
+                        if road_name.lower() in feature.get('name', '').lower():
+                            print(f"[DEBUG START] Tile {tile_x},{tile_y}: Processing {feature.get('name')}. Pts={len(feature['coords'])}, Geom={feature['geom_type']}, Layer={feature.get('layer', 'N/A')}")
+                            print(f"  [DEBUG START] SHAPELY_AVAILABLE={SHAPELY_AVAILABLE}")
+                            break
 
             # Handle text features separately
             if feature['geom_type'] == GEOM_TEXT:
@@ -1865,12 +1877,15 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                 tiles = get_feature_tiles(zoom_feature['coords'], zoom, is_polygon)
                 
                 # DEBUG: Trace assignment
-                if feature.get('name') == 'Avenue de Lardenne':
-                     relevant_tiles = [t for t in tiles if t[1] == 11966 and t[0] in [16509, 16510, 16511]]
-                     if relevant_tiles:
-                         print(f"[DEBUG ASSIGN z{zoom}] Avenue de Lardenne assigned to target tiles: {relevant_tiles}")
-                     else:
-                         pass # Reduce noise
+                debug_roads_assign = ['Boulevard Silvio Trentin', 'Boulevard Pierre et Marie Curie', 'Avenue de Lardenne']
+                debug_tiles_assign = [(11962, [16513, 16514, 16515]), (11966, [16509, 16510, 16511])]
+
+                for road_name in debug_roads_assign:
+                    if road_name.lower() in feature.get('name', '').lower():
+                        for debug_y, debug_xs in debug_tiles_assign:
+                            relevant_tiles = [t for t in tiles if t[1] == debug_y and t[0] in debug_xs]
+                            if relevant_tiles:
+                                print(f"[DEBUG ASSIGN z{zoom}] {feature.get('name')} (id={feature.get('id')}) assigned to tiles: {relevant_tiles}")
 
                 for tile in tiles:
                     tile_features[tile].append(zoom_feature)
