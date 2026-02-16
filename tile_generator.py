@@ -1484,8 +1484,24 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     if geom is None or geom.is_empty:
                         continue
 
+                    # DEBUG: Before clipping
+                    debug_roads_clip = ['Boulevard Silvio Trentin', 'Boulevard Pierre et Marie Curie', 'Avenue de Lardenne']
+                    debug_tiles_clip = [(11962, [16513, 16514, 16515]), (11966, [16509, 16510, 16511])]
+                    is_debug_road = any(road.lower() in feature.get('name', '').lower() for road in debug_roads_clip)
+                    is_debug_tile = any(tile_y == debug_y and tile_x in debug_xs for debug_y, debug_xs in debug_tiles_clip)
+                    if is_debug_road and is_debug_tile:
+                        print(f"[DEBUG CLIP BEFORE] Tile {tile_x},{tile_y}: {feature.get('name')} (id={feature.get('id')}), geom_type={type(geom).__name__}, pts={len(orig_coords)}, is_valid={geom.is_valid}")
+
                     # 2. Perform clipping (intersection with the tile bounding box)
                     clipped = geom.intersection(active_clip_box)
+
+                    # DEBUG: After clipping
+                    if is_debug_road and is_debug_tile:
+                        if clipped.is_empty:
+                            print(f"[DEBUG CLIP DROPPED] Tile {tile_x},{tile_y}: {feature.get('name')} (id={feature.get('id')}) - clipped result is EMPTY!")
+                        else:
+                            print(f"[DEBUG CLIP AFTER] Tile {tile_x},{tile_y}: {feature.get('name')} (id={feature.get('id')}), result_type={type(clipped).__name__}, has_coords={hasattr(clipped, 'coords')}")
+
                     if clipped.is_empty:
                         continue
 
