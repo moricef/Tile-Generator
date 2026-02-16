@@ -327,7 +327,16 @@ class NAVViewer:
         for feature in features:
             if feature.geom_type == GEOM_TEXT:
                 continue  # Skip text, render in pass 3
-            if feature.geom_type == GEOM_LINESTRING and feature.priority >= 8 and debug_line_count < 30:
+            # Enhanced debug for roads with priority >= 11 (residential, secondary, primary)
+            if feature.geom_type == GEOM_LINESTRING and feature.priority >= 11:
+                color = rgb565_to_rgb888(feature.color_rgb565)
+                print(f"[RENDER LINE] tile={feature.tile_x}/{feature.tile_y}, priority={feature.priority}, "
+                      f"color=#{color[0]:02x}{color[1]:02x}{color[2]:02x} (RGB565={feature.color_rgb565}), "
+                      f"width={feature.width}, pts={len(feature.coords)}")
+                # Show first coord to verify position
+                if feature.coords:
+                    print(f"  First coord: {feature.coords[0]}")
+            elif feature.geom_type == GEOM_LINESTRING and feature.priority >= 8 and debug_line_count < 30:
                 color = rgb565_to_rgb888(feature.color_rgb565)
                 print(f"[RENDER LINE] priority={feature.priority}, color=#{color[0]:02x}{color[1]:02x}{color[2]:02x}, width={feature.width}")
                 debug_line_count += 1
@@ -449,6 +458,12 @@ class NAVViewer:
         elif feature.geom_type == GEOM_LINESTRING:
             pts = [self._tile_coord_to_screen(feature.tile_x, feature.tile_y, x, y) for x, y in feature.coords]
             if len(pts) >= 2:
+                # DEBUG: Log roads with priority >= 11 being drawn
+                if feature.priority >= 11:
+                    # Check if any point is in viewport
+                    in_viewport = any(0 <= x < VIEWPORT_SIZE and 0 <= y < VIEWPORT_SIZE for x, y in pts)
+                    print(f"[DRAW LINE] tile={feature.tile_x}/{feature.tile_y}, priority={feature.priority}, "
+                          f"screen_pts={len(pts)}, in_viewport={in_viewport}, first_pt={pts[0]}, width={feature.width}")
                 # Draw road core with smooth joins (casing already drawn in pass 1 for roads with needs_casing flag)
                 self._draw_smooth_line(surface, color, pts, max(1, feature.width))
 
