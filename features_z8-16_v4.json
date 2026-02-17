@@ -588,7 +588,7 @@
   },
   "aeroway=aerodrome": {
     "zoom": 10,
-    "color": "#dadae0",
+    "color": "#eeeeee",
     "priority": 65
   },
   "aeroway=hangar": {
