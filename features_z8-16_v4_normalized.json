@@ -593,8 +593,8 @@
   },
   "aeroway=hangar": {
     "zoom": 12,
-    "color": "#dadae0",
-    "priority": 65
+    "color": "#d9d0c9",
+    "priority": 85
   },
   "aeroway=helipad": {
     "zoom": 11,

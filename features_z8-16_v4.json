@@ -1,7 +1,6 @@
 {
   "_comment": "Priority = rendering order. Lower = behind, higher = on top.",
   "_layers": "landuse:20-27, terrain:30-39, water:40-45, railways:40-45, roads:50-58, infrastructure:60-65, buildings:70, amenities:85, places:90-95",
-
   "landuse=forest": {
     "zoom": 8,
     "color": "#add19e",
@@ -98,9 +97,9 @@
     "priority": 40
   },
   "place=suburb": {
-    "zoom": 10,
-    "color": "#e0dfdf",
-    "priority": 24
+    "zoom": 12,
+    "color": "#666666",
+    "priority": 92
   },
   "landuse=retail": {
     "zoom": 10,
@@ -282,7 +281,6 @@
     "color": "#f5dcba",
     "priority": 28
   },
-
   "natural=bare_rock": {
     "zoom": 8,
     "color": "#eee5dc",
@@ -353,7 +351,6 @@
     "color": "#ddecec",
     "priority": 39
   },
-
   "natural=bay": {
     "zoom": 8,
     "color": "#aad3df",
@@ -449,7 +446,6 @@
     "color": "#aad3df",
     "priority": 45
   },
-
   "railway=rail": {
     "zoom": 10,
     "color": "#888888",
@@ -490,7 +486,7 @@
     "color": "#bbbbbb",
     "priority": 48
   },
-"highway=motorway": {
+  "highway=motorway": {
     "zoom": 6,
     "color": "#e990a0",
     "priority": 60
@@ -535,7 +531,6 @@
     "color": "#dedee8",
     "priority": 56
   },
-  
   "highway=motorway_link": {
     "zoom": 10,
     "color": "#e990a0",
@@ -561,7 +556,7 @@
     "color": "#ffffff",
     "priority": 46
   },
-   "highway=service": {
+  "highway=service": {
     "zoom": 15,
     "color": "#ffffff",
     "priority": 40
@@ -580,7 +575,7 @@
     "zoom": 13,
     "color": "#bbbbbb",
     "priority": 20
-  },  
+  },
   "tunnel=yes": {
     "zoom": 13,
     "color": "#aaaaaa",
@@ -598,8 +593,8 @@
   },
   "aeroway=hangar": {
     "zoom": 12,
-    "color": "#dadae0",
-    "priority": 65
+    "color": "#d9d0c9",
+    "priority": 85
   },
   "aeroway=helipad": {
     "zoom": 11,
@@ -638,7 +633,6 @@
     "color": "#aaaaaa",
     "priority": 65
   },
-
   "building": {
     "zoom": 13,
     "color": "#d9d0c9",
@@ -654,7 +648,6 @@
     "color": "#aaaaaa",
     "priority": 72
   },
-
   "amenity=grave_yard": {
     "zoom": 12,
     "color": "#aacbaf",
@@ -690,7 +683,6 @@
     "color": "#f0f0d8",
     "priority": 85
   },
-
   "place=city": {
     "zoom": 8,
     "color": "#555555",
@@ -711,11 +703,6 @@
     "color": "#666666",
     "priority": 92
   },
-  "place=suburb": {
-    "zoom": 12,
-    "color": "#666666",
-    "priority": 92
-  },
   "place=hamlet": {
     "zoom": 13,
     "color": "#777777",
@@ -726,7 +713,6 @@
     "color": "#e0e0e0",
     "priority": 95
   },
-
   "boundary=administrative;admin_level=2": {
     "zoom": 6,
     "color": "#9c7b97",
