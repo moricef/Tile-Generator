@@ -105,12 +105,13 @@ WIDTH_TAGS = {'highway', 'railway', 'waterway'}
 # Fixed width in pixels per feature type and zoom level (OSM Carto style)
 # Format: type_value -> {zoom: pixels}
 LINE_WIDTH_PER_ZOOM = {
-    # Highway - based on OpenStreetMap Carto standard (halved from original, min 1)
-    'motorway':      {6: 1,  7: 1,  8: 1,  9: 1,  10: 1,  11: 2,  12: 3,  13: 3,  14: 3,  15: 3,  16: 5,  17: 9,  18: 11, 19: 14},
-    'motorway_link': {                            10: 1,  11: 1,  12: 1,  13: 2,  14: 2,  15: 2,  16: 4,  17: 6,  18: 7,  19: 8},
-    'trunk':         {6: 1,  7: 1,  8: 1,  9: 1,  10: 1,  11: 1,  12: 2,  13: 3,  14: 3,  15: 3,  16: 5,  17: 9,  18: 11, 19: 14},
-    'trunk_link':    {                            10: 1,  11: 1,  12: 1,  13: 2,  14: 2,  15: 2,  16: 4,  17: 6,  18: 7,  19: 8},
-    'primary':       {              8: 1,  9: 1,  10: 1,  11: 1,  12: 2,  13: 3,  14: 3,  15: 3,  16: 5,  17: 9,  18: 11, 19: 14},
+    # z6-z11: original OSM Carto widths (sausage artifact not visible at low zoom)
+    # z12+: halved (min 1) to avoid fillCircle sausage artifact on T-Deck
+    'motorway':      {6: 1,  7: 1,  8: 2,  9: 2,  10: 2,  11: 3,  12: 3,  13: 3,  14: 3,  15: 3,  16: 5,  17: 9,  18: 11, 19: 14},
+    'motorway_link': {                            10: 1,  11: 2,  12: 1,  13: 2,  14: 2,  15: 2,  16: 4,  17: 6,  18: 7,  19: 8},
+    'trunk':         {6: 1,  7: 1,  8: 2,  9: 2,  10: 2,  11: 2,  12: 2,  13: 3,  14: 3,  15: 3,  16: 5,  17: 9,  18: 11, 19: 14},
+    'trunk_link':    {                            10: 1,  11: 2,  12: 1,  13: 2,  14: 2,  15: 2,  16: 4,  17: 6,  18: 7,  19: 8},
+    'primary':       {              8: 1,  9: 1,  10: 2,  11: 2,  12: 2,  13: 3,  14: 3,  15: 3,  16: 5,  17: 9,  18: 11, 19: 14},
     'primary_link':  {                            10: 1,  11: 1,  12: 1,  13: 2,  14: 2,  15: 2,  16: 4,  17: 6,  18: 7,  19: 8},
     'secondary':     {                            10: 1,  11: 1,  12: 2,  13: 3,  14: 3,  15: 2,  16: 5,  17: 9,  18: 11, 19: 14},
     'secondary_link':{                            10: 1,  11: 1,  12: 1,  13: 2,  14: 2,  15: 2,  16: 4,  17: 6,  18: 7,  19: 8},
