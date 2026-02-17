@@ -1706,18 +1706,12 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 f.write(struct.pack('<H', total_points))
                 f.write(b'\x00')
 
-                # Points for all rings
+                # Points for all rings (clamp to int16 range for long runways)
                 for ring in projected_rings:
                     for px, py in ring:
-                        if is_polygon:
-                            # Polygons: clamp to tile bounds [0, 4096] to prevent
-                            # aberrant AEL shapes in fillPolygonGeneral on T-Deck
-                            px_clamped = max(0, min(4096, px))
-                            py_clamped = max(0, min(4096, py))
-                        else:
-                            # Lines: allow overflow (drawLine handles out-of-bounds)
-                            px_clamped = max(-32768, min(32767, px))
-                            py_clamped = max(-32768, min(32767, py))
+                        # Clamp coordinates to fit in signed 16-bit integer range
+                        px_clamped = max(-32768, min(32767, px))
+                        py_clamped = max(-32768, min(32767, py))
                         f.write(struct.pack('<hh', px_clamped, py_clamped))
 
                 if is_polygon:
