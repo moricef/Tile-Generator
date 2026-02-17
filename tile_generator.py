@@ -352,7 +352,7 @@ def get_layer_for_tags(tags: Dict[str, str]) -> Optional[str]:
     
 
     # Explicit rule for buildings to ensure they are always on top of scenery
-    if 'building' in tags:
+    if 'building' in tags or tags.get('aeroway') == 'hangar':
         return 'buildings'
 
     # Explicit rule for all highways

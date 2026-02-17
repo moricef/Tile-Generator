@@ -366,6 +366,11 @@
     "color": "#dadae0",
     "priority": 74
   },
+  "aeroway=hangar": {
+    "zoom": 15,
+    "color": "#d9d0c9",
+    "priority": 85
+  },
 
   "building": {
     "zoom": 15,
