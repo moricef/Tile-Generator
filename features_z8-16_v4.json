@@ -203,17 +203,17 @@
   },
   "leisure=sports_centre": {
     "zoom": 12,
-    "color": "#33cc99",
+    "color": "#a9e0cb",
     "priority": 25
   },
   "leisure=sports_hall": {
     "zoom": 12,
-    "color": "#33cc99",
+    "color": "#a9e0cb",
     "priority": 25
   },
   "leisure=stadium": {
     "zoom": 11,
-    "color": "#33cc99",
+    "color": "#a9e0cb",
     "priority": 25
   },
   "leisure=swimming_pool": {

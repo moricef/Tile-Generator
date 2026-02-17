@@ -191,6 +191,8 @@ LAYER_PRIORITY = {
     'infrastructure': 65,
     'buildings': 75,
     'leisure': 80,      # Sports fields above water (visible on islands)
+    'surface': 86,      # Ground cover (grass, sand) visible inside leisure polygons (must be > max leisure combined=85)
+    'parking': 88,      # Parking lots above leisure zones and surface cover
     'boundaries': 85,
     'places': 90
 }
@@ -215,10 +217,10 @@ LAYER_MAPPING = {
     'landuse': [
         'natural=beach', 'natural=sand', 'natural=wood',
         'landuse=forest', 'natural=forest', 'natural=scrub',
-        'natural=heath', 'natural=grassland', 'landuse=meadow',
+        'natural=heath',
         'natural=bare_rock', 'natural=rock', 'natural=scree', 'natural=stone',
         'natural=fell', 'natural=moor', 'natural=shrubbery', 'landuse=quarry',
-        'landuse=grass', 'landuse=orchard', 'landuse=vineyard',
+        'landuse=orchard', 'landuse=vineyard',
         'landuse=farmland', 'landuse=farmyard',
         'landuse=residential',
         'landuse=commercial', 'landuse=retail', 'landuse=industrial',
@@ -227,6 +229,9 @@ LAYER_MAPPING = {
         'landuse=quarry', 'landuse=military', 'landuse=landfill', 'landuse=brownfield',
         'landuse=basin', 'landuse=railway', 'landuse=education',
         'landuse=garages', 'landuse=flowerbed'
+    ],
+    'surface': [
+        'natural=grassland', 'landuse=grass', 'landuse=meadow',
     ],
     'roads': [
         'highway=motorway', 'highway=motorway_link',
@@ -255,8 +260,10 @@ LAYER_MAPPING = {
         'amenity=school', 'amenity=university',
         'amenity=place_of_worship',
         'amenity=grave_yard', 'amenity=marketplace',
+    ],
+    'parking': [
+        'amenity=parking',
         'amenity=parking_space',
-        'amenity=parking'
     ],
     'infrastructure': [
         'bridge=yes', 'man_made=bridge',
