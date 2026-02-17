@@ -347,18 +347,20 @@ def get_layer_for_tags(tags: Dict[str, str]) -> Optional[str]:
         tags.get('landuse') == 'reservoir'):
         return 'water'
     
+    # Explicit rule for all highways and railways (BEFORE boundary filter,
+    # because some roads run along administrative boundaries and carry both tags)
+    if 'highway' in tags:
+        return 'roads'
+    if 'railway' in tags:
+        return 'roads'
+
     # Do not create polygons for abstract features like boundaries or place names
     if 'place' in tags or 'boundary' in tags or 'admin_level' in tags:
         return None
-    
 
     # Explicit rule for buildings to ensure they are always on top of scenery
     if 'building' in tags or tags.get('aeroway') == 'hangar':
         return 'buildings'
-
-    # Explicit rule for all highways
-    if 'highway' in tags:
-        return 'roads'
 
     for layer_name, feature_keys in LAYER_MAPPING.items():
         for feature_key in feature_keys:
