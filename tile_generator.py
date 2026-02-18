@@ -853,16 +853,12 @@ class OSMHandler(osmium.SimpleHandler):
         if highway_type in ('rail', 'subway', 'tram', 'light_rail', 'narrow_gauge', 'funicular', 'monorail'):
             print(f"[RAILWAY] way={w.id}, type={highway_type}, nibble={nibble}")
 
-        # Bridges: shift up to ensure above ALL normal roads (max normal road is 13)
-        # Major bridges (roads/links): nibble+3 ensures above normal motorway (13)
-        # Minor bridges (track/path): nibble+2 sufficient for hierarchy
-        original_nibble = nibble
-        if tags.get('bridge') in ('yes', 'viaduct'):
-            if highway_type in ('track', 'path', 'footway', 'cycleway', 'bridleway'):
-                nibble = min(nibble + 2, 15)  # Minor bridges: +2
-            else:
-                nibble = min(nibble + 3, 15)  # Major bridges: +3 to be above motorway(13)
-            print(f"[BRIDGE] way={w.id}, ref={ref}, highway={highway_type}, nibble {original_nibble}→{nibble}")
+        # Bridges: all bridges render at nibble 15 (above all at-grade roads)
+        is_bridge = tags.get('bridge') in ('yes', 'viaduct')
+        if is_bridge:
+            old_nibble = nibble
+            nibble = 15
+            print(f"[BRIDGE] way={w.id}, highway={highway_type}, nibble {old_nibble}→{nibble}, color={color}, width={width_meters}")
 
         # Tunnels: shift down to ensure below ground level while preserving hierarchy
         # motorway tunnel: max(13-11,1)=2, secondary tunnel: max(12-11,1)=1, etc.
@@ -883,6 +879,7 @@ class OSMHandler(osmium.SimpleHandler):
             'zoom_priority': pack_zoom_priority(min_zoom, nibble),
             'width_meters': width_meters,
             'highway_type': highway_type,
+            'is_bridge': is_bridge,
             'has_ref': bool(ref),
             'ref': ref,
             'old_ref': old_ref,
@@ -1044,6 +1041,10 @@ class OSMHandler(osmium.SimpleHandler):
             # leisure=track renders above other leisure polygons (sports_centre background)
             if tags.get('leisure') == 'track':
                 nibble = 6
+
+            # Bridge polygons render above water (nibble 8)
+            if tags.get('bridge') in ('yes', 'viaduct') or tags.get('man_made') == 'bridge':
+                nibble = 9
 
             color = get_color_for_tags(tags, self.config)
             color_rgb565 = hex_to_rgb565(color)
@@ -1697,7 +1698,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
                 # Mark roads that need casing (border rendering) based on priority nibble
                 priority_nibble = feature['zoom_priority'] & 0x0F
-                needs_casing = priority_nibble in (12, 13)
+                needs_casing = priority_nibble in (13, 14) or feature.get('is_bridge', False)
 
                 # Encode width with casing flag
                 width_byte = min(width_pixels, 127)  # Clamp to 7 bits
@@ -1710,6 +1711,12 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 # DEBUG: Confirm writing to file
                 if is_debug_road_proj and is_debug_tile_proj:
                     print(f"[DEBUG WRITE] Tile {tile_x},{tile_y}: WRITING {feature.get('name')} (id={feature.get('id')}) to file, total_points={total_points}, projected_rings={len(projected_rings)}, color={feature['color_rgb565']}, width={width_pixels}, hw_type={feature.get('highway_type', 'N/A')}")
+
+                # DEBUG: Log bridge features (nibble 15 linestrings)
+                if priority_nibble == 15 and not is_polygon:
+                    print(f"[BRIDGE WRITE] tile={tile_x},{tile_y} id={feature.get('id')}, hw={feature.get('highway_type','')}, "
+                          f"nibble={priority_nibble}, width={width_pixels}, casing={needs_casing}, pts={total_points}, "
+                          f"color=0x{feature['color_rgb565']:04x}")
 
                 # Feature Header
                 f.write(struct.pack('<B', feature['geom_type']))
@@ -1919,6 +1926,7 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                     'highway_type': hw_type,
                     'inner_rings': feature.get('inner_rings', []),
                     'layer': feature.get('layer', ''),  # Preserve layer for water detection
+                    'is_bridge': feature.get('is_bridge', False),  # Preserve for casing
                     'name': feature.get('name', ''),  # Preserve name for debugging
                     'id': feature.get('id', 0),  # Preserve OSM ID for debugging
                 }
