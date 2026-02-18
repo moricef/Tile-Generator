@@ -225,7 +225,7 @@ LAYER_MAPPING = {
         'landuse=residential',
         'landuse=commercial', 'landuse=retail', 'landuse=industrial',
         'landuse=construction', 'landuse=cemetery', 'landuse=allotments',
-        'leisure=common', 'landuse=village_green',
+        'landuse=village_green',
         'landuse=quarry', 'landuse=military', 'landuse=landfill', 'landuse=brownfield',
         'landuse=basin', 'landuse=railway', 'landuse=education',
         'landuse=garages', 'landuse=flowerbed'
@@ -285,11 +285,14 @@ LAYER_MAPPING = {
         'boundary=administrative'
     ],
     'leisure': [
-        'leisure=pitch', 'leisure=stadium', 'leisure=sports_centre',
+        'leisure=stadium', 'leisure=sports_centre',
         'leisure=sports_hall', 'leisure=track', 'leisure=swimming_pool',
-        'leisure=golf_course', 'leisure=playground',
+        'leisure=golf_course', 'leisure=common', 'leisure=playground',
         'landuse=park', 'leisure=park', 'leisure=nature_reserve', 'leisure=garden',
         'leisure=recreation_ground', 'landuse=recreation_ground'
+    ],
+    'pitch': [
+        'leisure=pitch',
     ],
     'places': [
         'place=city', 'place=state', 'place=town',
@@ -1028,7 +1031,8 @@ class OSMHandler(osmium.SimpleHandler):
             layer_to_nibble = {
                 'aeroways': 1,                   # Z=1: Airport base
                 'landuse': 2, 'terrain': 2,      # Z=2: Landcover (residential, forest, farmland)
-                'leisure': 4, 'amenities': 4,    # Z=4: Parks and amenities
+                'leisure': 4, 'amenities': 4,    # Z=4: Parks, recreation grounds, amenities
+                'pitch': 5,                      # Z=5: Pitches above recreation grounds
                 'surface': 5,                    # Z=5: Ground cover (grass, meadow) inside leisure zones
                 'parking': 5,                    # Z=5: Parking lots inside leisure zones
                 'infrastructure': 6,
