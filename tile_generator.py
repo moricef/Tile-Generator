@@ -1042,14 +1042,6 @@ class OSMHandler(osmium.SimpleHandler):
                 nibble = 6
 
             color = get_color_for_tags(tags, self.config)
-
-            # Surface-based color override for leisure=track (OSM Carto behaviour)
-            if tags.get('leisure') == 'track':
-                surface = tags.get('surface', '')
-                if surface == 'grass':
-                    color = '#cdebb0'
-                elif surface in ('earth', 'dirt', 'unpaved', 'gravel', 'fine_gravel', 'compacted'):
-                    color = '#ddd1be'
             color_rgb565 = hex_to_rgb565(color)
             
             # Force water color to ensure consistency, overriding JSON

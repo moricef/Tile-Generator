@@ -223,7 +223,7 @@
   },
   "leisure=track": {
     "zoom": 12,
-    "color": "#88e0be",
+    "color": "#8cd6b8",
     "priority": 32
   },
   "natural=beach": {
