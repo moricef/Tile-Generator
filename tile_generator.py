@@ -824,27 +824,27 @@ class OSMHandler(osmium.SimpleHandler):
         old_ref = tags.get('old_ref', '')
         name = tags.get('name', '')
 
-        # Fixed Z-order (nibble) for rendering priority (8-15: Structure)
+        # Fixed Z-order (nibble) for rendering priority (9-15: Roads/Railways, above water at 8)
         priority_map = {
-            # Z=14: Railways (above all roads for level crossings priority)
-            'rail': 14, 'subway': 14, 'tram': 14, 'light_rail': 14,
-            'narrow_gauge': 14, 'funicular': 14, 'monorail': 14,
-            # Z=13: Major roads & motorways
-            'motorway': 13, 'trunk': 13, 'primary': 13,
-            # Z=12: Secondary roads
-            'secondary': 12, 'tertiary': 12,
-            # Z=11: Residential and minor roads
-            'residential': 11, 'unclassified': 11, 'living_street': 11, 'pedestrian': 11,
-            # Z=9-10: Links/ramps differentiated by hierarchy (below main roads but above service)
-            'motorway_link': 11, 'trunk_link': 10, 'primary_link': 10, 'secondary_link': 9, 'tertiary_link': 9,
-            # Z=8: Service, tracks and paths
-            'service': 8, 'track': 8, 'path': 8, 'footway': 8, 'cycleway': 8
+            # Z=15: Railways (above all roads for level crossings priority)
+            'rail': 15, 'subway': 15, 'tram': 15, 'light_rail': 15,
+            'narrow_gauge': 15, 'funicular': 15, 'monorail': 15,
+            # Z=14: Major roads & motorways
+            'motorway': 14, 'trunk': 14, 'primary': 14,
+            # Z=13: Secondary roads
+            'secondary': 13, 'tertiary': 13,
+            # Z=12: Residential and minor roads
+            'residential': 12, 'unclassified': 12, 'living_street': 12, 'pedestrian': 12,
+            # Z=10-11: Links/ramps differentiated by hierarchy
+            'motorway_link': 12, 'trunk_link': 11, 'primary_link': 11, 'secondary_link': 10, 'tertiary_link': 10,
+            # Z=9: Service, tracks and paths
+            'service': 9, 'track': 9, 'path': 9, 'footway': 9, 'cycleway': 9
         }
 
         if layer == 'water':
-            nibble = 5
+            nibble = 8
         else:
-            nibble = priority_map.get(highway_type, 8)  # Default for other minor ways
+            nibble = priority_map.get(highway_type, 9)  # Default for other minor ways
 
         # Log railways to verify nibble assignment
         if highway_type in ('rail', 'subway', 'tram', 'light_rail', 'narrow_gauge', 'funicular', 'monorail'):
@@ -1024,16 +1024,16 @@ class OSMHandler(osmium.SimpleHandler):
                     self.stats['area_exception'] += 1
                     return
 
-            # Fixed Z-order (nibble) for polygon layers (0-7: Scenery & Buildings)
+            # Fixed Z-order (nibble) for polygon layers
             layer_to_nibble = {
                 'aeroways': 1,                   # Z=1: Airport base
                 'landuse': 2, 'terrain': 2,      # Z=2: Landcover (residential, forest, farmland)
-                'water': 3,                      # Z=3: All water bodies
                 'leisure': 4, 'amenities': 4,    # Z=4: Parks and amenities
                 'surface': 5,                    # Z=5: Ground cover (grass, meadow) inside leisure zones
                 'parking': 5,                    # Z=5: Parking lots inside leisure zones
                 'infrastructure': 6,
-                'buildings': 7                   # Z=7: Buildings (above infrastructure)
+                'buildings': 7,                  # Z=7: Buildings (above infrastructure)
+                'water': 8,                      # Z=8: Water above all polygons, below roads (9+)
             }
             nibble = layer_to_nibble.get(layer, 2)
 
