@@ -203,7 +203,7 @@
   },
   "leisure=sports_centre": {
     "zoom": 12,
-    "color": "#a9e0cb",
+    "color": "#e0dfdf",
     "priority": 25
   },
   "leisure=sports_hall": {

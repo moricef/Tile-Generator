@@ -1024,24 +1024,32 @@ class OSMHandler(osmium.SimpleHandler):
                     self.stats['area_exception'] += 1
                     return
 
-            # Fixed Z-order (nibble) for polygon layers (0-5: Scenery & Buildings)
+            # Fixed Z-order (nibble) for polygon layers (0-7: Scenery & Buildings)
             layer_to_nibble = {
                 'aeroways': 1,                   # Z=1: Airport base
-                'landuse': 2, 'terrain': 2,      # Z=2: Landcover (residential, forest, grass)
+                'landuse': 2, 'terrain': 2,      # Z=2: Landcover (residential, forest, farmland)
                 'water': 3,                      # Z=3: All water bodies
                 'leisure': 4, 'amenities': 4,    # Z=4: Parks and amenities
+                'surface': 5,                    # Z=5: Ground cover (grass, meadow) inside leisure zones
+                'parking': 5,                    # Z=5: Parking lots inside leisure zones
                 'infrastructure': 6,
                 'buildings': 7                   # Z=7: Buildings (above infrastructure)
-                
             }
             nibble = layer_to_nibble.get(layer, 2)
 
-            # Special case: grassland gets nibble=3 to render above other landuse
-            # This prevents grey features at nibble=2 from covering grassland
-            if tags.get('natural') == 'grassland':
-                nibble = 3
+            # leisure=track renders above other leisure polygons (sports_centre background)
+            if tags.get('leisure') == 'track':
+                nibble = 6
 
             color = get_color_for_tags(tags, self.config)
+
+            # Surface-based color override for leisure=track (OSM Carto behaviour)
+            if tags.get('leisure') == 'track':
+                surface = tags.get('surface', '')
+                if surface == 'grass':
+                    color = '#cdebb0'
+                elif surface in ('earth', 'dirt', 'unpaved', 'gravel', 'fine_gravel', 'compacted'):
+                    color = '#ddd1be'
             color_rgb565 = hex_to_rgb565(color)
             
             # Force water color to ensure consistency, overriding JSON
