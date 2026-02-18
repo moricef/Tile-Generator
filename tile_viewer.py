@@ -312,48 +312,35 @@ class NAVViewer:
         # This ensures proper Z-order (landuse/forests below, roads above)
         features.sort(key=lambda f: f.priority)
 
-        # TWO-PASS RENDERING for professional road casing
-        # Pass 1: Draw road casings (borders) for roads marked with needs_casing flag
-        # This ensures all borders are below all road cores, creating smooth intersections
+        # FOUR-PASS RENDERING for bridges over roads
+        # Bridge features (nibble 15 + casing) must be drawn AFTER all at-grade road cores,
+        # otherwise the at-grade road cores cover the bridge casings.
+        BRIDGE_NIBBLE = 15
+
+        # Pass 1: At-grade road casings (priority < BRIDGE_NIBBLE)
         for feature in features:
-            if feature.geom_type == GEOM_LINESTRING and feature.needs_casing:
+            if feature.geom_type == GEOM_LINESTRING and feature.needs_casing and feature.priority < BRIDGE_NIBBLE:
                 self._render_road_casing(surface, feature)
 
-        # Pass 2: Render all non-text features normally (including road cores)
-        # Low priority rendered first = below, high priority rendered last = above
-        # DEBUG: Log rendering order for roads/railways/polygons to verify priority
-        debug_line_count = 0
-        debug_poly_count = 0
+        # Pass 2: All non-text, non-bridge features (polygons + at-grade road cores + railways without casing)
         for feature in features:
             if feature.geom_type == GEOM_TEXT:
-                continue  # Skip text, render in pass 3
-            # Enhanced debug for roads with priority >= 11 (residential, secondary, primary)
-            if feature.geom_type == GEOM_LINESTRING and feature.priority >= 11:
-                color = rgb565_to_rgb888(feature.color_rgb565)
-                print(f"[RENDER LINE] tile={feature.tile_x}/{feature.tile_y}, priority={feature.priority}, "
-                      f"color=#{color[0]:02x}{color[1]:02x}{color[2]:02x} (RGB565={feature.color_rgb565}), "
-                      f"width={feature.width}, pts={len(feature.coords)}")
-                # Show first coord to verify position
-                if feature.coords:
-                    print(f"  First coord: {feature.coords[0]}")
-            elif feature.geom_type == GEOM_LINESTRING and feature.priority >= 8 and debug_line_count < 30:
-                color = rgb565_to_rgb888(feature.color_rgb565)
-                print(f"[RENDER LINE] priority={feature.priority}, color=#{color[0]:02x}{color[1]:02x}{color[2]:02x}, width={feature.width}")
-                debug_line_count += 1
-            elif feature.geom_type == GEOM_POLYGON and feature.priority <= 5 and debug_poly_count < 100:
-                color = rgb565_to_rgb888(feature.color_rgb565)
-                color_name = ""
-                # Identify aerodrome (grey) vs grassland (green)
-                if 210 <= color[0] <= 230 and 210 <= color[1] <= 230 and 220 <= color[2] <= 240:
-                    color_name = " [AERODROME?]"
-                elif 195 <= color[0] <= 210 and 225 <= color[1] <= 240 and 170 <= color[2] <= 185:
-                    color_name = " [GRASSLAND!]"
-                print(f"[RENDER POLY] priority={feature.priority}, tile={feature.tile_x}/{feature.tile_y}, "
-                      f"color=#{color[0]:02x}{color[1]:02x}{color[2]:02x}{color_name}, pts={len(feature.coords)}")
-                debug_poly_count += 1
+                continue
+            if feature.geom_type == GEOM_LINESTRING and feature.needs_casing and feature.priority == BRIDGE_NIBBLE:
+                continue  # Skip bridges, rendered in pass 3-4
             self._render_feature(surface, feature)
 
-        # Pass 3: Render all text features on top of everything
+        # Pass 3: Bridge casings (priority == BRIDGE_NIBBLE with casing flag)
+        for feature in features:
+            if feature.geom_type == GEOM_LINESTRING and feature.needs_casing and feature.priority == BRIDGE_NIBBLE:
+                self._render_road_casing(surface, feature)
+
+        # Pass 4: Bridge cores (priority == BRIDGE_NIBBLE with casing flag)
+        for feature in features:
+            if feature.geom_type == GEOM_LINESTRING and feature.needs_casing and feature.priority == BRIDGE_NIBBLE:
+                self._render_feature(surface, feature)
+
+        # Pass 5: Text labels on top of everything
         for feature in features:
             if feature.geom_type == GEOM_TEXT:
                 self._render_feature(surface, feature)

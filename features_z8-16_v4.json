@@ -53,7 +53,7 @@
   },
   "landuse=cemetery": {
     "zoom": 11,
-    "color": "#aacbaf",
+    "color": "#add19e",
     "priority": 24
   },
   "landuse=commercial": {

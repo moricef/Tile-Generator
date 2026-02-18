@@ -804,6 +804,7 @@ class OSMHandler(osmium.SimpleHandler):
                 'zoom_priority': pack_zoom_priority(min_zoom, nibble),
                 'width_meters': 0.0,  # Polygons don't use width
                 'subclass': subclass,  # Store for merge logic
+                'is_building': layer == 'buildings',
                 'name': tags.get('name', ''),
             }
             self.features.append(feature)
@@ -1084,6 +1085,7 @@ class OSMHandler(osmium.SimpleHandler):
                     'inner_rings': inner_rings,
                     'subclass': subclass,  # Store for merge logic
                     'layer': layer,  # Store layer name for inner_rings handling
+                    'is_building': layer == 'buildings',
                     'name': tags.get('name', ''),
                 }
 
@@ -1308,7 +1310,8 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                             'zoom_priority': priority,
                             'width_meters': 0.0,
                             'subclass': subclass,  # Preserve subclass after merge
-                            'layer': feature_layer  # Preserve layer
+                            'layer': feature_layer,  # Preserve layer
+                            'is_building': feature_layer == 'buildings',
                         })
 
                 if total_merged_points > 65535:
@@ -1700,10 +1703,16 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 priority_nibble = feature['zoom_priority'] & 0x0F
                 needs_casing = priority_nibble in (13, 14) or feature.get('is_bridge', False)
 
-                # Encode width with casing flag
+                # Encode width/flags byte (fp[4]):
+                # Lines: bits 0-6 = width in pixels, bit 7 = hasCasing
+                # Polygons: bit 7 = hasOutline (buildings)
                 width_byte = min(width_pixels, 127)  # Clamp to 7 bits
-                if needs_casing:
-                    width_byte |= 0x80  # Set bit 7
+                if is_polygon:
+                    width_byte = 0
+                    if feature.get('is_building', False):
+                        width_byte |= 0x80  # Set bit 7 = hasOutline
+                elif needs_casing:
+                    width_byte |= 0x80  # Set bit 7 = hasCasing
 
                 bx1, by1 = max(0, min(255, f_min_x >> 4)), max(0, min(255, f_min_y >> 4))
                 bx2, by2 = max(0, min(255, f_max_x >> 4)), max(0, min(255, f_max_y >> 4))
@@ -1927,6 +1936,7 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                     'inner_rings': feature.get('inner_rings', []),
                     'layer': feature.get('layer', ''),  # Preserve layer for water detection
                     'is_bridge': feature.get('is_bridge', False),  # Preserve for casing
+                    'is_building': feature.get('is_building', False),  # Preserve for outline
                     'name': feature.get('name', ''),  # Preserve name for debugging
                     'id': feature.get('id', 0),  # Preserve OSM ID for debugging
                 }
