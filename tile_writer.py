@@ -521,15 +521,6 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                         width_meters = feature.get('width_meters', 0.0)
                         width_pixels = meters_to_pixels(width_meters, zoom) if width_meters > 0 else 1
 
-                # Widen bridges to fill gap between dual carriageway ways
-                # Only major roads (motorway/trunk/primary) need the extra width
-                if feature.get('is_bridge', False) and not is_polygon:
-                    hw_type = feature.get('highway_type', '')
-                    if hw_type in ('motorway', 'trunk', 'primary'):
-                        width_pixels = int(width_pixels * 1.5)
-                    elif hw_type in ('secondary', 'tertiary'):
-                        width_pixels = int(width_pixels * 1.2)
-
                 # Mark roads that need casing (border rendering) based on priority nibble
                 priority_nibble = feature['zoom_priority'] & 0x0F
                 needs_casing = priority_nibble in (13, 14) or feature.get('is_bridge', False)
