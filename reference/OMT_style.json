@@ -68,8 +68,8 @@
 
   "aeroway=aerodrome": "#E7E6DE",
   "aeroway=apron": "#E7E6DE",
-  "aeroway=runway": "#E7E6DE",
-  "aeroway=taxiway": "#E7E6DE",
+  "aeroway=runway": "#B2B5D1",
+  "aeroway=taxiway": "#B2B5D1",
 
   "building=*": "#D9D0C9",
 

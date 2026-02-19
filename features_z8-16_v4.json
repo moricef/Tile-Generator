@@ -4,7 +4,7 @@
   "landuse=forest": {
     "zoom": 8,
     "color": "#add19e",
-    "priority": 22
+    "priority": 27
   },
   "natural=grassland": {
     "zoom": 9,
@@ -29,12 +29,12 @@
   "natural=wood": {
     "zoom": 8,
     "color": "#add19e",
-    "priority": 22
+    "priority": 27
   },
   "natural=forest": {
     "zoom": 8,
     "color": "#add19e",
-    "priority": 22
+    "priority": 27
   },
   "landuse=farmland": {
     "zoom": 9,
@@ -129,7 +129,7 @@
   "landuse=education": {
     "zoom": 10,
     "color": "#ffffe5",
-    "priority": 25
+    "priority": 29
   },
   "landuse=farmyard": {
     "zoom": 12,
@@ -517,12 +517,12 @@
     "priority": 56
   },
   "highway=unclassified": {
-    "zoom": 12,
+    "zoom": 13,
     "color": "#ffffff",
     "priority": 55
   },
   "highway=residential": {
-    "zoom": 12,
+    "zoom": 13,
     "color": "#ffffff",
     "priority": 54
   },
@@ -603,7 +603,7 @@
   },
   "aeroway=helipad": {
     "zoom": 11,
-    "color": "#e7e6de",
+    "color": "#b2b5d1",
     "priority": 65
   },
   "aeroway=parking_position": {
@@ -613,13 +613,13 @@
   },
   "aeroway=runway": {
     "zoom": 12,
-    "color": "#e7e6de",
+    "color": "#b2b5d1",
     "priority": 68,
     "width": 5
   },
   "aeroway=taxiway": {
     "zoom": 12,
-    "color": "#e7e6de",
+    "color": "#b2b5d1",
     "priority": 67,
     "width": 5
   },
