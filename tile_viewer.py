@@ -136,7 +136,7 @@ def read_nav_tile(path: str, tile_x: int, tile_y: int) -> List[NavFeature]:
                 # Width byte encoding: bit 7 = casing flag, bits 0-6 = actual width
                 width_byte = struct.unpack('<B', f.read(1))[0]
                 feature.needs_casing = (width_byte & 0x80) != 0
-                feature.width = width_byte & 0x7F
+                feature.width = (width_byte & 0x7F) / 2.0  # half-pixels to pixels
 
                 feature.bbox = struct.unpack('<BBBB', f.read(4))
                 coord_count = struct.unpack('<H', f.read(2))[0]
@@ -360,7 +360,7 @@ class NAVViewer:
         return int(fx * TILE_SIZE), int(fy * TILE_SIZE)
 
     def _draw_smooth_line(self, surface: pygame.Surface, color: Tuple[int, int, int],
-                          points: List[Tuple[int, int]], width: int):
+                          points: List[Tuple[int, int]], width: float):
         """Draw line using oriented rectangles for square ends, no AA, no joints."""
         if len(points) < 2:
             return
@@ -413,7 +413,7 @@ class NAVViewer:
         casing_color = darken_color(road_color, amount=0.3)  # 30% darker than road color
 
         # Draw casing: wider than the road core with smooth joins
-        casing_width = feature.width + 2
+        casing_width = feature.width + 1.0  # +1px border (0.5px each side)
         self._draw_smooth_line(surface, casing_color, pts, casing_width)
 
     def _render_feature(self, surface: pygame.Surface, feature: NavFeature):
@@ -452,7 +452,7 @@ class NAVViewer:
                     print(f"[DRAW LINE] tile={feature.tile_x}/{feature.tile_y}, priority={feature.priority}, "
                           f"screen_pts={len(pts)}, in_viewport={in_viewport}, first_pt={pts[0]}, width={feature.width}")
                 # Draw road core with smooth joins (casing already drawn in pass 1 for roads with needs_casing flag)
-                self._draw_smooth_line(surface, color, pts, max(1, feature.width))
+                self._draw_smooth_line(surface, color, pts, max(1.0, feature.width))
 
         elif feature.geom_type == GEOM_POLYGON:
             rings = feature.get_rings()
