@@ -188,7 +188,7 @@
   },
   "leisure=pitch": {
     "zoom": 13,
-    "color": "#8cd6b8",
+    "color": "#88e0be",
     "priority": 25
   },
   "leisure=playground": {
@@ -203,17 +203,17 @@
   },
   "leisure=sports_centre": {
     "zoom": 12,
-    "color": "#e0dfdf",
+    "color": "#caface",
     "priority": 25
   },
   "leisure=sports_hall": {
     "zoom": 12,
-    "color": "#a9e0cb",
+    "color": "#caface",
     "priority": 25
   },
   "leisure=stadium": {
     "zoom": 11,
-    "color": "#a9e0cb",
+    "color": "#caface",
     "priority": 25
   },
   "leisure=swimming_pool": {
@@ -223,7 +223,7 @@
   },
   "leisure=track": {
     "zoom": 12,
-    "color": "#8cd6b8",
+    "color": "#88e0be",
     "priority": 32
   },
   "natural=beach": {

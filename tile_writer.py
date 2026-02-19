@@ -523,7 +523,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
                 # Mark bridges only for casing (border rendering)
                 priority_nibble = feature['zoom_priority'] & 0x0F
-                needs_casing = feature.get('is_bridge', False)
+                needs_casing = feature.get('is_bridge', False) and zoom >= 14
 
                 # Encode width/flags byte (fp[4]):
                 # Lines: bits 0-6 = width in half-pixels (firmware divides by 2.0f)
