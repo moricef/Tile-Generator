@@ -486,11 +486,6 @@
     "color": "#888888",
     "priority": 46
   },
-  "railway=subway": {
-    "zoom": 12,
-    "color": "#999999",
-    "priority": 47
-  },
   "railway=tram": {
     "zoom": 12,
     "color": "#888888",

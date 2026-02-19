@@ -100,7 +100,6 @@ LINE_WIDTH_PER_ZOOM = {
     'bridleway':     {                                                    13: 2,  14: 2,  15: 2,  16: 2},
     # Railway
     'rail':          {                     9: 2,  10: 2,  11: 2,  12: 2,  13: 3,  14: 3,  15: 3,  16: 4,  17: 4,  18: 4,  19: 6},
-    'subway':        {                                            12: 3,  13: 3,  14: 3,  15: 3,  16: 4},
     'tram':          {                                                                    15: 3,  16: 3},
     'narrow_gauge':  {                                                    13: 3,  14: 3,  15: 3,  16: 4},
     'funicular':     {                                                    13: 3,  14: 3,  15: 3,  16: 4},
@@ -173,7 +172,7 @@ LAYER_MAPPING = {
         'highway=construction', 'highway=platform'
     ],
     'railways': [
-        'railway=rail', 'railway=subway', 'railway=tram',
+        'railway=rail', 'railway=tram',
         'railway=abandoned', 'railway=disused', 'railway=funicular',
         'railway=narrow_gauge', 'railway=platform'
     ],
