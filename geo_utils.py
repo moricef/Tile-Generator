@@ -145,7 +145,7 @@ def get_config_value_for_tags(
     """
     Generic helper to get configuration values for feature tags, with key priority.
     """
-    preferred_keys = ['building', 'natural', 'waterway', 'highway', 'railway', 'water']
+    preferred_keys = ['building', 'natural', 'waterway', 'highway', 'railway', 'water', 'surface']
 
     # 1. Prioritize preferred keys
     for key in preferred_keys:

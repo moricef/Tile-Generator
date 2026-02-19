@@ -191,6 +191,41 @@
     "color": "#88e0be",
     "priority": 25
   },
+  "surface=grass": {
+    "zoom": 13,
+    "color": "#88e0be",
+    "priority": 25
+  },
+  "surface=clay": {
+    "zoom": 13,
+    "color": "#d2956a",
+    "priority": 25
+  },
+  "surface=sand": {
+    "zoom": 13,
+    "color": "#f0e0b0",
+    "priority": 25
+  },
+  "surface=asphalt": {
+    "zoom": 13,
+    "color": "#aaaaaa",
+    "priority": 25
+  },
+  "surface=concrete": {
+    "zoom": 13,
+    "color": "#bbbbbb",
+    "priority": 25
+  },
+  "surface=tartan": {
+    "zoom": 13,
+    "color": "#cc7766",
+    "priority": 25
+  },
+  "surface=artificial_turf": {
+    "zoom": 13,
+    "color": "#7ed09e",
+    "priority": 25
+  },
   "leisure=playground": {
     "zoom": 12,
     "color": "#c8facc",
