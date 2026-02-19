@@ -145,7 +145,7 @@ def get_config_value_for_tags(
     """
     Generic helper to get configuration values for feature tags, with key priority.
     """
-    preferred_keys = ['building', 'natural', 'waterway', 'highway', 'railway', 'water', 'surface']
+    preferred_keys = ['building', 'natural', 'waterway', 'highway', 'railway', 'water']
 
     # 1. Prioritize preferred keys
     for key in preferred_keys:
@@ -159,6 +159,12 @@ def get_config_value_for_tags(
             # Then try key-only match
             if key in config and isinstance(config[key], dict):
                 return config[key].get(attribute, default)
+
+    # 1.5. Surface overrides leisure for sport pitches only
+    if 'leisure' in tags and 'surface' in tags:
+        surface_key = f"surface={tags['surface']}"
+        if surface_key in config and isinstance(config[surface_key], dict):
+            return config[surface_key].get(attribute, default)
 
     # 2. Check remaining tags
     for key, value in tags.items():
