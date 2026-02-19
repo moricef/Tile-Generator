@@ -523,7 +523,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
                 # Mark bridges only for casing (border rendering)
                 priority_nibble = feature['zoom_priority'] & 0x0F
-                needs_casing = feature.get('is_bridge', False) and zoom >= 14
+                needs_casing = False  # Disabled: bridge casing causes doubled outlines on dual carriageways
 
                 # Encode width/flags byte (fp[4]):
                 # Lines: bits 0-6 = width in half-pixels (firmware divides by 2.0f)
@@ -531,8 +531,8 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 width_byte = min(width_pixels, 127)  # Clamp to 7 bits (0-63.5px range)
                 if is_polygon:
                     width_byte = 0
-                    if feature.get('is_building', False):
-                        width_byte |= 0x80  # Set bit 7 = hasOutline
+                    if feature.get('is_building', False) and zoom >= 16:
+                        width_byte |= 0x80  # Set bit 7 = hasOutline (only z16+ for individual buildings)
                 elif needs_casing:
                     width_byte |= 0x80  # Set bit 7 = hasCasing
 
