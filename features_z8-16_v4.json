@@ -206,17 +206,7 @@
     "color": "#f0e0b0",
     "priority": 25
   },
-  "surface=asphalt": {
-    "zoom": 13,
-    "color": "#aaaaaa",
-    "priority": 25
-  },
-  "surface=concrete": {
-    "zoom": 13,
-    "color": "#bbbbbb",
-    "priority": 25
-  },
-  "surface=tartan": {
+"surface=tartan": {
     "zoom": 13,
     "color": "#cc7766",
     "priority": 25

@@ -244,6 +244,56 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                      f"{merge_stats['holes_removed']}/{merge_stats['holes_total']} holes removed, "
                      f"{merge_stats['sharding_fallbacks']} sharding fallbacks")
 
+    # Bridge underlay: create grey concrete polygons covering entire bridge width.
+    # Buffer each bridge road line → union overlapping buffers → single polygon per bridge.
+    # Priority 9 ensures it draws above water (8) but below roads (12-15).
+    if SHAPELY_AVAILABLE and zoom >= 13:
+        from shapely.geometry import LineString as ShapelyLineString
+        BRIDGE_COLOR_RGB565 = hex_to_rgb565('#b8b8b8')
+        BRIDGE_ROAD_TYPES = {
+            'motorway', 'trunk', 'primary', 'secondary', 'tertiary',
+            'motorway_link', 'trunk_link', 'primary_link', 'secondary_link', 'tertiary_link',
+            'residential', 'unclassified', 'living_street', 'pedestrian',
+        }
+        pixel_deg = 360.0 / (2**zoom * 256)
+        bridge_buffers = []
+        for feature in features:
+            if (feature.get('is_bridge') and
+                    feature['geom_type'] == GEOM_LINESTRING):
+                hw_type = feature.get('highway_type', '')
+                if hw_type not in BRIDGE_ROAD_TYPES:
+                    continue
+                road_width = LINE_WIDTH_PER_ZOOM.get(hw_type, {}).get(zoom, 1)
+                # Buffer = half road width + 0.5px margin each side, in degrees
+                buf_deg = pixel_deg * (road_width / 2.0 + 0.5)
+                try:
+                    line = ShapelyLineString(feature['coords'])
+                    bridge_buffers.append(line.buffer(buf_deg, cap_style='flat'))
+                except Exception:
+                    pass
+
+        if bridge_buffers:
+            merged = shapely_unary_union(bridge_buffers)
+            parts = []
+            if isinstance(merged, ShapelyPolygon):
+                parts = [merged]
+            elif hasattr(merged, 'geoms'):
+                parts = [g for g in merged.geoms if isinstance(g, ShapelyPolygon)]
+
+            for poly in parts:
+                if poly.is_empty or not poly.exterior:
+                    continue
+                features.append({
+                    'geom_type': GEOM_POLYGON,
+                    'coords': list(poly.exterior.coords),
+                    'inner_rings': [],
+                    'color_rgb565': BRIDGE_COLOR_RGB565,
+                    'zoom_priority': pack_zoom_priority(zoom, 9),
+                    'layer': 'infrastructure',
+                    '_bridge_underlay': True,
+                })
+            logger.debug(f"  Tile {tile_x},{tile_y}: Created {len(parts)} bridge underlay polygons from {len(bridge_buffers)} road segments")
+
     # Final sort by priority nibble to ensure strict rendering order on device.
     # This is the most critical step for correct Z-ordering.
     features.sort(key=lambda f: f['zoom_priority'] & 0x0F)
@@ -521,20 +571,19 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                         width_meters = feature.get('width_meters', 0.0)
                         width_pixels = meters_to_pixels(width_meters, zoom) if width_meters > 0 else 1
 
-                # Mark bridges only for casing (border rendering)
-                priority_nibble = feature['zoom_priority'] & 0x0F
-                needs_casing = False  # Disabled: bridge casing causes doubled outlines on dual carriageways
+                # Casing on each bridge road line (not on the underlay polygon)
+                needs_casing = feature.get('is_bridge', False) and zoom >= 14
 
                 # Encode width/flags byte (fp[4]):
                 # Lines: bits 0-6 = width in half-pixels (firmware divides by 2.0f)
-                # Polygons: bit 7 = hasOutline (buildings)
+                # Polygons: bit 7 = hasOutline (buildings only)
                 width_byte = min(width_pixels, 127)  # Clamp to 7 bits (0-63.5px range)
                 if is_polygon:
                     width_byte = 0
                     if feature.get('is_building', False) and zoom >= 16:
-                        width_byte |= 0x80  # Set bit 7 = hasOutline (only z16+ for individual buildings)
+                        width_byte |= 0x80  # Set bit 7 = hasOutline (individual buildings)
                 elif needs_casing:
-                    width_byte |= 0x80  # Set bit 7 = hasCasing
+                    width_byte |= 0x80  # Set bit 7 = hasCasing (bridge roads)
 
                 bx1, by1 = max(0, min(255, f_min_x >> 4)), max(0, min(255, f_min_y >> 4))
                 bx2, by2 = max(0, min(255, f_max_x >> 4)), max(0, min(255, f_max_y >> 4))

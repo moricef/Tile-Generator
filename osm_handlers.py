@@ -376,12 +376,12 @@ class OSMHandler(osmium.SimpleHandler):
 
         # Fixed Z-order (nibble) for rendering priority (9-15: Roads/Railways, above water at 8)
         priority_map = {
-            # Z=15: Railways (above all roads for level crossings priority)
-            'rail': 15, 'subway': 15, 'tram': 15, 'light_rail': 15,
-            'narrow_gauge': 15, 'funicular': 15, 'monorail': 15,
+            # Z=15: Heavy rail (above all roads for level crossings)
+            'rail': 15, 'narrow_gauge': 15, 'funicular': 15,
             # Z=14: Major roads & motorways
             'motorway': 14, 'trunk': 14, 'primary': 14,
-            # Z=13: Secondary roads
+            # Z=13: Secondary roads + tram/light rail (at grade, below motorways)
+            'tram': 13, 'light_rail': 13, 'monorail': 13,
             'secondary': 13, 'tertiary': 13,
             # Z=12: Residential and minor roads
             'residential': 12, 'unclassified': 12, 'living_street': 12, 'pedestrian': 12,
