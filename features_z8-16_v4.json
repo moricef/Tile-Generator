@@ -83,7 +83,7 @@
   },
   "landuse=military": {
     "zoom": 10,
-    "color": "#ff5555",
+    "color": "#f5bfbf",
     "priority": 25
   },
   "landuse=landfill": {
@@ -193,27 +193,12 @@
   },
   "surface=grass": {
     "zoom": 13,
-    "color": "#88e0be",
-    "priority": 25
-  },
-  "surface=clay": {
-    "zoom": 13,
-    "color": "#d2956a",
+    "color": "#cdebb0",
     "priority": 25
   },
   "surface=sand": {
     "zoom": 13,
-    "color": "#f0e0b0",
-    "priority": 25
-  },
-"surface=tartan": {
-    "zoom": 13,
-    "color": "#cc7766",
-    "priority": 25
-  },
-  "surface=artificial_turf": {
-    "zoom": 13,
-    "color": "#7ed09e",
+    "color": "#f5e9c6",
     "priority": 25
   },
   "leisure=playground": {

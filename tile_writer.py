@@ -264,21 +264,47 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 if hw_type not in BRIDGE_ROAD_TYPES:
                     continue
                 road_width = LINE_WIDTH_PER_ZOOM.get(hw_type, {}).get(zoom, 1)
-                # Buffer = half road width + 0.5px margin each side, in degrees
-                buf_deg = pixel_deg * (road_width / 2.0 + 0.5)
+                # Tight buffer: exactly road half-width (casing provides the border)
+                tight_buf = pixel_deg * road_width * 0.5
+                # Generous buffer: +5px to detect nearby carriageways
+                generous_buf = pixel_deg * (road_width / 2.0 + 5.0)
                 try:
                     line = ShapelyLineString(feature['coords'])
-                    bridge_buffers.append(line.buffer(buf_deg, cap_style='flat'))
+                    bridge_buffers.append({
+                        'tight': line.buffer(tight_buf, cap_style='flat'),
+                        'generous': line.buffer(generous_buf, cap_style='flat'),
+                    })
                 except Exception:
                     pass
 
         if bridge_buffers:
-            merged = shapely_unary_union(bridge_buffers)
-            parts = []
-            if isinstance(merged, ShapelyPolygon):
-                parts = [merged]
-            elif hasattr(merged, 'geoms'):
-                parts = [g for g in merged.geoms if isinstance(g, ShapelyPolygon)]
+            # Union generous buffers to find which carriageways belong together
+            all_generous = shapely_unary_union([b['generous'] for b in bridge_buffers])
+            all_tight = [b['tight'] for b in bridge_buffers]
+
+            # Group tight buffers by which generous polygon they intersect
+            generous_parts = []
+            if isinstance(all_generous, ShapelyPolygon):
+                generous_parts = [all_generous]
+            elif isinstance(all_generous, ShapelyMultiPolygon):
+                generous_parts = list(all_generous.geoms)
+            elif hasattr(all_generous, 'geoms'):
+                generous_parts = [g for g in all_generous.geoms if isinstance(g, ShapelyPolygon)]
+
+            deck_polys = []
+            for gp in generous_parts:
+                # Find tight buffers that intersect this generous group
+                group_tight = [t for t in all_tight if t.intersects(gp)]
+                if not group_tight:
+                    continue
+                tight_union = shapely_unary_union(group_tight)
+                # If multiple tight polys in same group → convex hull to bridge the gap
+                if isinstance(tight_union, ShapelyMultiPolygon) or (hasattr(tight_union, 'geoms') and len(list(tight_union.geoms)) > 1):
+                    deck_polys.append(tight_union.convex_hull)
+                elif isinstance(tight_union, ShapelyPolygon):
+                    deck_polys.append(tight_union)
+
+            parts = [p for p in deck_polys if not p.is_empty and p.exterior]
 
             for poly in parts:
                 if poly.is_empty or not poly.exterior:
@@ -409,8 +435,9 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             # Each entry will be a list of rings: [ [ext_pts], [hole1_pts], ... ]
             final_features_data = []
 
-            # Clip geometry (polygons with small margin, linestrings with large margin)
-            active_clip_box = clip_box_line if (not is_polygon and clip_box_line) else clip_box
+            # Clip geometry (polygons with small margin, linestrings/bridge decks with large margin)
+            is_bridge_deck = feature.get('_bridge_underlay', False)
+            active_clip_box = clip_box_line if (not is_polygon or is_bridge_deck) and clip_box_line else clip_box
             if active_clip_box:
                 try:
                     from shapely.geometry import Polygon, MultiPolygon, LineString, MultiLineString, GeometryCollection

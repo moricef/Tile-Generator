@@ -339,6 +339,10 @@ class OSMHandler(osmium.SimpleHandler):
             # Assign a polygon nibble just in case.
             nibble = 3 if layer == 'water' else 2
 
+            # Cemeteries render above base landuse (residential, farmland)
+            if tags.get('landuse') == 'cemetery' or tags.get('amenity') == 'grave_yard':
+                nibble = 4
+
             subclass = tags.get('natural', '') or tags.get('landuse', '') or tags.get('leisure', '')
 
             feature = {
@@ -567,6 +571,10 @@ class OSMHandler(osmium.SimpleHandler):
                 'water': 8,                      # Z=8: Water above all polygons, below roads (9+)
             }
             nibble = layer_to_nibble.get(layer, 2)
+
+            # Cemeteries render above base landuse (residential, farmland)
+            if tags.get('landuse') == 'cemetery' or tags.get('amenity') == 'grave_yard':
+                nibble = 4
 
             # leisure=track renders above other leisure polygons (sports_centre background)
             if tags.get('leisure') == 'track':
