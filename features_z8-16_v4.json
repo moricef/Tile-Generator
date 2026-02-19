@@ -38,7 +38,7 @@
   },
   "landuse=farmland": {
     "zoom": 9,
-    "color": "#eef0d6",
+    "color": "#eef0d5",
     "priority": 23
   },
   "landuse=grass": {
@@ -53,7 +53,7 @@
   },
   "landuse=cemetery": {
     "zoom": 11,
-    "color": "#add19e",
+    "color": "#aacbaf",
     "priority": 24
   },
   "landuse=commercial": {
@@ -78,12 +78,12 @@
   },
   "landuse=quarry": {
     "zoom": 10,
-    "color": "#adadad",
+    "color": "#c5c3c3",
     "priority": 25
   },
   "landuse=military": {
     "zoom": 10,
-    "color": "#f1f0d0",
+    "color": "#ff5555",
     "priority": 25
   },
   "landuse=landfill": {
@@ -118,7 +118,7 @@
   },
   "landuse=brownfield": {
     "zoom": 10,
-    "color": "#c9b28b",
+    "color": "#c7c7b4",
     "priority": 25
   },
   "landuse=construction": {
@@ -128,7 +128,7 @@
   },
   "landuse=education": {
     "zoom": 10,
-    "color": "#f0f0d8",
+    "color": "#ffffe5",
     "priority": 25
   },
   "landuse=farmyard": {
@@ -138,7 +138,7 @@
   },
   "landuse=flowerbed": {
     "zoom": 10,
-    "color": "#cbe7ca",
+    "color": "#cdebb0",
     "priority": 25
   },
   "landuse=orchard": {
@@ -148,12 +148,12 @@
   },
   "landuse=railway": {
     "zoom": 11,
-    "color": "#e3dfd2",
+    "color": "#ebdbe8",
     "priority": 25
   },
   "landuse=recreation_ground": {
     "zoom": 12,
-    "color": "#c8facc",
+    "color": "#dffce2",
     "priority": 25
   },
   "landuse=village_green": {
@@ -168,7 +168,7 @@
   },
   "leisure=common": {
     "zoom": 12,
-    "color": "#c8facc",
+    "color": "#dffce2",
     "priority": 25
   },
   "leisure=garden": {
@@ -228,27 +228,27 @@
   },
   "leisure=playground": {
     "zoom": 12,
-    "color": "#c8facc",
+    "color": "#dffce2",
     "priority": 25
   },
   "leisure=recreation_ground": {
     "zoom": 12,
-    "color": "#c8facc",
+    "color": "#dffce2",
     "priority": 25
   },
   "leisure=sports_centre": {
     "zoom": 12,
-    "color": "#caface",
+    "color": "#dffce2",
     "priority": 25
   },
   "leisure=sports_hall": {
     "zoom": 12,
-    "color": "#caface",
+    "color": "#dffce2",
     "priority": 25
   },
   "leisure=stadium": {
     "zoom": 11,
-    "color": "#caface",
+    "color": "#dffce2",
     "priority": 25
   },
   "leisure=swimming_pool": {
@@ -363,7 +363,7 @@
   },
   "natural=shingle": {
     "zoom": 10,
-    "color": "#e2dcc4",
+    "color": "#eee5dc",
     "priority": 35
   },
   "natural=stone": {
@@ -518,7 +518,7 @@
   },
   "highway=motorway": {
     "zoom": 6,
-    "color": "#e990a0",
+    "color": "#e892a2",
     "priority": 60
   },
   "highway=trunk": {
@@ -558,12 +558,12 @@
   },
   "highway=pedestrian": {
     "zoom": 13,
-    "color": "#dedee8",
+    "color": "#dddde8",
     "priority": 56
   },
   "highway=motorway_link": {
     "zoom": 10,
-    "color": "#e990a0",
+    "color": "#e892a2",
     "priority": 50
   },
   "highway=trunk_link": {
@@ -578,7 +578,7 @@
   },
   "highway=secondary_link": {
     "zoom": 12,
-    "color": "#f7f496",
+    "color": "#f7fabf",
     "priority": 47
   },
   "highway=tertiary_link": {
@@ -613,12 +613,12 @@
   },
   "aeroway=apron": {
     "zoom": 12,
-    "color": "#eeeeee",
+    "color": "#dadae0",
     "priority": 64
   },
   "aeroway=aerodrome": {
     "zoom": 10,
-    "color": "#eeeeee",
+    "color": "#e9e7e2",
     "priority": 65
   },
   "aeroway=hangar": {
@@ -670,7 +670,7 @@
   },
   "waterway=dam": {
     "zoom": 12,
-    "color": "#aaaaaa",
+    "color": "#adadad",
     "priority": 72
   },
   "waterway=weir": {
@@ -685,12 +685,12 @@
   },
   "amenity=hospital": {
     "zoom": 12,
-    "color": "#f0c0c0",
+    "color": "#ffffe5",
     "priority": 85
   },
   "amenity=marketplace": {
     "zoom": 12,
-    "color": "#f0e0d0",
+    "color": "#ffd6d1",
     "priority": 85
   },
   "amenity=parking_space": {
@@ -700,17 +700,17 @@
   },
   "amenity=place_of_worship": {
     "zoom": 13,
-    "color": "#d0b9a0",
+    "color": "#d0d0d0",
     "priority": 85
   },
   "amenity=school": {
     "zoom": 13,
-    "color": "#f0f0d8",
+    "color": "#ffffe5",
     "priority": 85
   },
   "amenity=university": {
     "zoom": 12,
-    "color": "#f0f0d8",
+    "color": "#ffffe5",
     "priority": 85
   },
   "place=city": {
@@ -745,18 +745,18 @@
   },
   "boundary=administrative;admin_level=2": {
     "zoom": 6,
-    "color": "#9c7b97",
+    "color": "#8d618b",
     "priority": 98,
     "width": 2
   },
   "boundary=administrative;admin_level=4": {
     "zoom": 7,
-    "color": "#a27ea2",
+    "color": "#8d618b",
     "priority": 97
   },
   "boundary=administrative;admin_level=6": {
     "zoom": 9,
-    "color": "#9fa0b9",
+    "color": "#8d618b",
     "priority": 96
   }
 }
