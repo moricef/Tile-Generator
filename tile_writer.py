@@ -148,16 +148,38 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 # landuse(1-2), terrain(2-3) only — NOT water(4-5) to avoid flooding
                 is_landcover = priority_nibble <= 3
 
-                # OpenMapTiles-style merge: only wood/forest, keep farmland/grass individual
-                should_merge = is_landcover and subclass in ('wood', 'forest')
+                # Detect building groups
+                is_building_group = poly_list[0].get('is_building', False)
 
-                if should_merge:
+                # OpenMapTiles-style merge: wood/forest + buildings at z14-15
+                merge_landcover = is_landcover and subclass in ('wood', 'forest')
+                merge_buildings = is_building_group and zoom <= 15
+
+                if merge_landcover:
                     # Merge wood/forest to reduce fragmentation
                     merged = shapely_unary_union(shapely_polys)
-                    # Simplify merged result (merge creates complex polygons with too many vertices)
                     merged = merged.simplify(pixel_deg * 0.5, preserve_topology=True)
+                elif merge_buildings:
+                    # Merge buildings into urban blocks:
+                    # Buffer to connect nearby buildings, union, shrink back, simplify
+                    if zoom <= 14:
+                        buf_deg = pixel_deg * 3    # ~3px gap bridged
+                        simplify_factor = 1.0      # aggressive simplification
+                    else:  # z15
+                        buf_deg = pixel_deg * 1.5  # ~1.5px gap bridged
+                        simplify_factor = 0.5      # moderate simplification
+                    buffered = [sp.buffer(buf_deg) for sp in shapely_polys]
+                    merged = shapely_unary_union(buffered)
+                    # Shrink back to restore approximate original footprint
+                    merged = merged.buffer(-buf_deg * 0.7)
+                    merged = merged.simplify(pixel_deg * simplify_factor, preserve_topology=True)
+                    logger.debug(f"  Tile {tile_x},{tile_y}: Merged {len(shapely_polys)} buildings into blocks at z{zoom}")
                 else:
                     # Keep individual: farmland, grass, water, roads
+                    merged_features.extend(poly_list)
+                    continue
+
+                if merged.is_empty:
                     merged_features.extend(poly_list)
                     continue
 
@@ -166,6 +188,9 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     parts = list(merged.geoms)
                 elif isinstance(merged, ShapelyPolygon):
                     parts = [merged]
+                elif hasattr(merged, 'geoms'):
+                    # GeometryCollection from buffer operations
+                    parts = [g for g in merged.geoms if isinstance(g, ShapelyPolygon)]
 
                 min_hole_deg2 = (pixel_deg ** 2) * K_VISIBILITY * K_HOLE_FACTOR
                 total_merged_points = 0
@@ -176,7 +201,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 candidate_features = []
                 for part in parts:
                     if not part.is_empty and part.exterior and len(part.exterior.coords) >= 4:
-                        # Keep inner_rings for water (islands), strip for landcover (pitting)
+                        # Keep inner_rings for water (islands), strip for landcover/buildings
                         if feature_layer == 'water':
                             inner_rings = [list(interior.coords) for interior in part.interiors if len(interior.coords) >= 4]
                             for interior in part.interiors:
@@ -197,8 +222,8 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                             'color_rgb565': color,
                             'zoom_priority': priority,
                             'width_meters': 0.0,
-                            'subclass': subclass,  # Preserve subclass after merge
-                            'layer': feature_layer,  # Preserve layer
+                            'subclass': subclass,
+                            'layer': feature_layer,
                             'is_building': feature_layer == 'buildings',
                             'name': '',
                             'id': 0,
