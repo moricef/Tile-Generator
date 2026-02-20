@@ -15,6 +15,7 @@ from constants import (
     NAV_MAGIC, COORD_SCALE, LAND_BG_COLOR,
     GEOM_POINT, GEOM_LINESTRING, GEOM_POLYGON, GEOM_TEXT,
     K_VISIBILITY, K_HOLE_FACTOR, LINE_WIDTH_PER_ZOOM,
+    CLIP_MARGIN_POLYGON, CLIP_MARGIN_LINE, BRIDGE_DECK_COLOR,
 )
 from geo_utils import (
     SHAPELY_AVAILABLE,
@@ -52,8 +53,8 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
     merc_range = t_max_merc - t_min_merc
 
     # Clipping box with margins: 10% for polygons, 100% for linestrings (long runways)
-    poly_margin = 0.10  # Small margin for polygons to avoid artifacts
-    line_margin = 1.0   # 100% = 1 full tile margin for runways spanning 8-12 tiles
+    poly_margin = CLIP_MARGIN_POLYGON
+    line_margin = CLIP_MARGIN_LINE
 
     poly_lon_margin = (tile_max_lon - tile_min_lon) * poly_margin
     poly_lat_margin = (tile_max_lat - tile_min_lat) * poly_margin
@@ -249,7 +250,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
     # Priority 9 ensures it draws above water (8) but below roads (12-15).
     if SHAPELY_AVAILABLE and zoom >= 16:
         from shapely.geometry import LineString as ShapelyLineString
-        BRIDGE_COLOR_RGB565 = hex_to_rgb565('#b8b8b8')
+        BRIDGE_COLOR_RGB565 = hex_to_rgb565(BRIDGE_DECK_COLOR)
         BRIDGE_ROAD_TYPES = {
             'motorway', 'trunk', 'primary', 'secondary', 'tertiary',
             'motorway_link', 'trunk_link', 'primary_link', 'secondary_link', 'tertiary_link',

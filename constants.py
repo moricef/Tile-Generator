@@ -36,6 +36,32 @@ K_VISIBILITY = 2.0
 # Anti-pitting: holes must be N times more visible than objects to be kept
 K_HOLE_FACTOR = 10.0
 
+# Label layout
+LABEL_CHAR_WIDTH_PX = 7
+LABEL_HEIGHT_PX = 11
+ROAD_LABEL_SPACING = 25
+PLACE_NAME_BREAK_THRESHOLD = 12
+
+# Population thresholds for place label priority
+POPULATION_MAJOR_CITY = 500000
+POPULATION_LARGE_CITY = 100000
+POPULATION_TOWN = 15000
+
+# Point symbol rendering
+POINT_SYMBOL_SIZE_PX = 3
+
+# Clipping margins (fraction of tile size)
+CLIP_MARGIN_POLYGON = 0.10
+CLIP_MARGIN_LINE = 1.0
+
+# Bridge underlay
+BRIDGE_DECK_COLOR = '#b8b8b8'
+
+# Parallel processing
+MAX_WORKERS = 4
+BAND_THRESHOLD = 50000
+BATCH_SIZE = 2000
+
 # Point features to extract from nodes (rendered as symbols)
 # shape: 'triangle' for peaks, 'circle' for places
 POINT_FEATURES = {

@@ -36,7 +36,11 @@ except ImportError:
     print("Error: osmium not found. Install with: pip install osmium")
     sys.exit(1)
 
-from constants import GEOM_POINT, GEOM_POLYGON, GEOM_TEXT, LINE_COLOR_PER_ZOOM
+from constants import (
+    GEOM_POINT, GEOM_POLYGON, GEOM_TEXT, LINE_COLOR_PER_ZOOM,
+    LABEL_CHAR_WIDTH_PX, LABEL_HEIGHT_PX, POINT_SYMBOL_SIZE_PX,
+    MAX_WORKERS, BAND_THRESHOLD, BATCH_SIZE,
+)
 from geo_utils import (
     get_simplify_tolerance, get_feature_tiles,
     lon_to_tile_x, lat_to_tile_y, tile_y_to_lat, hex_to_rgb565,
@@ -145,7 +149,6 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
         # For high-zoom levels with many tiles, process by horizontal bands
         # to avoid loading all tile_features into memory at once.
         # Each band covers BAND_SIZE rows of tiles; features are re-scanned per band.
-        BAND_THRESHOLD = 50000  # use bands above this tile count
         if num_tiles > BAND_THRESHOLD:
             BAND_SIZE = max(1, total_y // max(1, num_tiles // BAND_THRESHOLD))
         else:
@@ -191,8 +194,8 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
         if text_candidates:
             tile_width_deg = 360.0 / (2.0 ** zoom)
             pixel_deg = tile_width_deg / 256.0
-            char_w = pixel_deg * 7
-            label_h = pixel_deg * 11
+            char_w = pixel_deg * LABEL_CHAR_WIDTH_PX
+            label_h = pixel_deg * LABEL_HEIGHT_PX
 
             place_names = [f for f in text_candidates if 'coords_candidates' not in f]
             road_labels = [f for f in text_candidates if 'coords_candidates' in f]
@@ -273,8 +276,7 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
         # Phase 2: Process features and write tiles, by bands
         tiles_written = 0
         completed = 0
-        num_workers = min(os.cpu_count() or 1, 4, num_tiles)
-        BATCH_SIZE = 2000
+        num_workers = min(os.cpu_count() or 1, MAX_WORKERS, num_tiles)
 
         if num_bands > 1:
             print(f"\n  Zoom {zoom:2d}: Processing {num_tiles:,} tiles in {num_bands} bands of ~{BAND_SIZE} rows")
@@ -323,7 +325,7 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
                     lon, lat = coords[0]
                     tile_width_deg = 360.0 / (2.0 ** zoom)
                     pixel_deg = tile_width_deg / 256.0
-                    size = pixel_deg * 3
+                    size = pixel_deg * POINT_SYMBOL_SIZE_PX
 
                     shape = feature.get('shape', 'circle')
                     lat_size = size / math.cos(math.radians(lat))

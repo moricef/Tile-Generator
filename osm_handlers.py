@@ -20,6 +20,8 @@ except ImportError:
 from constants import (
     GEOM_POINT, GEOM_LINESTRING, GEOM_POLYGON, GEOM_TEXT,
     POINT_FEATURES, TEXT_FEATURES, WIDTH_TAGS,
+    POPULATION_MAJOR_CITY, POPULATION_LARGE_CITY, POPULATION_TOWN,
+    PLACE_NAME_BREAK_THRESHOLD, ROAD_LABEL_SPACING,
 )
 from geo_utils import (
     SHAPELY_AVAILABLE,
@@ -210,17 +212,17 @@ class OSMHandler(osmium.SimpleHandler):
                 color_rgb565 = hex_to_rgb565(cfg.get('color', '#000000'))
 
                 # Priority based on population - higher population = on top
-                if population >= 500000:
-                    nibble = 15  # Major cities (Paris, Lyon, Marseille, Toulouse...)
-                elif population >= 100000:
-                    nibble = 14  # Large cities
-                elif population >= 15000:
-                    nibble = 13  # Towns (Cugnaux, Muret...)
+                if population >= POPULATION_MAJOR_CITY:
+                    nibble = 15
+                elif population >= POPULATION_LARGE_CITY:
+                    nibble = 14
+                elif population >= POPULATION_TOWN:
+                    nibble = 13
                 else:
                     nibble = 12  # Small towns and villages
 
                 # Split long names on 2 lines at hyphen or space near middle
-                if len(name) > 12:
+                if len(name) > PLACE_NAME_BREAK_THRESHOLD:
                     mid = len(name) // 2
                     best = -1
                     best_dist = len(name)
@@ -455,9 +457,8 @@ class OSMHandler(osmium.SimpleHandler):
                     pass  # Invalid D-road format, skip
 
             if should_create_label:
-                # Space out labels: only create one every 25 segments
                 self.road_label_counters[ref] += 1
-                if self.road_label_counters[ref] % 25 == 1:
+                if self.road_label_counters[ref] % ROAD_LABEL_SPACING == 1:
                     # Generate 3 candidate positions (25%, 50%, 75%) for collision avoidance
                     candidates = []
                     for ratio in [0.25, 0.5, 0.75]:
