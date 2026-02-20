@@ -123,7 +123,10 @@ def get_layer_for_tags(tags: Dict[str, str]) -> Optional[str]:
         return 'roads'
 
     # Do not create polygons for abstract features like boundaries or place names
-    if 'place' in tags or 'boundary' in tags or 'admin_level' in tags:
+    # Exception: place=island/islet are real geographic features
+    if 'boundary' in tags or 'admin_level' in tags:
+        return None
+    if 'place' in tags and tags['place'] not in ('island', 'islet'):
         return None
 
     # Explicit rule for buildings to ensure they are always on top of scenery

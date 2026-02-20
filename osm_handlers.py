@@ -321,14 +321,13 @@ class OSMHandler(osmium.SimpleHandler):
         # Tags that automatically qualify a closed way as an area/polygon
         area_qualifiers = {
             'building', 'landuse', 'water', 'amenity', 'leisure', 'natural',
-            'waterway', 'man_made', 'aeroway', 'historic', 'military'
+            'man_made', 'aeroway', 'historic', 'military', 'place'
         }
 
         has_area_tag = any(k in tags for k in area_qualifiers)
-        # Explicitly force area for specific water body tags
-        if tags.get('natural') == 'bay' or \
-           tags.get('landuse') == 'reservoir' or \
-           tags.get('waterway') == 'riverbank':
+        if tags.get('waterway') in ('riverbank', 'dock', 'boatyard', 'dam', 'weir'):
+            has_area_tag = True
+        if tags.get('natural') == 'bay' or tags.get('landuse') == 'reservoir':
             has_area_tag = True
         is_area_tags = is_closed and (has_area_tag or tags.get('area') == 'yes')
 
