@@ -191,10 +191,6 @@ def get_color_for_tags(tags: Dict[str, str], config: Dict) -> str:
     return get_config_value_for_tags(tags, config, 'color', '#FFFFFF')
 
 
-def get_priority_for_tags(tags: Dict[str, str], config: Dict) -> int:
-    """Get rendering priority for feature based on config."""
-    return get_config_value_for_tags(tags, config, 'priority', 50)
-
 
 def hex_to_rgb565(hex_color: str) -> int:
     """Convert hex color to RGB565 format."""
@@ -260,16 +256,3 @@ def densify_linestring(coords: List[Tuple[float, float]], max_segment_degrees: f
         return coords
 
 
-def simplify_coords(coords: List[Tuple[float, float]], tolerance: float) -> List[Tuple[float, float]]:
-    """Simple Douglas-Peucker-like simplification."""
-    if len(coords) <= 2:
-        return coords
-
-    # Use shapely for simplification if available
-    if SHAPELY_AVAILABLE:
-        from shapely.geometry import LineString
-        line = LineString(coords)
-        simplified = line.simplify(tolerance, preserve_topology=True)
-        return list(simplified.coords)
-
-    return coords

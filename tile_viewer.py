@@ -445,83 +445,22 @@ class NAVViewer:
         elif feature.geom_type == GEOM_LINESTRING:
             pts = [self._tile_coord_to_screen(feature.tile_x, feature.tile_y, x, y) for x, y in feature.coords]
             if len(pts) >= 2:
-                # DEBUG: Log roads with priority >= 11 being drawn
-                if feature.priority >= 11:
-                    # Check if any point is in viewport
-                    in_viewport = any(0 <= x < VIEWPORT_SIZE and 0 <= y < VIEWPORT_SIZE for x, y in pts)
-                    print(f"[DRAW LINE] tile={feature.tile_x}/{feature.tile_y}, priority={feature.priority}, "
-                          f"screen_pts={len(pts)}, in_viewport={in_viewport}, first_pt={pts[0]}, width={feature.width}")
-                # Draw road core with smooth joins (casing already drawn in pass 1 for roads with needs_casing flag)
                 self._draw_smooth_line(surface, color, pts, max(1.0, feature.width))
 
         elif feature.geom_type == GEOM_POLYGON:
             rings = feature.get_rings()
             if not rings:
-                print(f"[POLYGON EMPTY] No rings for priority={feature.priority}, color=#{color[0]:02x}{color[1]:02x}{color[2]:02x}")
                 return
 
-            # DEBUG: Print info for green-ish polygons (grassland #cdebb0 = RGB 205,235,176)
-            if 195 <= color[0] <= 210 and 225 <= color[1] <= 240 and 170 <= color[2] <= 185:
-                first_ring = rings[0] if rings else []
-                print(f"[DEBUG GRASSLAND] tile={feature.tile_x}/{feature.tile_y}, color={color}, "
-                      f"rgb565=0x{feature.color_rgb565:04x}, rings={len(rings)}, "
-                      f"pts_first_ring={len(first_ring)}, "
-                      f"min_zoom={feature.min_zoom}, priority={feature.priority}")
-                if first_ring and len(first_ring) >= 3:
-                    # Convert to screen coords to check visibility
-                    screen_pts = [self._tile_coord_to_screen(feature.tile_x, feature.tile_y, x, y) for x, y in first_ring]
-                    xs = [p[0] for p in screen_pts]
-                    ys = [p[1] for p in screen_pts]
-                    print(f"  SCREEN: X=[{min(xs)}, {max(xs)}], Y=[{min(ys)}, {max(ys)}], "
-                          f"viewport=[0, {VIEWPORT_SIZE}]")
-
-            # DEBUG: Print info for blue-ish polygons (water)
-            if 150 <= color[2] <= 235 and 160 <= color[1] <= 220 and 150 <= color[0] <= 180:
-                first_ring = rings[0] if rings else []
-                print(f"DEBUG POLYGON water: tile={feature.tile_x}/{feature.tile_y}, color={color}, "
-                      f"rgb565=0x{feature.color_rgb565:04x}, rings={len(rings)}, "
-                      f"pts_first_ring={len(first_ring)}, "
-                      f"min_zoom={feature.min_zoom}, priority={feature.priority}")
-                if first_ring and len(first_ring) >= 3:
-                    print(f"  RAW coords: first={first_ring[0]}, second={first_ring[1]}, last={first_ring[-1]}")
-
-            # Only draw exterior ring (first ring)
-            # Inner rings (holes) are NOT drawn - they stay transparent
-            # This allows features below to show through (e.g., islands in rivers)
             for i, ring in enumerate(rings):
                 if i > 0 and self.fill_polygons:
-                    continue  # Skip holes when filling (keep transparent)
+                    continue
 
                 pts = [self._tile_coord_to_screen(feature.tile_x, feature.tile_y, x, y) for x, y in ring]
 
-                # DEBUG grassland rendering
-                if 195 <= color[0] <= 210 and 225 <= color[1] <= 240 and 170 <= color[2] <= 185:
-                    xs = [p[0] for p in pts] if pts else []
-                    ys = [p[1] for p in pts] if pts else []
-                    print(f"  [RENDER ATTEMPT] ring {i}, raw_pts={len(ring)}, screen_pts={len(pts)}, tile={feature.tile_x}/{feature.tile_y}")
-                    if len(pts) >= 3:
-                        print(f"    COORDS: X=[{min(xs)}, {max(xs)}], Y=[{min(ys)}, {max(ys)}], viewport=[0, {VIEWPORT_SIZE}]")
-                    else:
-                        print(f"    SKIPPED: not enough screen points!")
-
                 if len(pts) >= 3:
-                    # DEBUG grassland drawing
-                    if 195 <= color[0] <= 210 and 225 <= color[1] <= 240 and 170 <= color[2] <= 185:
-                        mode = "FILLED" if self.fill_polygons else "OUTLINE"
-                        print(f"    DRAWING {mode}: color={color}")
-
-                    # DEBUG: Print when drawing water polygon
-                    if 150 <= color[2] <= 235 and 160 <= color[1] <= 220 and 150 <= color[0] <= 180:
-                        if len(pts) >= 80:  # Large polygons - show full extent
-                            xs = [p[0] for p in pts]
-                            ys = [p[1] for p in pts]
-                            print(f"  -> SCREEN coords ring {i}: first={pts[0]}, second={pts[1]}, last={pts[-1]}")
-                            print(f"     ALL {len(pts)} points: X=[{min(xs)}, {max(xs)}] ({max(xs)-min(xs)} px), Y=[{min(ys)}, {max(ys)}] ({max(ys)-min(ys)} px)")
-                        else:
-                            print(f"  -> SCREEN coords ring {i}: first={pts[0]}, second={pts[1]}, last={pts[-1]}")
-
                     if self.fill_polygons:
-                        pygame.draw.polygon(surface, color, pts, 0)  # 0 = filled
+                        pygame.draw.polygon(surface, color, pts, 0)
                     else:
                         pygame.draw.polygon(surface, color, pts, 1)
 

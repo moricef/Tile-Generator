@@ -614,14 +614,12 @@
   "aeroway=runway": {
     "zoom": 12,
     "color": "#b2b5d1",
-    "priority": 68,
-    "width": 5
+    "priority": 68
   },
   "aeroway=taxiway": {
     "zoom": 12,
     "color": "#b2b5d1",
-    "priority": 67,
-    "width": 5
+    "priority": 67
   },
   "man_made=embankment": {
     "zoom": 12,

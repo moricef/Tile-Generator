@@ -541,14 +541,11 @@ class OSMHandler(osmium.SimpleHandler):
         if 'building' in tags:
             layer = 'buildings'
 
-        # Removed the 'highway in tags' filter that was causing issues
-
         min_zoom = get_zoom_for_tags(tags, self.config)
         if min_zoom > self.max_zoom:
             self.stats['area_zoom_filtered'] += 1
             return
 
-        # Construction de la geometrie
         try:
             wkb = self.wkbfab.create_multipolygon(a)
             geom = shapely.wkb.loads(wkb, hex=True)
