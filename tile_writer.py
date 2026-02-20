@@ -247,7 +247,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
     # Bridge underlay: create grey concrete polygons covering entire bridge width.
     # Buffer each bridge road line → union overlapping buffers → single polygon per bridge.
     # Priority 9 ensures it draws above water (8) but below roads (12-15).
-    if SHAPELY_AVAILABLE and zoom >= 13:
+    if SHAPELY_AVAILABLE and zoom >= 16:
         from shapely.geometry import LineString as ShapelyLineString
         BRIDGE_COLOR_RGB565 = hex_to_rgb565('#b8b8b8')
         BRIDGE_ROAD_TYPES = {
@@ -264,10 +264,11 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 if hw_type not in BRIDGE_ROAD_TYPES:
                     continue
                 road_width = LINE_WIDTH_PER_ZOOM.get(hw_type, {}).get(zoom, 1)
-                # Tight buffer: exactly road half-width (casing provides the border)
-                tight_buf = pixel_deg * road_width * 0.5
-                # Generous buffer: +5px to detect nearby carriageways
-                generous_buf = pixel_deg * (road_width / 2.0 + 5.0)
+                # Tight buffer: road_width is in half-pixels, actual = road_width/2
+                # Buffer = actual_width/2 on each side = road_width/4
+                tight_buf = pixel_deg * road_width * 0.25
+                # Generous buffer: +3px to detect nearby carriageways
+                generous_buf = pixel_deg * (road_width / 4.0 + 3.0)
                 try:
                     line = ShapelyLineString(feature['coords'])
                     bridge_buffers.append({
