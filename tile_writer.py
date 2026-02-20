@@ -5,7 +5,6 @@ Serializes features to .nav binary format: merge polygons, clip, project.
 """
 
 import os
-import math
 import struct
 import logging
 from typing import Dict, List, Tuple
@@ -20,6 +19,7 @@ from constants import (
 from geo_utils import (
     SHAPELY_AVAILABLE,
     hex_to_rgb565, pack_zoom_priority, meters_to_pixels,
+    lat_to_mercator_y, tile_y_to_lat,
 )
 
 logger = logging.getLogger(__name__)
@@ -35,21 +35,11 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
     tile_min_lon = -180.0 + tile_x * lon_deg_per_tile
     tile_max_lon = tile_min_lon + lon_deg_per_tile
 
-    def lat_to_merc(l):
-        r = math.radians(l)
-        r = max(-0.999 * math.pi / 2, min(0.999 * math.pi / 2, r))
-        return math.log(math.tan(r) + (1.0 / math.cos(r)))
+    tile_max_lat = tile_y_to_lat(tile_y, zoom)
+    tile_min_lat = tile_y_to_lat(tile_y + 1, zoom)
 
-    def lat_from_tile_y(y, z):
-        n = 2.0 ** z
-        lat_rad = math.atan(math.sinh(math.pi * (1 - 2 * y / n)))
-        return math.degrees(lat_rad)
-
-    tile_max_lat = lat_from_tile_y(tile_y, zoom)
-    tile_min_lat = lat_from_tile_y(tile_y + 1, zoom)
-
-    t_max_merc = lat_to_merc(tile_max_lat)
-    t_min_merc = lat_to_merc(tile_min_lat)
+    t_max_merc = lat_to_mercator_y(tile_max_lat)
+    t_min_merc = lat_to_mercator_y(tile_min_lat)
     merc_range = t_max_merc - t_min_merc
 
     # Clipping box with margins: 10% for polygons, 100% for linestrings (long runways)
@@ -360,7 +350,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
             if feature['geom_type'] == GEOM_TEXT:
                 lon, lat = feature['coords'][0]
                 px = int((lon - tile_min_lon) / (tile_max_lon - tile_min_lon) * 4096)
-                m_y = lat_to_merc(lat)
+                m_y = lat_to_mercator_y(lat)
                 py = int((t_max_merc - m_y) / merc_range * 4096)
 
                 if not (-8192 < px < 12288 and -8192 < py < 12288):
@@ -546,7 +536,7 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                     projected_ring = []
                     for lon, lat in ring:
                         px = int((lon - tile_min_lon) / (tile_max_lon - tile_min_lon) * 4096)
-                        m_y = lat_to_merc(lat)
+                        m_y = lat_to_mercator_y(lat)
                         py = int((t_max_merc - m_y) / merc_range * 4096)
 
                         projected_ring.append((px, py))

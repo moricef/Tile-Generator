@@ -66,6 +66,13 @@ def tile_y_to_lat(ty: int, zoom: int) -> float:
     return math.degrees(lat_rad)
 
 
+def lat_to_mercator_y(lat: float) -> float:
+    """Convert latitude (degrees) to Web Mercator Y (radians)."""
+    lat_rad = math.radians(lat)
+    lat_rad = max(-0.999 * math.pi / 2, min(0.999 * math.pi / 2, lat_rad))
+    return math.log(math.tan(lat_rad) + 1.0 / math.cos(lat_rad))
+
+
 def get_feature_tiles(coords: List[Tuple[float, float]], zoom: int, is_polygon: bool = False) -> Set[Tuple[int, int]]:
     """Get all tiles that a feature intersects at given zoom level."""
     tiles = set()
