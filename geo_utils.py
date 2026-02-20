@@ -198,6 +198,11 @@ def get_color_for_tags(tags: Dict[str, str], config: Dict) -> str:
     return get_config_value_for_tags(tags, config, 'color', '#FFFFFF')
 
 
+def get_nibble_for_tags(tags: Dict[str, str], config: Dict) -> int:
+    """Get z-order nibble (0-15) for feature based on config."""
+    return get_config_value_for_tags(tags, config, 'priority', 2)
+
+
 
 def hex_to_rgb565(hex_color: str) -> int:
     """Convert hex color to RGB565 format."""

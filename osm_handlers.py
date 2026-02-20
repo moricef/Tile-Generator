@@ -27,7 +27,7 @@ from geo_utils import (
     SHAPELY_AVAILABLE,
     hex_to_rgb565, lighten_rgb565, darken_rgb565,
     pack_zoom_priority, get_layer_for_tags,
-    get_zoom_for_tags, get_color_for_tags,
+    get_zoom_for_tags, get_color_for_tags, get_nibble_for_tags,
     densify_linestring,
 )
 
@@ -374,27 +374,7 @@ class OSMHandler(osmium.SimpleHandler):
         old_ref = tags.get('old_ref', '')
         name = tags.get('name', '')
 
-        # Fixed Z-order (nibble) for rendering priority (9-15: Roads/Railways, above water at 8)
-        priority_map = {
-            # Z=15: Heavy rail (above all roads for level crossings)
-            'rail': 15, 'narrow_gauge': 15, 'funicular': 15,
-            # Z=14: Major roads & motorways
-            'motorway': 14, 'trunk': 14, 'primary': 14,
-            # Z=13: Secondary roads + tram/light rail (at grade, below motorways)
-            'tram': 13, 'light_rail': 13, 'monorail': 13,
-            'secondary': 13, 'tertiary': 13,
-            # Z=12: Residential and minor roads
-            'residential': 12, 'unclassified': 12, 'living_street': 12, 'pedestrian': 12,
-            # Z=10-11: Links/ramps differentiated by hierarchy
-            'motorway_link': 12, 'trunk_link': 11, 'primary_link': 11, 'secondary_link': 10, 'tertiary_link': 10,
-            # Z=9: Service, tracks and paths
-            'service': 9, 'track': 9, 'path': 9, 'footway': 9, 'cycleway': 9
-        }
-
-        if layer == 'water':
-            nibble = 8
-        else:
-            nibble = priority_map.get(highway_type, 9)  # Default for other minor ways
+        nibble = get_nibble_for_tags(tags, self.config)
 
         # Bridges: all bridges render at nibble 15 (above all at-grade roads)
         is_bridge = tags.get('bridge') in ('yes', 'viaduct')
@@ -433,22 +413,10 @@ class OSMHandler(osmium.SimpleHandler):
         self._create_road_label(coords, ref, old_ref, highway_type, color_rgb565)
 
     def _get_polygon_nibble(self, tags: Dict[str, str], layer: str) -> int:
-        """Determine z-order nibble for a polygon based on its layer and tags."""
-        layer_to_nibble = {
-            'aeroways': 1,
-            'landuse': 2, 'terrain': 2,
-            'leisure': 4, 'amenities': 4,
-            'pitch': 5, 'surface': 5, 'parking': 5,
-            'infrastructure': 6,
-            'buildings': 7,
-            'water': 8,
-        }
-        nibble = layer_to_nibble.get(layer, 2)
+        """Determine z-order nibble for a polygon based on config, with dynamic overrides."""
+        nibble = get_nibble_for_tags(tags, self.config)
 
-        if tags.get('landuse') == 'cemetery' or tags.get('amenity') == 'grave_yard':
-            nibble = 4
-        if tags.get('leisure') == 'track':
-            nibble = 6
+        # Bridge polygons render above water (nibble 9)
         if tags.get('bridge') in ('yes', 'viaduct') or tags.get('man_made') == 'bridge':
             nibble = 9
 
