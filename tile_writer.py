@@ -194,7 +194,7 @@ def _merge_polygon_group(color, priority, subclass, poly_list, zoom, tile_x, til
 
 
 def _generate_bridge_underlays(features, zoom):
-    """Create grey deck polygons under bridge roads. Returns list of features to append."""
+    """Create grey deck polygons under bridge segments, grouped by category (road/rail)."""
     if not SHAPELY_AVAILABLE or zoom < 16:
         return []
 
@@ -206,71 +206,79 @@ def _generate_bridge_underlays(features, zoom):
     from shapely.ops import unary_union as shapely_unary_union
 
     BRIDGE_COLOR_RGB565 = hex_to_rgb565(BRIDGE_DECK_COLOR)
-    BRIDGE_ROAD_TYPES = {
+    ROAD_TYPES = {
         'motorway', 'trunk', 'primary', 'secondary', 'tertiary',
         'motorway_link', 'trunk_link', 'primary_link', 'secondary_link', 'tertiary_link',
         'residential', 'unclassified', 'living_street', 'pedestrian',
     }
+    RAIL_TYPES = {'rail', 'narrow_gauge', 'funicular', 'tram', 'light_rail'}
     pixel_deg = 360.0 / (2**zoom * 256)
-    bridge_buffers = []
 
+    groups = {'road': [], 'rail': []}
     for feature in features:
-        if feature.get('is_bridge') and feature['geom_type'] == GEOM_LINESTRING:
-            hw_type = feature.get('highway_type', '')
-            if hw_type not in BRIDGE_ROAD_TYPES:
-                continue
-            road_width = LINE_WIDTH_PER_ZOOM.get(hw_type, {}).get(zoom, 1)
-            tight_buf = pixel_deg * road_width * 0.25
-            generous_buf = pixel_deg * (road_width / 4.0 + 3.0)
-            try:
-                line = ShapelyLineString(feature['coords'])
-                bridge_buffers.append({
-                    'tight': line.buffer(tight_buf, cap_style='flat'),
-                    'generous': line.buffer(generous_buf, cap_style='flat'),
-                })
-            except Exception:
-                pass
-
-    if not bridge_buffers:
-        return []
-
-    all_generous = shapely_unary_union([b['generous'] for b in bridge_buffers])
-    all_tight = [b['tight'] for b in bridge_buffers]
-
-    generous_parts = []
-    if isinstance(all_generous, ShapelyPolygon):
-        generous_parts = [all_generous]
-    elif isinstance(all_generous, ShapelyMultiPolygon):
-        generous_parts = list(all_generous.geoms)
-    elif hasattr(all_generous, 'geoms'):
-        generous_parts = [g for g in all_generous.geoms if isinstance(g, ShapelyPolygon)]
-
-    deck_polys = []
-    for gp in generous_parts:
-        group_tight = [t for t in all_tight if t.intersects(gp)]
-        if not group_tight:
+        if not feature.get('is_bridge') or feature['geom_type'] != GEOM_LINESTRING:
             continue
-        tight_union = shapely_unary_union(group_tight)
-        if isinstance(tight_union, ShapelyMultiPolygon) or (hasattr(tight_union, 'geoms') and len(list(tight_union.geoms)) > 1):
-            deck_polys.append(tight_union.convex_hull)
-        elif isinstance(tight_union, ShapelyPolygon):
-            deck_polys.append(tight_union)
+        hw_type = feature.get('highway_type', '')
+        if hw_type in ROAD_TYPES:
+            cat = 'road'
+        elif hw_type in RAIL_TYPES:
+            cat = 'rail'
+        else:
+            continue
+        road_width = LINE_WIDTH_PER_ZOOM.get(hw_type, {}).get(zoom, 1)
+        rail_extra = 2.0 if cat == 'rail' else 1.0
+        tight_buf = pixel_deg * (road_width * 0.4 + rail_extra)
+        extra = 5.0 * (1 << (zoom - 16))
+        generous_buf = pixel_deg * (road_width / 4.0 + extra)
+        try:
+            line = ShapelyLineString(feature['coords'])
+            groups[cat].append({
+                'tight': line.buffer(tight_buf, cap_style='flat'),
+                'generous': line.buffer(generous_buf, cap_style='flat'),
+            })
+        except Exception:
+            pass
 
     result = []
-    for poly in deck_polys:
-        if poly.is_empty or not poly.exterior:
+    for cat, bridge_buffers in groups.items():
+        if not bridge_buffers:
             continue
-        result.append({
-            'geom_type': GEOM_POLYGON,
-            'coords': list(poly.exterior.coords),
-            'inner_rings': [],
-            'color_rgb565': BRIDGE_COLOR_RGB565,
-            'zoom_priority': pack_zoom_priority(zoom, 9),
-            'layer': 'infrastructure',
-            '_bridge_underlay': True,
-        })
 
-    logger.debug(f"  Created {len(result)} bridge underlay polygons from {len(bridge_buffers)} road segments")
+        all_generous = shapely_unary_union([b['generous'] for b in bridge_buffers])
+        all_tight = [b['tight'] for b in bridge_buffers]
+
+        generous_parts = []
+        if isinstance(all_generous, ShapelyPolygon):
+            generous_parts = [all_generous]
+        elif isinstance(all_generous, ShapelyMultiPolygon):
+            generous_parts = list(all_generous.geoms)
+        elif hasattr(all_generous, 'geoms'):
+            generous_parts = [g for g in all_generous.geoms if isinstance(g, ShapelyPolygon)]
+
+        for gp in generous_parts:
+            group_tight = [t for t in all_tight if t.intersects(gp)]
+            if not group_tight:
+                continue
+            tight_union = shapely_unary_union(group_tight)
+            if isinstance(tight_union, ShapelyMultiPolygon) or (hasattr(tight_union, 'geoms') and len(list(tight_union.geoms)) > 1):
+                deck = tight_union.convex_hull
+            elif isinstance(tight_union, ShapelyPolygon):
+                deck = tight_union
+            else:
+                continue
+            if deck.is_empty or not deck.exterior:
+                continue
+            result.append({
+                'geom_type': GEOM_POLYGON,
+                'coords': list(deck.exterior.coords),
+                'inner_rings': [],
+                'color_rgb565': BRIDGE_COLOR_RGB565,
+                'zoom_priority': pack_zoom_priority(zoom, 15),
+                'layer': 'infrastructure',
+                '_bridge_underlay': True,
+            })
+
+    logger.debug(f"  Created {len(result)} bridge underlay polygons")
     return result
 
 

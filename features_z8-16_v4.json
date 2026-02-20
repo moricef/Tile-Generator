@@ -485,6 +485,11 @@
     "color": "#888888",
     "priority": 15
   },
+  "aerialway=cable_car": {
+    "zoom": 12,
+    "color": "#888888",
+    "priority": 15
+  },
   "railway=platform": {
     "zoom": 12,
     "color": "#bbbbbb",

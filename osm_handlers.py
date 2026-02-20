@@ -368,7 +368,7 @@ class OSMHandler(osmium.SimpleHandler):
             return
 
         # Store line type for zoom-based width lookup
-        highway_type = tags.get('highway', '') or tags.get('railway', '') or tags.get('aeroway', '')
+        highway_type = tags.get('highway', '') or tags.get('railway', '') or tags.get('aeroway', '') or tags.get('aerialway', '')
         ref = tags.get('ref', '')
         old_ref = tags.get('old_ref', '')
         name = tags.get('name', '')

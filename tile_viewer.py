@@ -452,17 +452,42 @@ class NAVViewer:
             if not rings:
                 return
 
-            for i, ring in enumerate(rings):
-                if i > 0 and self.fill_polygons:
-                    continue
-
+            all_screen_rings = []
+            for ring in rings:
                 pts = [self._tile_coord_to_screen(feature.tile_x, feature.tile_y, x, y) for x, y in ring]
+                all_screen_rings.append(pts)
 
-                if len(pts) >= 3:
-                    if self.fill_polygons:
-                        pygame.draw.polygon(surface, color, pts, 0)
-                    else:
-                        pygame.draw.polygon(surface, color, pts, 1)
+            exterior = all_screen_rings[0]
+            inner_rings = [r for r in all_screen_rings[1:] if len(r) >= 3]
+
+            if len(exterior) < 3:
+                return
+
+            if self.fill_polygons:
+                if inner_rings:
+                    all_pts = [p for r in all_screen_rings for p in r]
+                    min_x = min(p[0] for p in all_pts)
+                    min_y = min(p[1] for p in all_pts)
+                    max_x = max(p[0] for p in all_pts)
+                    max_y = max(p[1] for p in all_pts)
+                    w = max_x - min_x + 1
+                    h = max_y - min_y + 1
+                    if w > 0 and h > 0:
+                        temp = pygame.Surface((w, h), pygame.SRCALPHA)
+                        offset_ext = [(x - min_x, y - min_y) for x, y in exterior]
+                        pygame.draw.polygon(temp, (*color, 255), offset_ext)
+                        hole_surf = pygame.Surface((w, h), pygame.SRCALPHA)
+                        for hr in inner_rings:
+                            offset_hr = [(x - min_x, y - min_y) for x, y in hr]
+                            pygame.draw.polygon(hole_surf, (0, 0, 0, 255), offset_hr)
+                        temp.blit(hole_surf, (0, 0), special_flags=pygame.BLEND_RGBA_SUB)
+                        surface.blit(temp, (min_x, min_y))
+                else:
+                    pygame.draw.polygon(surface, color, exterior, 0)
+            else:
+                for ring_pts in all_screen_rings:
+                    if len(ring_pts) >= 3:
+                        pygame.draw.polygon(surface, color, ring_pts, 1)
 
     def _draw_tile_grid(self, surface: pygame.Surface):
         grid_color = (100, 100, 100)
@@ -694,12 +719,12 @@ def main():
                     elif min_priority_slider_rect.collidepoint(mx, my):
                         # Set min priority from slider position
                         ratio = (mx - min_priority_slider_rect.x) / min_priority_slider_rect.width
-                        viewer.priority_filter_min = int(ratio * 15)
+                        viewer.priority_filter_min = round(ratio * 15)
                         need_redraw = True
                     elif max_priority_slider_rect.collidepoint(mx, my):
                         # Set max priority from slider position
                         ratio = (mx - max_priority_slider_rect.x) / max_priority_slider_rect.width
-                        viewer.priority_filter_max = int(ratio * 15)
+                        viewer.priority_filter_max = round(ratio * 15)
                         need_redraw = True
                     elif mx < VIEWPORT_SIZE and my < VIEWPORT_SIZE:
                         dragging = True

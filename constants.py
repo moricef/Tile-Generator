@@ -118,16 +118,17 @@ LINE_WIDTH_PER_ZOOM = {
     'living_street': {                                                    13: 2,  14: 3,  15: 4,  16: 6,  17: 12, 18: 14, 19: 18},
     'unclassified':  {                                            12: 2,  13: 2,  14: 4,  15: 4,  16: 6,  17: 12, 18: 14, 19: 18},
     'service':       {                                                    13: 2,  14: 2,  15: 2,  16: 4,  17: 6,  18: 8,  19: 10},
-    'track':         {                                                    15: 2,  16: 2,  17: 4,  18: 4,  19: 6},
+    'track':         {                                                                    15: 2,  16: 2,  17: 4,  18: 4,  19: 6},
     'footway':       {                                                    13: 2,  14: 2,  15: 2,  16: 2,  17: 2,  18: 2,  19: 2},
     'cycleway':      {                                                    13: 2,  14: 2,  15: 2,  16: 2,  17: 2,  18: 2,  19: 2},
     'path':          {                                                    13: 2,  14: 2,  15: 2,  16: 2,  17: 2,  18: 2,  19: 2},
-    'bridleway':     {                                                    13: 2,  14: 2,  15: 2,  16: 2},
+    'bridleway':     {                                                    13: 2,  14: 2,  15: 2,  16: 2,  17: 2,  18: 2,  19: 2},
     # Railway
     'rail':          {                     9: 2,  10: 2,  11: 2,  12: 2,  13: 2,  14: 2,  15: 2,  16: 3,  17: 3,  18: 4,  19: 6},
-    'tram':          {                                                                    15: 2,  16: 2},
-    'narrow_gauge':  {                                                    13: 2,  14: 2,  15: 2,  16: 3},
-    'funicular':     {                                                    13: 2,  14: 2,  15: 2,  16: 3},
+    'tram':          {                                                                    15: 2,  16: 2,  17: 2,  18: 3,  19: 4},
+    'narrow_gauge':  {                                                    13: 2,  14: 2,  15: 2,  16: 2,  17: 2,  18: 3,  19: 4},
+    'funicular':     {                                                    13: 2,  14: 2,  15: 2,  16: 2,  17: 2,  18: 3,  19: 4},
+    'cable_car':     {                                            12: 2,  13: 2,  14: 2,  15: 2,  16: 2,  17: 2,  18: 3,  19: 4},
     # Aeroway
     'runway':        {                                              12: 4,  13: 6,  14: 8,  15: 12, 16: 16, 17: 22, 18: 28},
     'taxiway':       {                                              12: 2,  13: 3,  14: 4,  15: 5,  16: 6,  17: 10, 18: 14},
@@ -199,7 +200,8 @@ LAYER_MAPPING = {
     'railways': [
         'railway=rail', 'railway=tram',
         'railway=abandoned', 'railway=disused', 'railway=funicular',
-        'railway=narrow_gauge', 'railway=platform'
+        'railway=narrow_gauge', 'railway=platform',
+        'aerialway=cable_car',
     ],
     'buildings': [
         'building', 'man_made=tower'
