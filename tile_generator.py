@@ -74,7 +74,6 @@ def _run_osm_passes(input_pbf, config, zoom_range):
     nlw = osmium.NodeLocationsForWays(idx)
     nlw.apply_nodes_to_ways = True
     osmium.apply(input_pbf, nlw, handler, area_manager.second_pass_handler(handler))
-    print()
 
     elapsed = time.time() - start_time
     logger.info(f"Processing completed in {elapsed:.2f}s")

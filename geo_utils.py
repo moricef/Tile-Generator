@@ -9,8 +9,7 @@ import logging
 from typing import Dict, List, Tuple, Set, Any, Optional
 
 try:
-    from shapely.geometry import Polygon
-    import shapely.wkb
+    import shapely
     SHAPELY_AVAILABLE = True
 except ImportError:
     SHAPELY_AVAILABLE = False

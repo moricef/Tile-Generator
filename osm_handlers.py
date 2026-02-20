@@ -24,7 +24,6 @@ from constants import (
     PLACE_NAME_BREAK_THRESHOLD, ROAD_LABEL_SPACING,
 )
 from geo_utils import (
-    SHAPELY_AVAILABLE,
     hex_to_rgb565, lighten_rgb565, darken_rgb565,
     pack_zoom_priority, get_layer_for_tags,
     get_zoom_for_tags, get_color_for_tags, get_nibble_for_tags,
@@ -413,10 +412,22 @@ class OSMHandler(osmium.SimpleHandler):
         self._create_road_label(coords, ref, old_ref, highway_type, color_rgb565)
 
     def _get_polygon_nibble(self, tags: Dict[str, str], layer: str) -> int:
-        """Determine z-order nibble for a polygon based on config, with dynamic overrides."""
-        nibble = get_nibble_for_tags(tags, self.config)
+        """Determine z-order nibble for a polygon based on its layer, with tag overrides."""
+        layer_to_nibble = {
+            'aeroways': 1,
+            'landuse': 2, 'terrain': 2,
+            'leisure': 4, 'amenities': 4,
+            'pitch': 5, 'surface': 5, 'parking': 5,
+            'infrastructure': 6,
+            'buildings': 7,
+            'water': 8,
+        }
+        nibble = layer_to_nibble.get(layer, 2)
 
-        # Bridge polygons render above water (nibble 9)
+        if tags.get('landuse') == 'cemetery' or tags.get('amenity') == 'grave_yard':
+            nibble = 4
+        if tags.get('leisure') == 'track':
+            nibble = 6
         if tags.get('bridge') in ('yes', 'viaduct') or tags.get('man_made') == 'bridge':
             nibble = 9
 

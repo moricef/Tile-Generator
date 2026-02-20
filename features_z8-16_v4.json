@@ -1,6 +1,5 @@
 {
-  "_comment": "Priority = rendering order. Lower = behind, higher = on top.",
-  "_layers": "landuse:20-27, terrain:30-39, water:40-45, railways:40-45, roads:50-58, infrastructure:60-65, buildings:70, amenities:85, places:90-95",
+  "_nibble_doc": "priority = z-order nibble 0-15. 1:aeroways 2:landuse/terrain 4:leisure/amenity 5:pitch/surface/parking 6:infrastructure 7:buildings 8:water 9-14:roads 15:rail/bridges",
   "landuse=forest": {
     "zoom": 8,
     "color": "#add19e",

@@ -7,12 +7,12 @@ Serializes features to .nav binary format: merge polygons, clip, project.
 import os
 import struct
 import logging
-from typing import Dict, List, Tuple
+from typing import Dict, List
 from collections import defaultdict
 
 from constants import (
     NAV_MAGIC, COORD_SCALE, LAND_BG_COLOR,
-    GEOM_POINT, GEOM_LINESTRING, GEOM_POLYGON, GEOM_TEXT,
+    GEOM_LINESTRING, GEOM_POLYGON, GEOM_TEXT,
     K_VISIBILITY, K_HOLE_FACTOR, LINE_WIDTH_PER_ZOOM,
     CLIP_MARGIN_POLYGON, CLIP_MARGIN_LINE, BRIDGE_DECK_COLOR,
 )
