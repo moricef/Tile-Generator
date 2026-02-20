@@ -154,7 +154,7 @@ LAYER_MAPPING = {
         'waterway=riverbank', 'waterway=dock', 'waterway=boatyard',
         'waterway=river', 'waterway=stream', 'waterway=canal',
         'waterway=ditch', 'waterway=drain',
-        'natural=spring', 'natural=wetland',
+        'natural=spring',
         'water=river', 'water=canal', 'water=reservoir', 'water=pond', 'water=lake', 'water=basin',
         'landuse=reservoir'
     ],
@@ -230,7 +230,8 @@ LAYER_MAPPING = {
         'natural=volcano', 'natural=cliff',
         'natural=tree_row', 'natural=tree',
         'natural=arete', 'natural=earth_bank',
-        'natural=shingle', 'natural=glacier'
+        'natural=shingle', 'natural=glacier',
+        'natural=wetland'
     ],
     'boundaries': [
         'boundary=administrative'

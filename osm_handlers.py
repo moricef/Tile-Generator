@@ -424,6 +424,8 @@ class OSMHandler(osmium.SimpleHandler):
         }
         nibble = layer_to_nibble.get(layer, 2)
 
+        if tags.get('natural') == 'wood' or tags.get('landuse') == 'forest':
+            nibble = 5
         if tags.get('landuse') == 'cemetery' or tags.get('amenity') == 'grave_yard':
             nibble = 4
         if tags.get('leisure') == 'track':

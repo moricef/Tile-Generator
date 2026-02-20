@@ -422,8 +422,8 @@
   },
   "natural=wetland": {
     "zoom": 11,
-    "color": "#add19e",
-    "priority": 8
+    "color": "#acd2bf",
+    "priority": 2
   },
   "natural=spring": {
     "zoom": 13,
