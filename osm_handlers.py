@@ -337,13 +337,7 @@ class OSMHandler(osmium.SimpleHandler):
         color_rgb565 = hex_to_rgb565(color)
 
         if is_closed and is_area_tags and 'highway' not in tags:
-            # This logic will be handled by area(), but we might catch some here.
-            # Assign a polygon nibble just in case.
-            nibble = 3 if layer == 'water' else 2
-
-            # Cemeteries render above base landuse (residential, farmland)
-            if tags.get('landuse') == 'cemetery' or tags.get('amenity') == 'grave_yard':
-                nibble = 4
+            nibble = self._get_polygon_nibble(tags, layer)
 
             subclass = tags.get('natural', '') or tags.get('landuse', '') or tags.get('leisure', '')
 
@@ -436,49 +430,112 @@ class OSMHandler(osmium.SimpleHandler):
         self.features.append(feature)
         self.stats['features_extracted'] += 1
 
-        # Create road number label for major roads with ref
-        # Display at z10: A* (autoroutes), N* (nationales), D1xxx with old_ref=N* (major former nationales)
-        if ref and highway_type in ('motorway', 'trunk', 'primary', 'secondary'):
-            # Filter by road number (ref), not highway_type:
-            # - A* : motorways (all)
-            # - N* : national roads (all)
-            # - D1000-D1999 : only major former national roads with old_ref=N* (e.g., D1124 was N124)
-            should_create_label = False
-            if ref.startswith('A') or ref.startswith('N'):
-                should_create_label = True
-            elif ref.startswith('D'):
-                # Extract number from D-road (e.g., "D1124" -> 1124)
-                try:
-                    d_number = int(ref[1:])
-                    # Only D1000-D1999 (major former nationales) with old_ref=N*
-                    if 1000 <= d_number <= 1999 and old_ref and old_ref.startswith('N'):
-                        should_create_label = True
-                except (ValueError, IndexError):
-                    pass  # Invalid D-road format, skip
+        self._create_road_label(coords, ref, old_ref, highway_type, color_rgb565)
 
-            if should_create_label:
-                self.road_label_counters[ref] += 1
-                if self.road_label_counters[ref] % ROAD_LABEL_SPACING == 1:
-                    # Generate 3 candidate positions (25%, 50%, 75%) for collision avoidance
-                    candidates = []
-                    for ratio in [0.25, 0.5, 0.75]:
-                        idx = int(len(coords) * ratio)
-                        candidates.append(coords[idx])
+    def _get_polygon_nibble(self, tags: Dict[str, str], layer: str) -> int:
+        """Determine z-order nibble for a polygon based on its layer and tags."""
+        layer_to_nibble = {
+            'aeroways': 1,
+            'landuse': 2, 'terrain': 2,
+            'leisure': 4, 'amenities': 4,
+            'pitch': 5, 'surface': 5, 'parking': 5,
+            'infrastructure': 6,
+            'buildings': 7,
+            'water': 8,
+        }
+        nibble = layer_to_nibble.get(layer, 2)
 
-                    ref_label = {
-                        'geom_type': GEOM_TEXT,
-                        'coords': [candidates[1]],
-                        'coords_candidates': candidates,
-                        'color_rgb565': darken_rgb565(color_rgb565),  # Text: dark
-                        'bg_color_rgb565': lighten_rgb565(color_rgb565),  # Background: light
-                        'border_color_rgb565': color_rgb565,  # Border: original
-                        'zoom_priority': pack_zoom_priority(10, 98),
-                        'font_size': 2,
-                        'text': ref.encode('utf-8')[:32],
-                        'population': 0,
-                    }
-                    self.features.append(ref_label)
-                    self.stats['features_extracted'] += 1
+        if tags.get('landuse') == 'cemetery' or tags.get('amenity') == 'grave_yard':
+            nibble = 4
+        if tags.get('leisure') == 'track':
+            nibble = 6
+        if tags.get('bridge') in ('yes', 'viaduct') or tags.get('man_made') == 'bridge':
+            nibble = 9
+
+        return nibble
+
+    def _build_area_geometry(self, a) -> List[Dict]:
+        """Extract polygon geometries from an osmium area object.
+
+        Returns list of dicts with 'coords' and 'inner_rings' keys.
+        """
+        wkb = self.wkbfab.create_multipolygon(a)
+        geom = shapely.wkb.loads(wkb, hex=True)
+        if not geom.is_valid:
+            geom = geom.buffer(0)
+            if geom.is_empty:
+                return []
+
+        polygons = []
+        if geom.geom_type == 'Polygon':
+            polygons = [geom]
+        elif geom.geom_type == 'MultiPolygon':
+            polygons = list(geom.geoms)
+
+        result = []
+        for poly in polygons:
+            if poly.is_empty or not poly.exterior:
+                continue
+            coords = list(poly.exterior.coords)
+            if len(coords) < 4:
+                continue
+
+            inner_rings = []
+            if poly.interiors:
+                for interior in poly.interiors:
+                    if len(interior.coords) >= 4:
+                        inner_rings.append(list(interior.coords))
+
+            result.append({'coords': coords, 'inner_rings': inner_rings})
+
+        return result
+
+    def _create_road_label(self, coords: List, ref: str, old_ref: str,
+                           highway_type: str, color_rgb565: int) -> bool:
+        """Create a road number label if the ref qualifies.
+
+        Returns True if a label was created.
+        """
+        if not ref or highway_type not in ('motorway', 'trunk', 'primary', 'secondary'):
+            return False
+
+        should_create = False
+        if ref.startswith('A') or ref.startswith('N'):
+            should_create = True
+        elif ref.startswith('D'):
+            try:
+                d_number = int(ref[1:])
+                if 1000 <= d_number <= 1999 and old_ref and old_ref.startswith('N'):
+                    should_create = True
+            except (ValueError, IndexError):
+                pass
+
+        if not should_create:
+            return False
+
+        self.road_label_counters[ref] += 1
+        if self.road_label_counters[ref] % ROAD_LABEL_SPACING != 1:
+            return False
+
+        candidates = []
+        for ratio in [0.25, 0.5, 0.75]:
+            idx = int(len(coords) * ratio)
+            candidates.append(coords[idx])
+
+        self.features.append({
+            'geom_type': GEOM_TEXT,
+            'coords': [candidates[1]],
+            'coords_candidates': candidates,
+            'color_rgb565': darken_rgb565(color_rgb565),
+            'bg_color_rgb565': lighten_rgb565(color_rgb565),
+            'border_color_rgb565': color_rgb565,
+            'zoom_priority': pack_zoom_priority(10, 98),
+            'font_size': 2,
+            'text': ref.encode('utf-8')[:32],
+            'population': 0,
+        })
+        self.stats['features_extracted'] += 1
+        return True
 
     def _get_width_meters(self, tags: Dict[str, str]) -> float:
         """Extract width in meters from OSM tags.
@@ -548,86 +605,36 @@ class OSMHandler(osmium.SimpleHandler):
             return
 
         try:
-            wkb = self.wkbfab.create_multipolygon(a)
-            geom = shapely.wkb.loads(wkb, hex=True)
-            if not geom.is_valid:
-                geom = geom.buffer(0)
-                if geom.is_empty:
-                    self.stats['area_exception'] += 1
-                    return
+            geom_parts = self._build_area_geometry(a)
+            if not geom_parts:
+                self.stats['area_exception'] += 1
+                return
 
-            # Fixed Z-order (nibble) for polygon layers
-            layer_to_nibble = {
-                'aeroways': 1,                   # Z=1: Airport base
-                'landuse': 2, 'terrain': 2,      # Z=2: Landcover (residential, forest, farmland)
-                'leisure': 4, 'amenities': 4,    # Z=4: Parks, recreation grounds, amenities
-                'pitch': 5,                      # Z=5: Pitches above recreation grounds
-                'surface': 5,                    # Z=5: Ground cover (grass, meadow) inside leisure zones
-                'parking': 5,                    # Z=5: Parking lots inside leisure zones
-                'infrastructure': 6,
-                'buildings': 7,                  # Z=7: Buildings (above infrastructure)
-                'water': 8,                      # Z=8: Water above all polygons, below roads (9+)
-            }
-            nibble = layer_to_nibble.get(layer, 2)
-
-            # Cemeteries render above base landuse (residential, farmland)
-            if tags.get('landuse') == 'cemetery' or tags.get('amenity') == 'grave_yard':
-                nibble = 4
-
-            # leisure=track renders above other leisure polygons (sports_centre background)
-            if tags.get('leisure') == 'track':
-                nibble = 6
-
-            # Bridge polygons render above water (nibble 8)
-            if tags.get('bridge') in ('yes', 'viaduct') or tags.get('man_made') == 'bridge':
-                nibble = 9
+            nibble = self._get_polygon_nibble(tags, layer)
 
             color = get_color_for_tags(tags, self.config)
             color_rgb565 = hex_to_rgb565(color)
 
-            # Force water color to ensure consistency, overriding JSON
             if layer == 'water':
                 color_rgb565 = hex_to_rgb565("#aad3df")
 
-            # Extract subclass for landcover discrimination (wood/forest vs farmland)
             subclass = tags.get('natural', '') or tags.get('landuse', '') or tags.get('leisure', '')
 
-            polygons = []
-            if geom.geom_type == 'Polygon':
-                polygons = [geom]
-            elif geom.geom_type == 'MultiPolygon':
-                polygons = list(geom.geoms)
-
-            for poly in polygons:
-                if poly.is_empty or not poly.exterior:
-                    continue
-                coords = list(poly.exterior.coords)
-                if len(coords) < 4:
-                    continue
-
-                inner_rings = []
-                if poly.interiors:
-                    for interior in poly.interiors:
-                        if len(interior.coords) >= 4:
-                            inner_rings.append(list(interior.coords))
-
-                feature_data = {
+            for part in geom_parts:
+                self.features.append({
                     'geom_type': GEOM_POLYGON,
-                    'coords': coords,
+                    'coords': part['coords'],
                     'color_rgb565': color_rgb565,
                     'zoom_priority': pack_zoom_priority(min_zoom, nibble),
                     'width_meters': 0.0,
-                    'inner_rings': inner_rings,
-                    'subclass': subclass,  # Store for merge logic
-                    'layer': layer,  # Store layer name for inner_rings handling
+                    'inner_rings': part['inner_rings'],
+                    'subclass': subclass,
+                    'layer': layer,
                     'is_building': layer == 'buildings',
                     'name': tags.get('name', ''),
-                }
-
-                self.features.append(feature_data)
+                })
                 self.stats['features_extracted'] += 1
         except Exception as e:
             self.stats['area_exception'] += 1
-            # Debug: log first 10 errors
             if self.stats['area_exception'] <= 10:
                 logger.warning(f"Area extraction failed: {e} | tags: {tags}")
