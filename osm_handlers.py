@@ -497,6 +497,14 @@ class OSMHandler(osmium.SimpleHandler):
         if self.road_label_counters[ref] % ROAD_LABEL_SPACING != 1:
             return False
 
+        label_index = self.road_label_counters[ref] // ROAD_LABEL_SPACING
+        if label_index % 3 == 0:
+            min_zoom = 10
+        elif label_index % 2 == 0:
+            min_zoom = 12
+        else:
+            min_zoom = 13
+
         candidates = []
         for ratio in [0.25, 0.5, 0.75]:
             idx = int(len(coords) * ratio)
@@ -509,7 +517,7 @@ class OSMHandler(osmium.SimpleHandler):
             'color_rgb565': darken_rgb565(color_rgb565),
             'bg_color_rgb565': lighten_rgb565(color_rgb565),
             'border_color_rgb565': color_rgb565,
-            'zoom_priority': pack_zoom_priority(10, 98),
+            'zoom_priority': pack_zoom_priority(min_zoom, 98),
             'font_size': 2,
             'text': ref.encode('utf-8')[:32],
             'population': 0,

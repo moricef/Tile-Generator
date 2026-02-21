@@ -39,7 +39,7 @@ K_HOLE_FACTOR = 10.0
 # Label layout
 LABEL_CHAR_WIDTH_PX = 7
 LABEL_HEIGHT_PX = 11
-ROAD_LABEL_SPACING = 25
+ROAD_LABEL_SPACING = 75
 PLACE_NAME_BREAK_THRESHOLD = 12
 
 # Population thresholds for place label priority
