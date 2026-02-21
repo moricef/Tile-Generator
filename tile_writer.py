@@ -392,6 +392,19 @@ def _clip_geometry(orig_coords, inner_rings, is_polygon, feature_layer, clip_box
         return [[orig_coords]]
 
 
+def _zigzag_encode(n: int) -> int:
+    return (n << 1) ^ (n >> 31)
+
+
+def _to_varint(value: int) -> bytearray:
+    out = bytearray()
+    while value >= 0x80:
+        out.append((value & 0x7F) | 0x80)
+        value >>= 7
+    out.append(value)
+    return out
+
+
 def _project_and_write(f, feature, feature_rings, is_polygon, feature_layer,
                        tile_bounds, merc_bounds, zoom):
     """Project rings to tile coordinates and write binary data.
@@ -472,26 +485,38 @@ def _project_and_write(f, feature, feature_rings, is_polygon, feature_layer,
     bx1, by1 = max(0, min(255, f_min_x >> 4)), max(0, min(255, f_min_y >> 4))
     bx2, by2 = max(0, min(255, f_max_x >> 4)), max(0, min(255, f_max_y >> 4))
 
+    coord_buffer = bytearray()
+    last_x, last_y = 0, 0
+    for ring in projected_rings:
+        for px, py in ring:
+            px_clamped = max(-32768, min(32767, px))
+            py_clamped = max(-32768, min(32767, py))
+            dx = px_clamped - last_x
+            dy = py_clamped - last_y
+            coord_buffer.extend(_to_varint(_zigzag_encode(dx)))
+            coord_buffer.extend(_to_varint(_zigzag_encode(dy)))
+            last_x, last_y = px_clamped, py_clamped
+
+    extra_payload = bytearray()
+    if is_polygon:
+        extra_payload.extend(struct.pack('<H', len(projected_rings)))
+        current_end = 0
+        for ring in projected_rings:
+            current_end += len(ring)
+            extra_payload.extend(struct.pack('<H', current_end))
+
+    payload_size = len(coord_buffer) + len(extra_payload)
+
     f.write(struct.pack('<B', feature['geom_type']))
     f.write(struct.pack('<H', feature['color_rgb565']))
     f.write(struct.pack('<B', feature['zoom_priority']))
     f.write(struct.pack('<B', width_byte))
     f.write(struct.pack('<BBBB', bx1, by1, bx2, by2))
     f.write(struct.pack('<H', total_points))
-    f.write(b'\x00')
+    f.write(struct.pack('<H', payload_size))
 
-    for ring in projected_rings:
-        for px, py in ring:
-            px_clamped = max(-32768, min(32767, px))
-            py_clamped = max(-32768, min(32767, py))
-            f.write(struct.pack('<hh', px_clamped, py_clamped))
-
-    if is_polygon:
-        f.write(struct.pack('<H', len(projected_rings)))
-        current_end = 0
-        for ring in projected_rings:
-            current_end += len(ring)
-            f.write(struct.pack('<H', current_end))
+    f.write(coord_buffer)
+    f.write(extra_payload)
 
     return 1, 0
 
@@ -555,17 +580,25 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
 
         # Background land polygon
         bg_points = [(0, 0), (4096, 0), (4096, 4096), (0, 4096), (0, 0)]
+        bg_coord_buf = bytearray()
+        bg_last_x, bg_last_y = 0, 0
+        for px, py in bg_points:
+            dx = px - bg_last_x
+            dy = py - bg_last_y
+            bg_coord_buf.extend(_to_varint(_zigzag_encode(dx)))
+            bg_coord_buf.extend(_to_varint(_zigzag_encode(dy)))
+            bg_last_x, bg_last_y = px, py
+        bg_extra = struct.pack('<H', 1) + struct.pack('<H', 5)
+        bg_payload_size = len(bg_coord_buf) + len(bg_extra)
         f.write(struct.pack('<B', GEOM_POLYGON))
         f.write(struct.pack('<H', hex_to_rgb565(LAND_BG_COLOR)))
         f.write(struct.pack('<B', pack_zoom_priority(0, 0)))
         f.write(struct.pack('<B', 1))
         f.write(struct.pack('<BBBB', 0, 0, 255, 255))
         f.write(struct.pack('<H', 5))
-        f.write(b'\x00')
-        for px, py in bg_points:
-            f.write(struct.pack('<hh', px, py))
-        f.write(struct.pack('<H', 1))
-        f.write(struct.pack('<H', 5))
+        f.write(struct.pack('<H', bg_payload_size))
+        f.write(bg_coord_buf)
+        f.write(bg_extra)
         written_features += 1
 
         for feature in features:
@@ -593,23 +626,25 @@ def write_nav_tile(features: List[Dict], output_path: str, zoom: int, tile_x: in
                 bx = max(0, min(255, px >> 4))
                 by = max(0, min(255, py >> 4))
 
+                text_payload = bytearray()
+                text_payload.extend(struct.pack('<hh', px, py))
+                text_payload.extend(struct.pack('<B', text_len))
+                text_payload.extend(text_bytes)
+                if has_shield:
+                    text_payload.extend(struct.pack('<H', feature['bg_color_rgb565']))
+                    text_payload.extend(struct.pack('<H', feature['border_color_rgb565']))
+                padding = padded_size - data_size
+                if padding > 0:
+                    text_payload.extend(b'\x00' * padding)
+
                 f.write(struct.pack('<B', GEOM_TEXT))
                 f.write(struct.pack('<H', feature['color_rgb565']))
                 f.write(struct.pack('<B', feature['zoom_priority']))
                 f.write(struct.pack('<B', feature.get('font_size', 0)))
                 f.write(struct.pack('<BBBB', bx, by, bx, by))
                 f.write(struct.pack('<H', coord_count))
-                f.write(struct.pack('<B', 1 if has_shield else 0))
-
-                f.write(struct.pack('<hh', px, py))
-                f.write(struct.pack('<B', text_len))
-                f.write(text_bytes)
-                if has_shield:
-                    f.write(struct.pack('<H', feature['bg_color_rgb565']))
-                    f.write(struct.pack('<H', feature['border_color_rgb565']))
-                padding = padded_size - data_size
-                if padding > 0:
-                    f.write(b'\x00' * padding)
+                f.write(struct.pack('<H', len(text_payload)))
+                f.write(text_payload)
 
                 written_features += 1
                 continue

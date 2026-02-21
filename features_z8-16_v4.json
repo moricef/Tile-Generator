@@ -58,7 +58,7 @@
   "landuse=commercial": {
     "zoom": 10,
     "color": "#f2dad9",
-    "priority": 2
+    "priority": 3
   },
   "landuse=garages": {
     "zoom": 12,
@@ -103,7 +103,7 @@
   "landuse=retail": {
     "zoom": 10,
     "color": "#ffd6d1",
-    "priority": 2
+    "priority": 3
   },
   "landuse=allotments": {
     "zoom": 10,

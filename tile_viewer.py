@@ -2,7 +2,7 @@
 """
 NAV Tile Viewer - ESP32 Map Simulator
 
-Displays NAV binary tiles using the optimized int16 relative coordinate format.
+Displays NAV binary tiles using the Delta+ZigZag+VarInt coordinate format.
 Simulates the ESP32 rendering pipeline in a 768x768 viewport.
 
 Usage:
@@ -112,6 +112,22 @@ class NavFeature:
         return rings
 
 
+def _zigzag_decode(n: int) -> int:
+    return (n >> 1) ^ -(n & 1)
+
+
+def _read_varint(buffer: bytes, offset: int) -> Tuple[int, int]:
+    result = 0
+    shift = 0
+    while True:
+        b = buffer[offset]
+        offset += 1
+        result |= (b & 0x7F) << shift
+        if not (b & 0x80):
+            return result, offset
+        shift += 7
+
+
 def read_nav_tile(path: str, tile_x: int, tile_y: int) -> List[NavFeature]:
     """Read optimized NAV tile file and return list of features with rings."""
     features = []
@@ -140,26 +156,32 @@ def read_nav_tile(path: str, tile_x: int, tile_y: int) -> List[NavFeature]:
 
                 feature.bbox = struct.unpack('<BBBB', f.read(4))
                 coord_count = struct.unpack('<H', f.read(2))[0]
-                f.read(1)
+                payload_size = struct.unpack('<H', f.read(2))[0]
+                payload = f.read(payload_size)
 
                 if feature.geom_type == GEOM_TEXT:
-                    # Read raw data block (coord_count * 4 bytes)
-                    data = f.read(coord_count * 4)
-                    if len(data) >= 5:
-                        px, py = struct.unpack('<hh', data[0:4])
+                    if len(payload) >= 5:
+                        px, py = struct.unpack('<hh', payload[0:4])
                         feature.coords.append((px, py))
-                        text_len = data[4]
-                        feature.text = data[5:5 + text_len].decode('utf-8', errors='replace')
+                        text_len = payload[4]
+                        feature.text = payload[5:5 + text_len].decode('utf-8', errors='replace')
                         feature.font_size = feature.width
                 else:
+                    offset = 0
+                    last_x, last_y = 0, 0
                     for _ in range(coord_count):
-                        px, py = struct.unpack('<hh', f.read(4))
-                        feature.coords.append((px, py))
+                        zx, offset = _read_varint(payload, offset)
+                        zy, offset = _read_varint(payload, offset)
+                        last_x += _zigzag_decode(zx)
+                        last_y += _zigzag_decode(zy)
+                        feature.coords.append((last_x, last_y))
 
                     if feature.geom_type == GEOM_POLYGON:
-                        ring_count = struct.unpack('<H', f.read(2))[0]
+                        ring_count = struct.unpack('<H', payload[offset:offset + 2])[0]
+                        offset += 2
                         for _ in range(ring_count):
-                            feature.ring_ends.append(struct.unpack('<H', f.read(2))[0])
+                            feature.ring_ends.append(struct.unpack('<H', payload[offset:offset + 2])[0])
+                            offset += 2
 
                 features.append(feature)
     except Exception as e:

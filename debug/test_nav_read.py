@@ -1,12 +1,32 @@
 #!/usr/bin/env python3
+"""Read a NAV tile (Delta+ZigZag+VarInt format) and print water polygon stats."""
+
 import struct
 import sys
+from typing import Tuple
 
 NAV_MAGIC = b'NAV1'
 GEOM_POINT = 1
 GEOM_LINESTRING = 2
 GEOM_POLYGON = 3
 GEOM_TEXT = 4
+
+
+def zigzag_decode(n: int) -> int:
+    return (n >> 1) ^ -(n & 1)
+
+
+def read_varint(buffer: bytes, offset: int) -> Tuple[int, int]:
+    result = 0
+    shift = 0
+    while True:
+        b = buffer[offset]
+        offset += 1
+        result |= (b & 0x7F) << shift
+        if not (b & 0x80):
+            return result, offset
+        shift += 7
+
 
 def read_nav_file(path):
     with open(path, 'rb') as f:
@@ -29,26 +49,32 @@ def read_nav_file(path):
             width_byte = struct.unpack('<B', f.read(1))[0]
             bbox = struct.unpack('<BBBB', f.read(4))
             coord_count = struct.unpack('<H', f.read(2))[0]
-            f.read(1)  # padding
+            payload_size = struct.unpack('<H', f.read(2))[0]
+            payload = f.read(payload_size)
 
-            # Read coords
             coords = []
             if geom_type == GEOM_TEXT:
-                # TEXT has different format: read entire data block
-                data = f.read(coord_count * 4)
-            else:
-                for _ in range(coord_count):
-                    px, py = struct.unpack('<hh', f.read(4))
+                if len(payload) >= 5:
+                    px, py = struct.unpack('<hh', payload[0:4])
                     coords.append((px, py))
+            else:
+                offset = 0
+                last_x, last_y = 0, 0
+                for _ in range(coord_count):
+                    zx, offset = read_varint(payload, offset)
+                    zy, offset = read_varint(payload, offset)
+                    last_x += zigzag_decode(zx)
+                    last_y += zigzag_decode(zy)
+                    coords.append((last_x, last_y))
 
-            # Read rings if polygon
             ring_ends = []
             if geom_type == GEOM_POLYGON:
-                ring_count = struct.unpack('<H', f.read(2))[0]
+                ring_count = struct.unpack('<H', payload[offset:offset + 2])[0]
+                offset += 2
                 for _ in range(ring_count):
-                    ring_ends.append(struct.unpack('<H', f.read(2))[0])
+                    ring_ends.append(struct.unpack('<H', payload[offset:offset + 2])[0])
+                    offset += 2
 
-            # Check if water (rgb565=0xae9b) and polygon
             if color_rgb565 == 0xae9b and geom_type == GEOM_POLYGON:
                 water_polygons.append({
                     'index': i,
