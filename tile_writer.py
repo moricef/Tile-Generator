@@ -273,7 +273,7 @@ def _generate_bridge_underlays(features, zoom):
                 'coords': list(deck.exterior.coords),
                 'inner_rings': [],
                 'color_rgb565': BRIDGE_COLOR_RGB565,
-                'zoom_priority': pack_zoom_priority(zoom, 15),
+                'zoom_priority': pack_zoom_priority(zoom, 14),
                 'layer': 'infrastructure',
                 '_bridge_underlay': True,
             })
