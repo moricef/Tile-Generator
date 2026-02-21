@@ -26,7 +26,7 @@ import math
 import time
 from typing import Dict, List, Tuple
 from collections import defaultdict
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 try:
     import osmium
@@ -52,24 +52,28 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
-def _run_osm_passes(input_pbf, config, zoom_range):
-    """Run boundary scan + feature extraction passes on the PBF file."""
-    start_time = time.time()
-
+def _run_boundary_scan(input_pbf, config, max_zoom):
+    """Run boundary scan pass on the PBF file. Returns boundary_ways dict."""
     logger.info("Pass 1: Scanning boundary relations...")
-    scanner = BoundaryScanner(config, zoom_range[1])
+    scanner = BoundaryScanner(config, max_zoom)
     scanner.apply_file(input_pbf)
     logger.info(f"  Boundary ways found: {len(scanner.boundary_ways):,}")
+    return scanner.boundary_ways
+
+
+def _run_feature_extraction(input_pbf, config, zoom_range, boundary_ways):
+    """Run feature extraction pass on the PBF file for a given zoom range."""
+    start_time = time.time()
 
     handler = OSMHandler(config, zoom_range)
-    handler.boundary_ways = scanner.boundary_ways
+    handler.boundary_ways = boundary_ways
 
     area_manager = osmium.area.AreaManager()
 
-    logger.info("Pass 2a: Scanning multipolygon relations...")
+    logger.info(f"Pass 2a: Scanning multipolygon relations (z{zoom_range[0]}-{zoom_range[1]})...")
     osmium.apply(input_pbf, area_manager.first_pass_handler())
 
-    logger.info("Pass 2b: Building areas and extracting features...")
+    logger.info(f"Pass 2b: Building areas and extracting features (z{zoom_range[0]}-{zoom_range[1]})...")
     idx = osmium.index.create_map('flex_mem')
     nlw = osmium.NodeLocationsForWays(idx)
     nlw.apply_nodes_to_ways = True
@@ -77,7 +81,7 @@ def _run_osm_passes(input_pbf, config, zoom_range):
 
     elapsed = time.time() - start_time
     logger.info(f"Processing completed in {elapsed:.2f}s")
-    logger.info(f"Statistics:")
+    logger.info(f"Statistics (z{zoom_range[0]}-{zoom_range[1]}):")
     logger.info(f"  Nodes (peaks): {handler.stats['nodes_processed'] - handler.stats['text_labels']:,}")
     logger.info(f"  Text labels (places): {handler.stats['text_labels']:,}")
     logger.info(f"  Ways processed: {handler.stats['ways_processed']:,}")
@@ -347,7 +351,7 @@ def _write_tile_band(tile_features, output_dir, zoom, min_tx, max_tx,
                 yield (features, tile_path, zoom, x, y, tolerance)
 
     job_iter = tile_job_iter()
-    with ProcessPoolExecutor(max_workers=num_workers) as executor:
+    with ThreadPoolExecutor(max_workers=num_workers) as executor:
         while True:
             batch = []
             for job in job_iter:
@@ -399,73 +403,93 @@ def convert_pbf_to_nav(input_pbf: str, output_dir: str, config_file: str,
 
     start_time = time.time()
 
-    handler = _run_osm_passes(input_pbf, config, zoom_range)
+    boundary_ways = _run_boundary_scan(input_pbf, config, zoom_range[1])
 
-    logger.info("Calculating bounding box from ALL features...")
-    min_lon, max_lon, min_lat, max_lat = _compute_feature_bbox(handler.features)
+    # Build zoom groups: low zooms together, high zooms individually
+    all_zooms = list(range(zoom_range[0], zoom_range[1] + 1))
+    zoom_groups = []
+    low_zooms = [z for z in all_zooms if z <= 10]
+    if low_zooms:
+        zoom_groups.append((low_zooms[0], low_zooms[-1]))
+    for z in all_zooms:
+        if z > 10:
+            zoom_groups.append((z, z))
+
+    logger.info(f"Zoom groups: {[(f'z{a}-{b}' if a != b else f'z{a}') for a, b in zoom_groups]}")
 
     logger.info("Generating NAV tile files...")
 
     total_tiles = 0
     total_size = 0
+    min_lon = max_lon = min_lat = max_lat = None
 
-    for zoom in range(zoom_range[0], zoom_range[1] + 1):
-        tolerance = get_simplify_tolerance(zoom)
-        zoom_start = time.time()
+    for group_min_zoom, group_max_zoom in zoom_groups:
+        handler = _run_feature_extraction(input_pbf, config, (group_min_zoom, group_max_zoom), boundary_ways)
 
-        min_tx = lon_to_tile_x(min_lon, zoom)
-        max_tx = lon_to_tile_x(max_lon, zoom)
-        min_ty = lat_to_tile_y(max_lat, zoom)
-        max_ty = lat_to_tile_y(min_lat, zoom)
+        # Compute bbox from the first group (which has all low-zoom features including boundaries)
+        if min_lon is None:
+            logger.info("Calculating bounding box from features...")
+            min_lon, max_lon, min_lat, max_lat = _compute_feature_bbox(handler.features)
 
-        total_y = max_ty - min_ty + 1
-        total_x = max_tx - min_tx + 1
-        num_tiles = total_x * total_y
-        if num_tiles <= 0:
-            print(f"\r  Zoom {zoom:2d}: No tiles to generate for this area.")
-            continue
+        for zoom in range(group_min_zoom, group_max_zoom + 1):
+            tolerance = get_simplify_tolerance(zoom)
+            zoom_start = time.time()
 
-        if num_tiles > BAND_THRESHOLD:
-            band_size = max(1, total_y // max(1, num_tiles // BAND_THRESHOLD))
-        else:
-            band_size = total_y
+            min_tx = lon_to_tile_x(min_lon, zoom)
+            max_tx = lon_to_tile_x(max_lon, zoom)
+            min_ty = lat_to_tile_y(max_lat, zoom)
+            max_ty = lat_to_tile_y(min_lat, zoom)
 
-        num_bands = (total_y + band_size - 1) // band_size
+            total_y = max_ty - min_ty + 1
+            total_x = max_tx - min_tx + 1
+            num_tiles = total_x * total_y
+            if num_tiles <= 0:
+                print(f"\r  Zoom {zoom:2d}: No tiles to generate for this area.")
+                continue
 
-        print(f"\r  Zoom {zoom:2d}: Preparing labels...", end='', flush=True)
-        placed_labels = _resolve_text_labels(handler.features, zoom)
+            if num_tiles > BAND_THRESHOLD:
+                band_size = max(1, total_y // max(1, num_tiles // BAND_THRESHOLD))
+            else:
+                band_size = total_y
 
-        tiles_written = 0
-        completed_ref = [0]
-        num_workers = min(os.cpu_count() or 1, MAX_WORKERS, num_tiles)
+            num_bands = (total_y + band_size - 1) // band_size
 
-        if num_bands > 1:
-            print(f"\n  Zoom {zoom:2d}: Processing {num_tiles:,} tiles in {num_bands} bands of ~{band_size} rows")
+            print(f"\r  Zoom {zoom:2d}: Preparing labels...", end='', flush=True)
+            placed_labels = _resolve_text_labels(handler.features, zoom)
 
-        for band_idx in range(num_bands):
-            band_min_ty = min_ty + band_idx * band_size
-            band_max_ty = min(min_ty + (band_idx + 1) * band_size - 1, max_ty)
+            tiles_written = 0
+            completed_ref = [0]
+            num_workers = min(os.cpu_count() or 1, MAX_WORKERS, num_tiles)
 
-            band_lat_max = tile_y_to_lat(max(0, band_min_ty - 1), zoom)
-            band_lat_min = tile_y_to_lat(band_max_ty + 2, zoom)
+            if num_bands > 1:
+                print(f"\n  Zoom {zoom:2d}: Processing {num_tiles:,} tiles in {num_bands} bands of ~{band_size} rows")
 
-            tile_features = _distribute_features_to_tiles(
-                handler.features, placed_labels, zoom,
-                band_min_ty, band_max_ty, band_lat_min, band_lat_max,
-                band_idx, num_bands)
+            for band_idx in range(num_bands):
+                band_min_ty = min_ty + band_idx * band_size
+                band_max_ty = min(min_ty + (band_idx + 1) * band_size - 1, max_ty)
 
-            band_written, band_size_bytes = _write_tile_band(
-                tile_features, output_dir, zoom, min_tx, max_tx,
-                band_min_ty, band_max_ty, tolerance, num_tiles,
-                num_workers, completed_ref)
+                band_lat_max = tile_y_to_lat(max(0, band_min_ty - 1), zoom)
+                band_lat_min = tile_y_to_lat(band_max_ty + 2, zoom)
 
-            tiles_written += band_written
-            total_size += band_size_bytes
-            tile_features.clear()
+                tile_features = _distribute_features_to_tiles(
+                    handler.features, placed_labels, zoom,
+                    band_min_ty, band_max_ty, band_lat_min, band_lat_max,
+                    band_idx, num_bands)
 
-        zoom_elapsed = time.time() - zoom_start
-        print(f"\r  Zoom {zoom:2d}: {tiles_written} tiles written. ({zoom_elapsed:.1f}s)" + " " * 20)
-        total_tiles += tiles_written
+                band_written, band_size_bytes = _write_tile_band(
+                    tile_features, output_dir, zoom, min_tx, max_tx,
+                    band_min_ty, band_max_ty, tolerance, num_tiles,
+                    num_workers, completed_ref)
+
+                tiles_written += band_written
+                total_size += band_size_bytes
+                tile_features.clear()
+
+            zoom_elapsed = time.time() - zoom_start
+            print(f"\r  Zoom {zoom:2d}: {tiles_written} tiles written. ({zoom_elapsed:.1f}s)" + " " * 20)
+            total_tiles += tiles_written
+
+        del handler
 
     total_time = time.time() - start_time
     hours, remainder = divmod(int(total_time), 3600)

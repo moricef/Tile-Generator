@@ -27,3 +27,7 @@ NAVMAP/
 output_test/
 output_vect/
 cpp_generator/
+CLAUDE.md
+Tile-Generator-Optimize/
+reference/
+viewer

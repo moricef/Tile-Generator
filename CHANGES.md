@@ -57,9 +57,25 @@ Changes:
 ### Binary Format Updates
 
 The NAV1 binary format is updated (see `docs/bin_tile_format.md`):
-- Feature header now 12 bytes (was 11) with alignment padding
-- Width field bit 7 reserved for building outline flag
+- **Delta+ZigZag+VarInt coordinate encoding** — Replaces fixed int16 pairs. Coordinates are delta-encoded, ZigZag-mapped, then VarInt-compressed, reducing tile sizes significantly
+- Feature header: 13 bytes with `payload_size` field (u16) replacing the old padding byte
+- Width field bit 7 reserved for building outline / bridge casing flag
 - Priority nibble used for z-ordering (was unused)
+
+### Rendering Improvements
+
+- **Bridge deck underlays** — Grey deck polygons generated under bridge segments, grouped by category (road/rail)
+- **4-pass bridge rendering** — At-grade casings → all features → bridge casings → bridge cores, ensuring bridges visually cross over at-grade roads
+- **Polygon hole rendering** — Inner rings correctly subtracted from exterior polygons (water islands, forest clearings)
+- **Road casing** — Two-pass rendering with darkened border for road width perception
+- **Building block merge** — Adjacent buildings merged into urban blocks at z14-15 via buffer/unbuffer
+- **Landuse z-order fix** — commercial/retail rendered above residential to prevent overlap
+
+### Validation
+
+- Roundtrip tests for ZigZag, VarInt, and delta encoding
+- Integration tests: write/read cycle for polygons (with holes), linestrings, text features, shields
+- Full generation validated: 6035 tiles, 1.38M features, 0 read errors
 
 ### Supporting Material
 
