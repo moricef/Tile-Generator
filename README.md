@@ -7,7 +7,7 @@ C++ toolset for generating optimized vector map tiles from OpenStreetMap PBF fil
 - **Pure Hilbert Indexing (New)**: Uses a space-filling curve for both data ordering and indexing, ensuring maximum spatial locality and optimized SD card seek patterns.
 - **Binary Tile Deduplication (New)**: Identifies identical tiles (e.g., land/ocean background) and reuses data blocks, significantly reducing final file size.
 - **High-Performance C++ Engine**: OSM PBF parsing and tile generation using GEOS, GDAL, and Libosmium.
-- **Efficient Binary Format**: Packed NPK2 containers with Delta+ZigZag+VarInt coordinate encoding.
+- **Efficient Binary Format**: Packed NPK3 containers with Delta+ZigZag+VarInt coordinate encoding.
 - **Memory-Mapped Storage**: Uses `mmap` for feature storage, allowing processing of large PBF files with minimal RAM.
 - **Multi-threaded Processing**: Parallel tile generation leveraging all available CPU cores.
 - **Z-Order Management**: 4-pass rendering pipeline supported in binary format.
@@ -19,7 +19,7 @@ The generator operates in multiple passes to ensure topological consistency and 
 1. **Pass 1 (Relations)**: Scans PBF for administrative boundaries and water multipolygons.
 2. **Pass 2 (Features)**: Extracts nodes and ways, applying semantic filtering and layer assignment.
 3. **Pass 3 (Water)**: Integrates global water polygons from external Shapefiles (using GDAL/OGR).
-4. **Pass 4 (Tiles)**: Parallel clipping, simplification (GEOS), and NPK2-Hilbert packaging.
+4. **Pass 4 (Tiles)**: Parallel clipping, simplification (GEOS), and NPK3-Hilbert packaging.
 
 ## Dependencies & Installation
 
@@ -79,7 +79,7 @@ python3 tile_viewer.py <output_dir> --lat <latitude> --lon <longitude> --config 
 
 ## Internal Format Details
 
-- **Container**: NPK2-Hilbert (Flat Hilbert Index).
+- **Container**: NPK3-Hilbert (Flat Hilbert Index).
 - **Internal Format**: NAV1 (Geometry + Text labels).
 - **Coordinates**: Web Mercator, 12-bit tile-relative space (0-4096).
 

@@ -1,8 +1,8 @@
 # NAV-PACK Format Specification (v0.5.0)
 
-This document describes the **NPK2** container format evolved with **Pure Hilbert Indexing**, a high-performance binary storage system for vector map tiles designed for ESP32-based GPS navigators.
+This document describes the **NPK3** container format evolved with **Pure Hilbert Indexing**, a high-performance binary storage system for vector map tiles designed for ESP32-based GPS navigators.
 
-NPK2-Hilbert optimizes SD card access by ordering tiles and indices along a space-filling curve, ensuring that geographically adjacent tiles are physically close in the binary file.
+NPK3-Hilbert optimizes SD card access by ordering tiles and indices along a space-filling curve, ensuring that geographically adjacent tiles are physically close in the binary file.
 
 ---
 
@@ -25,7 +25,7 @@ Each Pack file consists of: **Global Header** → **Hilbert Index Table** → **
 
 | Offset | Field          | Type      | Size  | Description                               |
 |--------|----------------|-----------|--------|-------------------------------------------|
-| 0      | magic          | bytes[4]  | 4      | "NPK2"                                    |
+| 0      | magic          | bytes[4]  | 4      | "NPK3"                                    |
 | 4      | zoom           | uint8     | 1      | Zoom level                                |
 | 5      | tile_count     | uint32    | 4      | Total number of tiles (LE)                |
 | 9      | index_offset   | uint32    | 4      | File offset to the Hilbert Index Table    |

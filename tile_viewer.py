@@ -362,11 +362,11 @@ class NAVViewer:
                 self._index_pack_file(full)
 
     def _index_pack_file(self, pack_path: str):
-        """Parse Pure Hilbert NPK2 pack header + index and store tile offsets."""
+        """Parse Pure Hilbert NPK3 pack header + index and store tile offsets (supports NPK2 for backward compatibility)."""
         try:
             with open(pack_path, 'rb') as f:
                 magic = f.read(4)
-                if magic != b'NPK2':
+                if magic not in (b'NPK2', b'NPK3'):
                     return
                 zoom = struct.unpack('<B', f.read(1))[0]
                 # Header: magic(4), zoom(1), count(4), index_off(4), reserved(16)

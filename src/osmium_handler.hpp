@@ -480,7 +480,7 @@ private:
         else if (layer == "pitch" || layer == "surface") nibble = 4;
         else if (layer == "infrastructure") nibble = 6;
         else if (layer == "buildings") nibble = 7;
-        else if (layer == "water") nibble = 7;
+        else if (layer == "water") nibble = 8;
 
         if (tags.count("landuse") && tags.at("landuse") == "commercial")
             nibble = 1;

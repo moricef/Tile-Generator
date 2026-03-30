@@ -23,7 +23,7 @@ const uint8_t GEOM_TEXT_LINE = 5;
 #pragma pack(push, 1)
 struct PackHeader
 {
-    char magic[4];    // "NPK2"
+    char magic[4];    // "NPK3" (Hilbert format v0.5)
     uint8_t zoom;
     uint32_t tile_count;
     uint32_t index_offset;   // file offset to tile index

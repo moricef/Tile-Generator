@@ -53,7 +53,7 @@ entry = index.get(h_id) # O(1) in Python dictionary / O(log N) on ESP32
 
 ## Sidebar Panels
 
-### NPK2 Optimization (New)
+### NPK3 Optimization (New)
 Displays the efficiency of the deduplication engine:
 - **Unique data**: Ratio of unique physical tiles to total logical tiles.
 - **Space savings**: Percentage of storage saved by reusing tile data.

@@ -636,7 +636,7 @@ private:
             }
 
             PackHeader ph;
-            memcpy(ph.magic, "NPK2", 4);
+            memcpy(ph.magic, "NPK3", 4);
             ph.zoom = (uint8_t)z;
             ph.tile_count = (uint32_t)index.size();
             ph.index_offset = index_offset;
