@@ -362,7 +362,7 @@ class NAVViewer:
                 self._index_pack_file(full)
 
     def _index_pack_file(self, pack_path: str):
-        """Parse Pure Hilbert NPK3 pack header + index and store tile offsets (supports NPK2 for backward compatibility)."""
+        """Parse Pure Hilbert NPK3 pack header + index and store tile offsets (NPK2 Y‑table format not supported)."""
         try:
             with open(pack_path, 'rb') as f:
                 magic = f.read(4)
